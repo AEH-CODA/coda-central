@@ -1,0 +1,591 @@
+input,output
+List all unique diagnosis names,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?diagnosisName
+WHERE {
+  ?diagnosis a ex:Diagnosis ;
+             rdfs:label ?diagnosisName .
+}
+"
+List all unique patients,"PREFIX ex: <http://example.org/>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?patient a ex:Patient .
+}
+"
+List all investigations,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?investigationName
+WHERE {
+  ?investigation a ex:Investigation ;
+                 rdfs:label ?investigationName .
+}"
+List all complaints,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?complaintName
+WHERE {
+  ?complaint a ex:Complaint ;
+             rdfs:label ?complaintName .
+}"
+List all patients who were diagnosed with PDR,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diagnosis .
+  ?diagnosis rdfs:label ?label .
+  FILTER (CONTAINS(?label, ""PDR""))
+}
+"
+List all patients who came with complaint of Post op Followup,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasComplaint ?complaint .
+  ?complaint rdfs:label ""Post op Followup"" .
+}
+"
+List all patients who went through OCT investigation,"SELECT DISTINCT ?patient
+WHERE {
+  ?visit a <http://example.org/Visit> ;
+         <http://example.org/hasPatient> ?patient ;
+         <http://example.org/hasInvestigation> ?investigation .
+  ?investigation <http://www.w3.org/2000/01/rdf-schema#label> ?label .
+  FILTER CONTAINS(?label, ""OCT"")
+}"
+List patients diagnosed with Dry AMD,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diagnosis .
+  ?diagnosis rdfs:label ?label .
+  FILTER (CONTAINS(?label, ""ARMD""))
+}"
+Show all patients with complaint of sudden vision loss,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasComplaint ?complaint .
+  ?complaint rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""sudden vision loss""))
+}
+"
+Retrieve all treatment plans for patients who complained of eye itching,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient ?treatmentPlan
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasComplaint ?complaint ;
+         ex:hasTreatmentPlan ?treatmentPlan .
+  ?complaint rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""eye itching""))
+}
+"
+Show the drugs prescribed to patients with Neovascular Glaucoma,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient ?drug
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diagnosis .
+    ?diagnosis rdfs:label ?label .
+  FILTER (
+    CONTAINS(LCASE(?label), ""neovascular"") &&
+    CONTAINS(LCASE(?label), ""glaucoma"")
+  )
+}"
+"Get all disease staging names (e.g., mild, moderate, severe) for Glaucoma",
+Find patients who were given Avastin,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:wasGivenDrug ?drug .
+  ?drug rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""avastin""))
+}"
+List all visits of patients who were diagnosed with BRVO and had complained of swelling and/or redness in the eye.,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?visit
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasComplaint ?complaint ;
+         ex:hasDiagnosis ?diagnosis .
+  ?complaint rdfs:label ?clabel .
+  ?diagnosis rdfs:label ?dlabel .
+  FILTER (CONTAINS(LCASE(?dlabel), ""brvo""))
+  FILTER (
+    CONTAINS(LCASE(?clabel), ""swelling"") ||
+    CONTAINS(LCASE(?clabel), ""redness"")
+  )
+}"
+"List all patients who had a complaint of “distorted central vision”, diagnosed with CNVM","PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasComplaint ?comp ;
+         ex:hasDiagnosis ?diag .
+  ?comp rdfs:label ?compLabel .
+  ?diag rdfs:label ?diagLabel .
+  FILTER (CONTAINS(LCASE(?compLabel), ""distorted central vision""))
+  FILTER (CONTAINS(LCASE(?diagLabel), ""cnvm""))
+}"
+List all patients under the age of 20 with IOP less than 15 mmHg,"PREFIX ex: <http://example.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT DISTINCT ?patient ?age ?iop
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasAge ?age ;
+         ex:hasIOP ?iop .
+  FILTER (xsd:decimal(?age) < 20 && xsd:decimal(?iop) < 15)
+}"
+List the IOP values of patients who have Glaucoma,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient ?iop
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag ;
+         ex:hasIOP ?iop .
+  ?diag rdfs:label ?diagLabel .
+  FILTER (CONTAINS(LCASE(?diagLabel), ""glaucoma""))
+}"
+Find patients with complaints of halos who underwent Gonioscopy,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasComplaint ?comp ;
+         ex:hasInvestigation ?inv .
+  ?comp rdfs:label ?compLabel .
+  ?inv rdfs:label ?invLabel .
+  FILTER (CONTAINS(LCASE(?compLabel), ""halos""))
+  FILTER (CONTAINS(LCASE(?invLabel), ""gonioscopy""))
+}"
+Find all visits this month with complaints involving night vision difficulty,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?visit ?date
+WHERE {
+  ?visit a ex:Visit ;
+         ex:visitDate ?date ;
+         ex:hasComplaint ?comp .
+  ?comp rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""night""))
+  FILTER (STRSTARTS(?date, ""2025-07""))  # adjust for current month
+}"
+List the symptoms of patients who underwent a Macular thickness scan,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?complaintLabel
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasInvestigation ?inv ;
+         ex:hasComplaint ?comp .
+  ?inv rdfs:label ?invLabel .
+  ?comp rdfs:label ?complaintLabel .
+  FILTER (CONTAINS(LCASE(?invLabel), ""macular thickness""))
+}"
+List all patients who went through Carotid doppler investigation,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?diagLabel .
+  FILTER (CONTAINS(LCASE(?diagLabel), ""cme""))
+}"
+List all patients who were diagnosed with CME,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?diagLabel .
+  FILTER (CONTAINS(LCASE(?diagLabel), ""cme""))
+}"
+List all patients who were diagnosed with Nuclear Sclerosis Grade-III,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?diagLabel .
+  FILTER (CONTAINS(LCASE(?diagLabel), ""nuclear sclerosis grade-iii""))
+}
+"
+List all patients who were diagnosed with Early Cataract,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?diagLabel .
+  FILTER (CONTAINS(LCASE(?diagLabel), ""early cataract""))
+}"
+List all patients who came with complaint of Foreign Body,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit a ex:Visit ;
+         ex:hasPatient ?patient ;
+         ex:hasComplaint ?comp .
+  ?comp rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""foreign body""))
+}"
+List all patients who were diagnosed with Mixed Retinopathy,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""mixed retinopathy""))
+}
+"
+List all patients who were diagnosed with NAAION- Non Arteritic Anterior Ischemic Optic Neuropathy,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""naaion""))
+}
+"
+List all patients who came with complaint of Checkup,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasComplaint ?comp .
+  ?comp rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""checkup""))
+}
+"
+List all patients who were diagnosed with NPDR Severe,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""npdr severe""))
+}
+"
+List all patients who were diagnosed with Retinal Detachment,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""retinal detachment""))
+}
+"
+List all patients who went through Central Fields investigation,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasInvestigation ?inv .
+  ?inv rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""central fields""))
+}
+"
+List all patients who went through Pre Fundus Photo TCNW400 investigation,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasInvestigation ?inv .
+  ?inv rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""central fields""))
+}"
+List all patients who came with complaint of Pain,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasInvestigation ?inv .
+  ?inv rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""central fields""))
+}
+"
+List all patients who were diagnosed with Blepharitis,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""blepharitis""))
+}
+"
+List all patients who went through HRT investigation,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasInvestigation ?inv .
+  ?inv rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""hrt""))
+}"
+List all patients who came with complaint of User Defined Complaints,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasComplaint ?comp .
+  ?comp rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""user defined complaints""))
+}"
+List all patients who were diagnosed with Pseudophakic Bullous Keratopathy,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""pseudophakic bullous keratopathy""))
+}"
+List all patients who were diagnosed with PACS- Primary Angle Closure Suspect,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""pacs""))
+}"
+List all patients who went through IOP investigation,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasInvestigation ?inv .
+  ?inv rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""iop""))
+}"
+List all patients who were diagnosed with Simple Myopia,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""simple myopia""))
+}"
+List all patients who were diagnosed with S/P VR Surgery,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""vr surgery""))
+}
+"
+List all patients who were diagnosed with RRD,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""rrd""))
+}"
+List all patients who were diagnosed with NPDR Mild,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""npdr mild""))
+}"
+List all patients who went through B Scan investigation,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasInvestigation ?inv .
+  ?inv rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""b scan""))
+}"
+Show all diagnoses made for patients with complaints of Defective Vision,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?diagnosisLabel
+WHERE {
+  ?visit ex:hasComplaint ?comp ;
+         ex:hasDiagnosis ?diag .
+  ?comp rdfs:label ?compLabel .
+  ?diag rdfs:label ?diagnosisLabel .
+  FILTER (CONTAINS(LCASE(?compLabel), ""defective vision""))
+}"
+List all patients who were diagnosed with S/P Intravitreal Injection,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""s/p intravitreal injection""))
+}"
+List all patients who went through CCT investigation,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasInvestigation ?inv .
+  ?inv rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""cct""))
+}"
+List all patients who went through Fundus Flourescein Angiography investigation,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasInvestigation ?inv .
+  ?inv rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""fundus flourescein angiography""))
+}"
+List all patients who were diagnosed with S/P PRP - Incomplete,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""prp - incomplete""))
+}
+"
+List all patients who were diagnosed with S/P PPV+SOI,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""ppv+soi""))
+}
+"
+List all patients who went through Echo Cardiogram investigation,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""s/p ppv+soi""))
+}
+"
+List all patients who were diagnosed with PDR- Proliferative Diabetic Retinopathy,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""diabetic""))
+}
+"
+List all patients who went through A-Scan investigation,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasDiagnosis ?diag .
+  ?diag rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""pdr""))
+}
+"
+List all patients who came with complaint of Head ache,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasComplaint ?comp .
+  ?comp rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""head ache""))
+}
+"
+List all patients who were diagnosed with PSCC- Posterior Subcapsular Cataract,"PREFIX ex: <http://example.org/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?patient
+WHERE {
+  ?visit ex:hasPatient ?patient ;
+         ex:hasComplaint ?comp .
+  ?comp rdfs:label ?label .
+  FILTER (CONTAINS(LCASE(?label), ""head ache""))
+}
+"
