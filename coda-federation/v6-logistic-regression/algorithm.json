@@ -1,0 +1,11 @@
+{
+    "name": "logistic-regression",
+    "image": "raru123/logistic-regression",
+    "input": [
+        {
+            "name": "method",
+            "type": "string",
+            "default": "logistic"
+        }
+    ]
+}

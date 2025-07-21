@@ -1,0 +1,36 @@
+{
+  "vantage6_version": "4.3",
+  "functions": [
+    {
+      "databases": [
+        {
+          "description": "CSV data to run logistic regression.",
+          "name": "CSV file"
+        }
+      ],
+      "description": "Performs logistic regression on the provided dataset.",
+      "name": "logistic",
+      "arguments": [],
+      "type": "local",
+      "ui_visualizations": [
+        {
+          "description": "Logistic regression accuracy result.",
+          "schema": {
+            "location": [
+              "accuracy"
+            ],
+            "columns": []
+          },
+          "name": "Model Accuracy",
+          "type": "value"
+        }
+      ]
+    }
+  ],
+  "partitioning": "horizontal",
+  "code_url": "https://github.com/lekhaabhi/vantage6demo",
+  "description": "Simple logistic regression using scikit-learn for binary classification.",
+  "name": "Logistic Regression",
+  "documentation_url": "",
+  "image": "docker.io/raru123/logistic-regression:latest"
+}
