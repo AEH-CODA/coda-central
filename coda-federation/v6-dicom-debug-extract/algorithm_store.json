@@ -1,0 +1,57 @@
+{
+    "vantage6_version": "4.3",
+    "functions": [
+        {
+            "databases": [
+                {
+                    "description": "Folder with DICOM files",
+                    "name": "DICOM Folder"
+                }
+            ],
+            "description": "Debug-enabled extractor for DICOM metadata with optional filtering.",
+            "name": "dicom_query",
+            "arguments": [
+                {
+                    "type": "string",
+                    "description": "DICOM field to filter by (optional)",
+                    "name": "query_field"
+                },
+                {
+                    "type": "string",
+                    "description": "Value of the field to match (optional)",
+                    "name": "query_value"
+                }
+            ],
+            "type": "central",
+            "ui_visualizations": [
+                {
+                    "description": "Extracted DICOM metadata table (with debug info).",
+                    "schema": {
+                        "location": [
+                            "dicom_metadata"
+                        ],
+                        "columns": [
+                            "Patient Scan Number",
+                            "Image Name",
+                            "SOPClassUID",
+                            "SeriesInstanceUID",
+                            "PatientID",
+                            "Modality",
+                            "AccessionNumber",
+                            "ManufacturerModelName",
+                            "ImageLaterality"
+                        ]
+                    },
+                    "name": "DICOM Metadata Table",
+                    "type": "table"
+                }
+            ]
+        }
+    ],
+    "partitioning": "horizontal",
+    "code_url": "https://github.com/lekhaabhi/v6-dicom-debug",
+    "description": "Extract DICOM metadata with debug logging for troubleshooting.",
+    "name": "DICOM Metadata Debug Extractor",
+    "documentation_url": "",
+    "image": "docker.io/raru123/dicom-debug-extract:latest"
+}

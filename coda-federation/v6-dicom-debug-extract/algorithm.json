@@ -1,0 +1,21 @@
+{
+    "name": "dicom-debug-extract",
+    "image": "your-dockerhub-username/dicom-debug-extract",
+    "input": [
+        {
+            "name": "method",
+            "type": "string",
+            "default": "dicom_query"
+        },
+        {
+            "name": "query_field",
+            "type": "string",
+            "description": "Optional DICOM field to filter by"
+        },
+        {
+            "name": "query_value",
+            "type": "string",
+            "description": "Value to match in the given field"
+        }
+    ]
+}
