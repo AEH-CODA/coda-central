@@ -1,0 +1,1053 @@
+{
+  "endpoint": "http://localhost:7200/repositories/userRepo/statements",
+  "database_name": "coda_db",
+  "variable_info": {
+    "anonymous_Uid": {
+      "predicate": "sio:SIO_000115",
+      "class": "ncit:C25364",
+      "local_definition": "A unique identifier for the patient, anonymized to protect privacy. This UID represents the patient's identification and is common across hospitals in the network. It is system generated and not visible to the patient or clinicians. ",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C28421",
+          "class_label": "Patient",
+          "aesthetic_label": "Patient Identification"
+        }
+      ]
+    },
+    "anonymous_mrno": {
+      "predicate": "sio:SIO_000115",
+      "class": "ncit:C25364",
+      "local_definition": "Anonymized medical record number of the patient. This number is specific to the patient's medical record number in the specific hospital and is used for tracking visits. It is visible to the users of the system and is used by clinicians to track visits, diagnosis, history etc of the patient. ",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C28421",
+          "class_label": "Patient",
+          "aesthetic_label": "Patient Identification"
+        }
+      ]
+    },
+    "sh_history_code": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C2991",
+      "local_definition": "The name of the disease as reported by the patient and noted in the systemic history during initial examination. ",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C19794",
+          "class_label": "Systemic History",
+          "aesthetic_label": "Systemic History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Diabetes": {
+            "target_class": "ncit:C2985"
+          },
+          "Hypertension": {
+            "target_class": "ncit:C3117"
+          },
+          "Cardiac": {
+            "target_class": "ncit:C3079"
+          },
+          "Asthma": {
+            "target_class": "ncit:C28566"
+          },
+          "Other Allergies": {
+            "target_class": "ncit:C26726"
+          },
+          "Non-Ocular Sx": {
+            "target_class": null
+          },
+          "GIT": {
+            "target_class": null
+          },
+          "Renal": {
+            "target_class": null
+          },
+          "RS": {
+            "target_class": null
+          },
+          "Others": {
+            "target_class": null
+          },
+          "GluacomaYoga": {
+            "target_class": null
+          },
+          "GluacomaDriving": {
+            "target_class": null
+          },
+          "FamilyH/O": {
+            "target_class": null
+          },
+          "GluacomaFamilyH/O": {
+            "target_class": null
+          },
+          "GluacomaFamilyH/OTxt1": {
+            "target_class": null
+          },
+          "GluacomaFamilyH/OTxt2": {
+            "target_class": null
+          },
+          "GluacomaFamilyH/OTxt3": {
+            "target_class": null
+          },
+          "Stroke": {
+            "target_class": null
+          },
+          "Ischemic heart disease": {
+            "target_class": null
+          },
+          "Bronchial Asthma": {
+            "target_class": null
+          },
+          "TB": {
+            "target_class": null
+          },
+          "Epilepsy": {
+            "target_class": null
+          },
+          "Renal failure": {
+            "target_class": null
+          },
+          "BowelBladder": {
+            "target_class": null
+          },
+          "Menstruation": {
+            "target_class": null
+          },
+          "MenstruationDays": {
+            "target_class": null
+          },
+          "SimilarComplaints": {
+            "target_class": null
+          },
+          "Sarcoid": {
+            "target_class": null
+          },
+          "Arthritis": {
+            "target_class": null
+          },
+          "Syphilis": {
+            "target_class": null
+          },
+          "Leprosy": {
+            "target_class": null
+          },
+          "Collagen vascular disease": {
+            "target_class": null
+          },
+          "Skin": {
+            "target_class": null
+          },
+          "Joints": {
+            "target_class": null
+          },
+          "GI": {
+            "target_class": null
+          },
+          "CNS": {
+            "target_class": null
+          },
+          "Pulmonary": {
+            "target_class": null
+          },
+          "Genitourinary": {
+            "target_class": null
+          },
+          "UveaFamilyHx": {
+            "target_class": null
+          },
+          "UveaFamilyHxOthers": {
+            "target_class": null
+          },
+          "UveaContactWith": {
+            "target_class": null
+          },
+          "UveaContactWithOthers": {
+            "target_class": null
+          },
+          "UveaBathIn": {
+            "target_class": null
+          },
+          "UveaDiet": {
+            "target_class": null
+          },
+          "UveaOthers": {
+            "target_class": null
+          },
+          "Hyperlipidemia": {
+            "target_class": null
+          },
+          "Epilepsy/Seizures": {
+            "target_class": null
+          },
+          "Any hospital admissions": {
+            "target_class": null
+          },
+          "Liver Problems": {
+            "target_class": null
+          },
+          "Renal Problems": {
+            "target_class": null
+          },
+          "Ear discharge": {
+            "target_class": null
+          },
+          "Skin lesions": {
+            "target_class": null
+          },
+          "Any oral steroids": {
+            "target_class": null
+          },
+          "Nocturnal cough": {
+            "target_class": null
+          },
+          "Frequent cold/cough": {
+            "target_class": null
+          },
+          "Congenital Heart problems": {
+            "target_class": null
+          },
+          "Do they see cardiologist regularly?": {
+            "target_class": null
+          },
+          "Have they had an ECHO?": {
+            "target_class": null
+          },
+          "How frequent is the occurrence of fits?": {
+            "target_class": null
+          },
+          "Date of last fits": {
+            "target_class": null
+          },
+          "Drug Allergies": {
+            "target_class": null
+          },
+          "Remarks": {
+            "target_class": null
+          },
+          "H/O COVID 19": {
+            "target_class": null
+          },
+          "H/O COVID VACCINE": {
+            "target_class": null
+          },
+          "Collagen vascular diseases": {
+            "target_class": null
+          },
+          "Hormonal therapy": {
+            "target_class": null
+          },
+          "Pregnancy": {
+            "target_class": null
+          },
+          "Lactation": {
+            "target_class": null
+          },
+          "Thyroid": {
+            "target_class": null
+          },
+          "ConcernOnVision": {
+            "target_class": null
+          },
+          "ConcernOnVisionYesOthers": {
+            "target_class": null
+          },
+          "ConceptionType": {
+            "target_class": null
+          },
+          "LowVisionSimilarComplaints": {
+            "target_class": null
+          },
+          "LowVisionSimilarComplaintsOthers": {
+            "target_class": null
+          },
+          "Keloid Tendency": {
+            "target_class": null
+          },
+          "Isotretinoin Therapy": {
+            "target_class": null
+          },
+          "PCOS / Irregular periods": {
+            "target_class": null
+          },
+          "Renal Disease": {
+            "target_class": null
+          },
+          "Liver Disease": {
+            "target_class": null
+          },
+          "Stroke/Neuro": {
+            "target_class": null
+          },
+          "Lungs Problem": {
+            "target_class": null
+          },
+          "Malignancy-site": {
+            "target_class": null
+          },
+          "Rheumatoid Arthritis": {
+            "target_class": null
+          }
+        }
+      }
+    },
+    "sh_duration": {
+      "predicate": "sio:SIO_000300",
+      "class": "ncit:C25377",
+      "local_definition": "The number of days, months or years which the patient has reported having the disease in the systemic history. Temporal field, but not Datetime.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C19794",
+          "class_label": "Systemic History",
+          "aesthetic_label": "Systemic History"
+        }
+      ]
+    },
+    "sh_prescription": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C28179",
+      "local_definition": "Denotes whether the disease reported in the systemic history is being treated via a prescription medicine. Boolean value, 0 or 1.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C19794",
+          "class_label": "Systemic History",
+          "aesthetic_label": "Systemic History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "0": {
+            "target_class": "ncit:C46098"
+          },
+          "1": {
+            "target_class": "ncit:C25463"
+          }
+        }
+      }
+    },
+    "sh_medicine": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C1909",
+      "local_definition": "The name of the medicine that is being used to treat the condition reported in the Systemic History. Located from a fixed vocabulary, but can also be mentioned in the drugdesc field.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C19794",
+          "class_label": "Systemic History",
+          "aesthetic_label": "Systemic History"
+        }
+      ]
+    },
+    "sh_non_ocular_sx": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C17173",
+      "local_definition": "Type of non ocular surgery done as part of systemic history",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C19794",
+          "class_label": "Systemic History",
+          "aesthetic_label": "Systemic History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Cardiothoracic surgery": {
+            "target_class": null
+          },
+          "Vascular surgery": {
+            "target_class": null
+          },
+          "Plastic surgery": {
+            "target_class": null
+          },
+          "Paediatric surgery": {
+            "target_class": null
+          },
+          "Colorectal surgery": {
+            "target_class": null
+          },
+          "Transplant surgery": {
+            "target_class": null
+          },
+          "Surgical oncology": {
+            "target_class": null
+          },
+          "Trauma surgery": {
+            "target_class": null
+          },
+          "Endocrine surgery": {
+            "target_class": null
+          },
+          "Breast surgery": {
+            "target_class": null
+          },
+          "Skin surgery": {
+            "target_class": null
+          },
+          "Hysterectomy": {
+            "target_class": null
+          }
+        }
+      }
+    },
+    "sh_non_ocular_sx_duration": {
+      "predicate": "sio:SIO_000300",
+      "class": "ncit:C25377",
+      "local_definition": "Number of days, months or years since the non ocular surgery.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C19794",
+          "class_label": "Systemic History",
+          "aesthetic_label": "Systemic History"
+        }
+      ]
+    },
+    "sh_other_allergies": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C26726",
+      "local_definition": "Patient allergy information",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C19794",
+          "class_label": "Systemic History",
+          "aesthetic_label": "Systemic History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Penicillin": {
+            "target_class": null
+          },
+          "Sulpha Drugs": {
+            "target_class": null
+          },
+          "Tropicamide+": {
+            "target_class": null
+          },
+          "Pupil will not dilate": {
+            "target_class": null
+          }
+        }
+      }
+    },
+    "sh_diabetes_control": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C25220",
+      "local_definition": "Method of control of diabetes. ",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C19794",
+          "class_label": "Systemic History",
+          "aesthetic_label": "Systemic History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Insulin": {
+            "target_class": null
+          },
+          "Tablets": {
+            "target_class": null
+          },
+          "Diet Control": {
+            "target_class": null
+          },
+          "Lifestyle Changes": {
+            "target_class": null
+          },
+          "Ayurveda": {
+            "target_class": null
+          },
+          "Homoeopathy": {
+            "target_class": null
+          }
+        }
+      }
+    },
+    "bh_consanguinous_parents": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C63764",
+      "local_definition": "Indicates whether the patient has consanguinous parents. If the value is non-null, indicates that there is consanguinity, and the value indicates the level of it. Note: Birth history is generally noted only for minor patients.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C178769",
+          "class_label": "Birth History",
+          "aesthetic_label": "Birth History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Other": {
+            "target_class": null
+          },
+          "First Cousins": {
+            "target_class": null
+          },
+          "Second Cousins": {
+            "target_class": null
+          },
+          "None": {
+            "target_class": null
+          }
+        }
+      }
+    },
+    "bh_gestation_period": {
+      "predicate": "sio:SIO_000300",
+      "class": "ncit:C92832",
+      "local_definition": "Gestation period at birth of the patient, indicates if it was a premature birth. Format #weeks.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C178769",
+          "class_label": "Birth History",
+          "aesthetic_label": "Birth History"
+        }
+      ]
+    },
+    "bh_mode_of_delivery": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C65207",
+      "local_definition": "Mode of delivery, whether C-section or natural birth of the patient.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C178769",
+          "class_label": "Birth History",
+          "aesthetic_label": "Birth History"
+        }
+      ]
+    },
+    "bh_birthweight": {
+      "predicate": "sio:SIO_000300",
+      "class": "ncit:C81328",
+      "local_definition": "Weight at birth noted as per the Birth History, of the patient. Format #lbs",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C178769",
+          "class_label": "Birth History",
+          "aesthetic_label": "Birth History"
+        }
+      ]
+    },
+    "oh_diagnosis": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C2991",
+      "local_definition": "Diagnosis made in the past.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C16612",
+          "class_label": "Ocular History",
+          "aesthetic_label": "Ocular History"
+        }
+      ]
+    },
+    "oh_diagnosis_date": {
+      "predicate": "sio:SIO_000369",
+      "class": "ncit:C25164",
+      "local_definition": "Date of diagnosis",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C16612",
+          "class_label": "Ocular History",
+          "aesthetic_label": "Ocular History"
+        }
+      ]
+    },
+    "oh_diagnosis_laterality": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C25341",
+      "local_definition": "Eye Laterality related to the diagnosis.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C16612",
+          "class_label": "Ocular History",
+          "aesthetic_label": "Ocular History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "OS": {
+            "target_class": "ncit:C12379"
+          },
+          "OU": {
+            "target_class": "ncit:C12380"
+          },
+          "OD": {
+            "target_class": "ncit:C12378"
+          }
+        }
+      }
+    },
+    "oh_procedure_type": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C25220",
+      "local_definition": "Procedure or surgery or medication taken in the past.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C16612",
+          "class_label": "Ocular History",
+          "aesthetic_label": "Ocular History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Injection": {
+            "target_class": null
+          },
+          "Surgery": {
+            "target_class": null
+          },
+          "Medication": {
+            "target_class": null
+          },
+          "Other": {
+            "target_class": null
+          }
+        }
+      }
+    },
+    "oh_procedure_name": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C21007",
+      "local_definition": "Name of past procedure, surgery, medication",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C16612",
+          "class_label": "Ocular History",
+          "aesthetic_label": "Ocular History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Accessible PRP": {
+            "target_class": null
+          },
+          "BARRAGE LASER": {
+            "target_class": null
+          },
+          "Conformer removal": {
+            "target_class": null
+          },
+          "Custom fit prosthesis fitting": {
+            "target_class": null
+          },
+          "Custom fit prosthesis polishing": {
+            "target_class": null
+          },
+          "Cyst needling": {
+            "target_class": null
+          },
+          "Facial prosthesis appointment": {
+            "target_class": null
+          },
+          "Facial prosthesis fitting": {
+            "target_class": null
+          },
+          "FB Removed Under Topical": {
+            "target_class": null
+          },
+          "FDS bolster removal": {
+            "target_class": null
+          },
+          "FIRST SITTING": {
+            "target_class": null
+          },
+          "Focal": {
+            "target_class": null
+          },
+          "Grid": {
+            "target_class": null
+          },
+          "IMP": {
+            "target_class": null
+          },
+          "Impression cytology": {
+            "target_class": null
+          },
+          "Inj. PST": {
+            "target_class": null
+          },
+          "Inj.Clendamycin": {
+            "target_class": null
+          },
+          "Intra Cameral Injection - Avastin": {
+            "target_class": null
+          },
+          "Intra Vireal Injection Methotraxate": {
+            "target_class": null
+          },
+          "Intra Vitreal Injection - Accentrix": {
+            "target_class": null
+          },
+          "Intra Vitreal Injection - Avastin": {
+            "target_class": null
+          },
+          "Intra Vitreal Injection - Eylea": {
+            "target_class": null
+          },
+          "Intra Vitreal Injection - Ganciclovir": {
+            "target_class": null
+          },
+          "Intra Vitreal Injection - Lucentis": {
+            "target_class": null
+          },
+          "Intra Vitreal Injection - Ozurdex": {
+            "target_class": null
+          },
+          "Intra Vitreal Injection - Pagenax": {
+            "target_class": null
+          },
+          "Intra Vitreal Injection - Ranieyes": {
+            "target_class": null
+          },
+          "Intra Vitreal Injection - Razumab": {
+            "target_class": null
+          },
+          "Intra Vitreal Injection - Tricot": {
+            "target_class": null
+          },
+          "Intra vitreal Injection Vabysmo": {
+            "target_class": null
+          },
+          "INTRA VITREAL RANIZUREL": {
+            "target_class": null
+          },
+          "Intracameral Inj": {
+            "target_class": null
+          },
+          "Intracameral Injection - Accentrix": {
+            "target_class": null
+          },
+          "Intracameral Injection - Eylea": {
+            "target_class": null
+          },
+          "Intracameral Injection - Lucentis": {
+            "target_class": null
+          },
+          "Intracameral Injection - Ozurdex": {
+            "target_class": null
+          },
+          "Intracameral Injection - Tricort": {
+            "target_class": null
+          },
+          "IntraVit Inj": {
+            "target_class": null
+          },
+          "Intravitreal Injection Actilyse": {
+            "target_class": null
+          },
+          "Intravitreal Injection LRP AFLI study": {
+            "target_class": null
+          },
+          "Intravitreal Injection Melphalan": {
+            "target_class": null
+          },
+          "Intravitreal injection TOPOTECAN": {
+            "target_class": null
+          },
+          "INTRAVITREAL INJECTION-OCEVA": {
+            "target_class": null
+          },
+          "Intravitreal Methyl Prednisolone": {
+            "target_class": null
+          },
+          "Irrigation- eye cleaning": {
+            "target_class": null
+          },
+          "LSL": {
+            "target_class": null
+          },
+          "Manual Epilation": {
+            "target_class": null
+          },
+          "New Custom fit prosthesis appointment": {
+            "target_class": null
+          },
+          "Pad and Bandage": {
+            "target_class": null
+          },
+          "Probing": {
+            "target_class": null
+          },
+          "PRP": {
+            "target_class": null
+          },
+          "PRP + Focal": {
+            "target_class": null
+          },
+          "PRP + Grid": {
+            "target_class": null
+          },
+          "Repeat yag PI": {
+            "target_class": null
+          },
+          "Retina Laser": {
+            "target_class": null
+          },
+          "Saline wash": {
+            "target_class": null
+          },
+          "Scleral Abscess": {
+            "target_class": null
+          },
+          "Selective Laser Trabeculoplasty": {
+            "target_class": null
+          },
+          "Socket cleaning": {
+            "target_class": null
+          },
+          "Stent removal": {
+            "target_class": null
+          },
+          "Stock shell prosthesis fitting": {
+            "target_class": null
+          },
+          "Stock shell prosthesis polishing": {
+            "target_class": null
+          },
+          "Supra Tarsal Injection": {
+            "target_class": null
+          },
+          "Supra Tarsal Injection with Tricort": {
+            "target_class": null
+          },
+          "Suture Removal \u2013 OP": {
+            "target_class": null
+          },
+          "TTT": {
+            "target_class": null
+          },
+          "Tube/ stent repositioning": {
+            "target_class": null
+          },
+          "Wound cleaning(Betadine)": {
+            "target_class": null
+          },
+          "YAG ANTERIOR CAPSULOTOMY-AEH": {
+            "target_class": null
+          },
+          "YAG ANTERIOR CAPSULOTOMY-Surgery Done at Outside": {
+            "target_class": null
+          },
+          "YAG Cap": {
+            "target_class": null
+          },
+          "YAG CAPSULOTOMY-Surgery Done at Outside": {
+            "target_class": null
+          },
+          "YAG ENLARGEMENT - AEH": {
+            "target_class": null
+          },
+          "YAG ENLARGEMENT-Surgery Done at Outside": {
+            "target_class": null
+          },
+          "YAG Hyaloidotomy": {
+            "target_class": null
+          },
+          "Yag Laser Synechiolysis": {
+            "target_class": null
+          },
+          "YAG MEMBRANALYSIS - AEH": {
+            "target_class": null
+          },
+          "YAG MEMBRANOLYSIS-Surgery Done at Outside": {
+            "target_class": null
+          },
+          "YAG Phimosis release - AEH": {
+            "target_class": null
+          },
+          "YAG Phimosis release - Surgery done at outside": {
+            "target_class": null
+          },
+          "YAG PI": {
+            "target_class": null
+          },
+          "Yag PI Enlargement": {
+            "target_class": null
+          },
+          "YAG PIGMENT DISPERSION/SWEEPING - AEH": {
+            "target_class": null
+          },
+          "YAG PIGMENT DISPERSION/SWEEPING- Sx Done Outside": {
+            "target_class": null
+          },
+          "YAG VITREOLYSIS - AEH": {
+            "target_class": null
+          },
+          "YAG VITREOLYSIS-Surgery Done at Outside": {
+            "target_class": null
+          }
+        }
+      }
+    },
+    "oh_procedure_date": {
+      "predicate": "sio:SIO_000369",
+      "class": "ncit:C25164",
+      "local_definition": "Date of past procedure, surgery or medication",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C16612",
+          "class_label": "Ocular History",
+          "aesthetic_label": "Ocular History"
+        }
+      ]
+    },
+    "oh_procedure_laterality": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C25341",
+      "local_definition": "Eye Laterality related to the procedure.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C16612",
+          "class_label": "Ocular History",
+          "aesthetic_label": "Ocular History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "OS": {
+            "target_class": "ncit:C12379"
+          },
+          "OU": {
+            "target_class": "ncit:C12380"
+          },
+          "OD": {
+            "target_class": "ncit:C12378"
+          }
+        }
+      }
+    },
+    "sch_consanginous_parents": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C63764",
+      "local_definition": "Indicates whether the patient has consanguinous parents. If the value is non-null, indicates that there is consanguinity, and the value indicates the grade.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C173522",
+          "class_label": "Social History",
+          "aesthetic_label": "Social History"
+        }
+      ]
+    },
+    "sch_marital_status": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C25188",
+      "local_definition": "Indicates the marital status of the patient. Values can be single, married, unreported.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C173522",
+          "class_label": "Social History",
+          "aesthetic_label": "Social History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Married": {
+            "target_class": "ncit:C25554"
+          },
+          "Single": {
+            "target_class": "ncit:C27954"
+          }
+        }
+      }
+    },
+    "sch_smoking": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C94226",
+      "local_definition": "Indicates the smoking habit of the patient. Its a temporal value. A null value indicates non smoker, and a non null indicates level of smoking: occasional, heavy or chain.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C173522",
+          "class_label": "Social History",
+          "aesthetic_label": "Social History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Occasional": {
+            "target_class": null
+          },
+          "Regular": {
+            "target_class": null
+          },
+          "Heavy": {
+            "target_class": null
+          }
+        }
+      }
+    },
+    "sch_alcohol": {
+      "predicate": "sio:SIO_000008",
+      "class": "ncit:C16680",
+      "local_definition": "Indicates the alcohol intake of the patient. A null value indicates no alcohol consumption, a non null value indicates level of consumption.",
+      "schema_reconstruction": [
+        {
+          "type": "class",
+          "predicate": "sio:SIO_000235",
+          "class": "ncit:C173522",
+          "class_label": "Social History",
+          "aesthetic_label": "Social History"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Occasional": {
+            "target_class": null
+          },
+          "Regular": {
+            "target_class": null
+          },
+          "Heavy": {
+            "target_class": null
+          }
+        }
+      }
+    }
+  }
+}
