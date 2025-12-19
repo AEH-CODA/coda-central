@@ -6,7 +6,7 @@ async function loadSemanticMap() {
   const headerMetaEl = document.getElementById("header-meta");
 
   try {
-    const res = await fetch("data_semantic_map.json");
+    const res = await fetch("data_semantic_map_full.json");
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
 
