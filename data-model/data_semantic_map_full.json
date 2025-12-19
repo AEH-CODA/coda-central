@@ -1,0 +1,4527 @@
+{
+  "endpoint": "http://localhost:7200/repositories/userRepo/statements",
+  "database_name": "coda_db",
+  "variable_info": {
+    "anonymous_Uid": {
+      "local_definition": "A unique identifier for the patient, anonymized to protect privacy. This UID represents the patient's identification and is common across hospitals in the network. It is system generated and not visible to the patient or clinicians. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Patient_Identification",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Patient_Identification"
+        },
+        {
+          "class_label": "Patient_Identification Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Patient_Identification Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "anonymous_mrno": {
+      "local_definition": "Anonymized medical record number of the patient. This number is specific to the patient's medical record number in the specific hospital and is used for tracking visits. It is visible to the users of the system and is used by clinicians to track visits, diagnosis, history etc of the patient. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Patient_Identification",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Patient_Identification"
+        },
+        {
+          "class_label": "Patient_Identification Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Patient_Identification Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "sh_history_code": {
+      "local_definition": "The name of the disease as reported by the patient and noted in the systemic history during initial examination. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Systemic History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History"
+        },
+        {
+          "class_label": "Systemic History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Diabetes": {
+            "target_class": "ncit:SH001"
+          },
+          "Hypertension": {
+            "target_class": "ncit:SH002"
+          },
+          "Cardiac": {
+            "target_class": "ncit:SH003"
+          },
+          "Asthma": {
+            "target_class": "ncit:SH004"
+          },
+          "Other Allergies": {
+            "target_class": "ncit:SH005"
+          },
+          "Non-Ocular Sx": {
+            "target_class": "ncit:SH006"
+          },
+          "GIT": {
+            "target_class": "ncit:SH007"
+          },
+          "Renal": {
+            "target_class": "ncit:SH008"
+          },
+          "RS": {
+            "target_class": "ncit:SH009"
+          },
+          "Others": {
+            "target_class": "ncit:SH010"
+          },
+          "GluacomaYoga": {
+            "target_class": "ncit:SH011"
+          },
+          "GluacomaDriving": {
+            "target_class": "ncit:SH012"
+          },
+          "FamilyH/O": {
+            "target_class": "ncit:SH013"
+          },
+          "GluacomaFamilyH/O": {
+            "target_class": "ncit:SH014"
+          },
+          "GluacomaFamilyH/OTxt1": {
+            "target_class": "ncit:SH015"
+          },
+          "GluacomaFamilyH/OTxt2": {
+            "target_class": "ncit:SH016"
+          },
+          "GluacomaFamilyH/OTxt3": {
+            "target_class": "ncit:SH017"
+          },
+          "Stroke": {
+            "target_class": "ncit:SH018"
+          },
+          "Ischemic heart disease": {
+            "target_class": "ncit:SH019"
+          },
+          "Bronchial Asthma": {
+            "target_class": "ncit:SH020"
+          },
+          "TB": {
+            "target_class": "ncit:SH021"
+          },
+          "Epilepsy": {
+            "target_class": "ncit:SH022"
+          },
+          "Renal failure": {
+            "target_class": "ncit:SH023"
+          },
+          "BowelBladder": {
+            "target_class": "ncit:SH024"
+          },
+          "Menstruation": {
+            "target_class": "ncit:SH025"
+          },
+          "MenstruationDays": {
+            "target_class": "ncit:SH026"
+          },
+          "SimilarComplaints": {
+            "target_class": "ncit:SH027"
+          },
+          "Sarcoid": {
+            "target_class": "ncit:SH028"
+          },
+          "Arthritis": {
+            "target_class": "ncit:SH029"
+          },
+          "Syphilis": {
+            "target_class": "ncit:SH030"
+          },
+          "Leprosy": {
+            "target_class": "ncit:SH031"
+          },
+          "Collagen vascular disease": {
+            "target_class": "ncit:SH032"
+          },
+          "Skin": {
+            "target_class": "ncit:SH033"
+          },
+          "Joints": {
+            "target_class": "ncit:SH034"
+          },
+          "GI": {
+            "target_class": "ncit:SH035"
+          },
+          "CNS": {
+            "target_class": "ncit:SH036"
+          },
+          "Pulmonary": {
+            "target_class": "ncit:SH037"
+          },
+          "Genitourinary": {
+            "target_class": "ncit:SH038"
+          },
+          "UveaFamilyHx": {
+            "target_class": "ncit:SH039"
+          },
+          "UveaFamilyHxOthers": {
+            "target_class": "ncit:SH040"
+          },
+          "UveaContactWith": {
+            "target_class": "ncit:SH041"
+          },
+          "UveaContactWithOthers": {
+            "target_class": "ncit:SH042"
+          },
+          "UveaBathIn": {
+            "target_class": "ncit:SH043"
+          },
+          "UveaDiet": {
+            "target_class": "ncit:SH044"
+          },
+          "UveaOthers": {
+            "target_class": "ncit:SH045"
+          },
+          "Hyperlipidemia": {
+            "target_class": "ncit:SH046"
+          },
+          "Epilepsy/Seizures": {
+            "target_class": "ncit:SH047"
+          },
+          "Any hospital admissions": {
+            "target_class": "ncit:SH048"
+          },
+          "Liver Problems": {
+            "target_class": "ncit:SH049"
+          },
+          "Renal Problems": {
+            "target_class": "ncit:SH050"
+          },
+          "Ear discharge": {
+            "target_class": "ncit:SH051"
+          },
+          "Skin lesions": {
+            "target_class": "ncit:SH052"
+          },
+          "Any oral steroids": {
+            "target_class": "ncit:SH053"
+          },
+          "Nocturnal cough": {
+            "target_class": "ncit:SH054"
+          },
+          "Frequent cold/cough": {
+            "target_class": "ncit:SH055"
+          },
+          "Congenital Heart problems": {
+            "target_class": "ncit:SH056"
+          },
+          "Do they see cardiologist regularly?": {
+            "target_class": "ncit:SH057"
+          },
+          "Have they had an ECHO?": {
+            "target_class": "ncit:SH058"
+          },
+          "How frequent is the occurrence of fits?": {
+            "target_class": "ncit:SH059"
+          },
+          "Date of last fits": {
+            "target_class": "ncit:SH060"
+          },
+          "Drug Allergies": {
+            "target_class": "ncit:SH061"
+          },
+          "Remarks": {
+            "target_class": "ncit:SH062"
+          },
+          "H/O COVID 19": {
+            "target_class": "ncit:SH063"
+          },
+          "H/O COVID VACCINE": {
+            "target_class": "ncit:SH064"
+          },
+          "Collagen vascular diseases": {
+            "target_class": "ncit:SH065"
+          },
+          "Hormonal therapy": {
+            "target_class": "ncit:SH066"
+          },
+          "Pregnancy": {
+            "target_class": "ncit:SH067"
+          },
+          "Lactation": {
+            "target_class": "ncit:SH068"
+          },
+          "Thyroid": {
+            "target_class": "ncit:SH069"
+          },
+          "ConcernOnVision": {
+            "target_class": "ncit:SH070"
+          },
+          "ConcernOnVisionYesOthers": {
+            "target_class": "ncit:SH071"
+          },
+          "ConceptionType": {
+            "target_class": "ncit:SH072"
+          },
+          "LowVisionSimilarComplaints": {
+            "target_class": "ncit:SH073"
+          },
+          "LowVisionSimilarComplaintsOthers": {
+            "target_class": "ncit:SH074"
+          },
+          "Keloid Tendency": {
+            "target_class": "ncit:SH075"
+          },
+          "Isotretinoin Therapy": {
+            "target_class": "ncit:SH076"
+          },
+          "PCOS / Irregular periods": {
+            "target_class": "ncit:SH077"
+          },
+          "Renal Disease": {
+            "target_class": "ncit:SH078"
+          },
+          "Liver Disease": {
+            "target_class": "ncit:SH079"
+          },
+          "Stroke/Neuro": {
+            "target_class": "ncit:SH080"
+          },
+          "Lungs Problem": {
+            "target_class": "ncit:SH081"
+          },
+          "Malignancy-site": {
+            "target_class": "ncit:SH082"
+          },
+          "Rheumatoid Arthritis": {
+            "target_class": "ncit:SH083"
+          }
+        }
+      }
+    },
+    "sh_duration": {
+      "local_definition": "The number of days, months or years which the patient has reported having the disease in the systemic history. Temporal field, but not Datetime.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Systemic History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History"
+        },
+        {
+          "class_label": "Systemic History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "sh_prescription": {
+      "local_definition": "Denotes whether the disease reported in the systemic history is being treated via a prescription medicine. Boolean value, 0 or 1.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Systemic History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History"
+        },
+        {
+          "class_label": "Systemic History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "sh_medicine": {
+      "local_definition": "The name of the medicine that is being used to treat the condition reported in the Systemic History. Located from a fixed vocabulary, but can also be mentioned in the drugdesc field.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Systemic History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History"
+        },
+        {
+          "class_label": "Systemic History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "sh_non_ocular_sx": {
+      "local_definition": "Type of non ocular surgery done as part of systemic history",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Systemic History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History"
+        },
+        {
+          "class_label": "Systemic History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "sh_non_ocular_sx_duration": {
+      "local_definition": "Number of days, months or years since the non ocular surgery.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Systemic History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History"
+        },
+        {
+          "class_label": "Systemic History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "sh_other_allergies": {
+      "local_definition": "Patient allergy information",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Systemic History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History"
+        },
+        {
+          "class_label": "Systemic History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Penicillin": {
+            "target_class": "ncit:SH096"
+          },
+          "Sulpha Drugs": {
+            "target_class": "ncit:SH097"
+          },
+          "Tropicamide+": {
+            "target_class": "ncit:SH098"
+          },
+          "Pupil will not dilate": {
+            "target_class": "ncit:SH099"
+          }
+        }
+      }
+    },
+    "sh_diabetes_control": {
+      "local_definition": "Method of control of diabetes. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Systemic History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History"
+        },
+        {
+          "class_label": "Systemic History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Systemic History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Insulin": {
+            "target_class": "ncit:SH100"
+          },
+          "Tablets": {
+            "target_class": "ncit:SH101"
+          },
+          "Diet Control": {
+            "target_class": "ncit:SH102"
+          },
+          "Lifestyle Changes": {
+            "target_class": "ncit:SH103"
+          },
+          "Ayurveda": {
+            "target_class": "ncit:SH104"
+          },
+          "Homoeopathy": {
+            "target_class": "ncit:SH105"
+          }
+        }
+      }
+    },
+    "bh_consanguinous_parents": {
+      "local_definition": "Indicates whether the patient has consanguinous parents. If the value is non-null, indicates that there is consanguinity, and the value indicates the level of it. Note: Birth history is generally noted only for minor patients.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Birth History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Birth History"
+        },
+        {
+          "class_label": "Birth History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Birth History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "bh_gestation_period": {
+      "local_definition": "Gestation period at birth of the patient, indicates if it was a premature birth. Format #weeks.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Birth History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Birth History"
+        },
+        {
+          "class_label": "Birth History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Birth History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "bh_mode_of_delivery": {
+      "local_definition": "Mode of delivery, whether C-section or natural birth of the patient.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Birth History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Birth History"
+        },
+        {
+          "class_label": "Birth History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Birth History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "bh_birthweight": {
+      "local_definition": "Weight at birth noted as per the Birth History, of the patient. Format #lbs",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Birth History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Birth History"
+        },
+        {
+          "class_label": "Birth History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Birth History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "oh_procedure_type": {
+      "local_definition": "Procedure or surgery or medication taken in the past.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Ocular History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Ocular History"
+        },
+        {
+          "class_label": "Ocular History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Ocular History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "oh_procedure_name": {
+      "local_definition": "Name of past procedure, surgery, medication",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Ocular History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Ocular History"
+        },
+        {
+          "class_label": "Ocular History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Ocular History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "oh_procedure_date": {
+      "local_definition": "Date of past procedure, surgery or medication",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Ocular History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Ocular History"
+        },
+        {
+          "class_label": "Ocular History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Ocular History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "oh_procedure_laterality": {
+      "local_definition": "Eye Laterality related to the procedure.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Ocular History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Ocular History"
+        },
+        {
+          "class_label": "Ocular History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Ocular History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "sch_consanginous_parents": {
+      "local_definition": "Indicates whether the patient has consanguinous parents. If the value is non-null, indicates that there is consanguinity, and the value indicates the grade.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Social History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Social History"
+        },
+        {
+          "class_label": "Social History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Social History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "sch_marital_status": {
+      "local_definition": "Indicates the marital status of the patient. Values can be single, married, unreported.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Social History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Social History"
+        },
+        {
+          "class_label": "Social History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Social History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Married": {
+            "target_class": "ncit:SCH001"
+          },
+          "Single": {
+            "target_class": "ncit:SCH002"
+          }
+        }
+      }
+    },
+    "sch_smoking": {
+      "local_definition": "Indicates the smoking habit of the patient. Its a temporal value. A null value indicates non smoker, and a non null indicates level of smoking: occasional, heavy or chain.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Social History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Social History"
+        },
+        {
+          "class_label": "Social History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Social History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Occasional": {
+            "target_class": "ncit:SCH003"
+          },
+          "Regular": {
+            "target_class": "ncit:SCH004"
+          },
+          "Heavy": {
+            "target_class": "ncit:SCH005"
+          }
+        }
+      }
+    },
+    "sch_alcohol": {
+      "local_definition": "Indicates the alcohol intake of the patient. A null value indicates no alcohol consumption, a non null value indicates level of consumption.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Social History",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Social History"
+        },
+        {
+          "class_label": "Social History Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Social History Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Occasional": {
+            "target_class": "ncit:SCH006"
+          },
+          "Regular": {
+            "target_class": "ncit:SCH007"
+          },
+          "Heavy": {
+            "target_class": "ncit:SCH008"
+          }
+        }
+      }
+    },
+    "peid": {
+      "local_definition": "Unique identifier for patient encounters or visits. A PE is a patient event, and it means a visit to the hospital, which can be a fresh visit, a routine followup or a visit for a procedure. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Visit Details",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Visit Details"
+        },
+        {
+          "class_label": "Visit Details Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Visit Details Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "pedate": {
+      "local_definition": "The date of the patient encounter or visit.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Visit Details",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Visit Details"
+        },
+        {
+          "class_label": "Visit Details Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Visit Details Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "purpose_of_visit": {
+      "local_definition": "Purpose of Visit",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Visit Details",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Visit Details"
+        },
+        {
+          "class_label": "Visit Details Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Visit Details Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Routine Check-up": {
+            "target_class": "ncit:PVT001"
+          },
+          "FollowUp": {
+            "target_class": "ncit:PVT002"
+          },
+          "Certificate": {
+            "target_class": "ncit:PVT003"
+          },
+          "Post-op Followup": {
+            "target_class": "ncit:PVT004"
+          },
+          "Review with Reports": {
+            "target_class": "ncit:PVT005"
+          },
+          "Review for Inv": {
+            "target_class": "ncit:PVT006"
+          }
+        }
+      }
+    },
+    "complaint_name": {
+      "local_definition": "A coded name for the patient complaint. The complaint is a set of vocabulary fields that are filled in the patient record by the initial examiner. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Complaint",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Complaint"
+        },
+        {
+          "class_label": "Complaint Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Complaint Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "laterality": {
+      "local_definition": "",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Treatment Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice"
+        },
+        {
+          "class_label": "Treatment Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "OS": {
+            "target_class": "ncit:LA001"
+          },
+          "OU": {
+            "target_class": "ncit:LA002"
+          },
+          "OD": {
+            "target_class": "ncit:LA003"
+          }
+        }
+      }
+    },
+    "sub_complaint": {
+      "local_definition": "There are further information points about each complaint. Further data points about the complaint. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Complaint",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Complaint"
+        },
+        {
+          "class_label": "Complaint Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Complaint Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "sub_complaint_value": {
+      "local_definition": "Each complaint_qualifier has a list of coded values. This field is filled from that list. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Complaint",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Complaint"
+        },
+        {
+          "class_label": "Complaint Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Complaint Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "complaint_duration": {
+      "local_definition": "A temporal value suggesting how many days, years or months the patient has had this complaint.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Complaint",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Complaint"
+        },
+        {
+          "class_label": "Complaint Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Complaint Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "as_part_name": {
+      "local_definition": "Part of the anterior segment this value refers to. Has fixed values in the vocabulary",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+        },
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Conjunctiva": {
+            "target_class": "ncit:AS001"
+          },
+          "Cornea": {
+            "target_class": "ncit:AS002"
+          },
+          "Anterior Chamber": {
+            "target_class": "ncit:AS003"
+          },
+          "Iris": {
+            "target_class": "ncit:AS004"
+          },
+          "Pupil": {
+            "target_class": "ncit:AS005"
+          },
+          "Lens": {
+            "target_class": "ncit:AS006"
+          },
+          "Corneal Reflex": {
+            "target_class": "ncit:AS007"
+          },
+          "Ocular Movements": {
+            "target_class": "ncit:AS008"
+          },
+          "Lid": {
+            "target_class": "ncit:AS009"
+          }
+        }
+      }
+    },
+    "as_laterality": {
+      "local_definition": "This field indicates the laterality of the eye this exam refers to.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+        },
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "as_finding": {
+      "local_definition": "Name of issue found in this part. Has fixed values in the vocabulary.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+        },
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Bleb": {
+            "target_class": "ncit:AS001-01"
+          },
+          "Chemosis": {
+            "target_class": "ncit:AS001-02"
+          },
+          "Concretions": {
+            "target_class": "ncit:AS001-03"
+          },
+          "Congestion": {
+            "target_class": "ncit:AS001-04"
+          },
+          "Corneo-Scleral Wound": {
+            "target_class": "ncit:AS001-05"
+          },
+          "Discharge": {
+            "target_class": "ncit:AS001-06"
+          },
+          "Episcleritis": {
+            "target_class": "ncit:AS001-07"
+          },
+          "Foreign Body": {
+            "target_class": "ncit:AS002-07"
+          },
+          "Lower Tarsal": {
+            "target_class": "ncit:AS001-09"
+          },
+          "Maggots": {
+            "target_class": "ncit:AS001-10"
+          },
+          "Membrane": {
+            "target_class": "ncit:AS001-11"
+          },
+          "Nodules": {
+            "target_class": "ncit:AS004-07"
+          },
+          "Palpebral": {
+            "target_class": "ncit:AS001-13"
+          },
+          "Phlycten": {
+            "target_class": "ncit:AS001-14"
+          },
+          "Pinguecula": {
+            "target_class": "ncit:AS001-15"
+          },
+          "Pterygium": {
+            "target_class": "ncit:AS001-16"
+          },
+          "Scarring": {
+            "target_class": "ncit:AS001-17"
+          },
+          "Scleral Thinning": {
+            "target_class": "ncit:AS001-18"
+          },
+          "Symblepheron": {
+            "target_class": "ncit:AS001-19"
+          },
+          "Tear": {
+            "target_class": "ncit:AS002-14"
+          },
+          "Upper Tarsal": {
+            "target_class": "ncit:AS001-21"
+          },
+          "Abrasion": {
+            "target_class": "ncit:AS002-01"
+          },
+          "Conjunctivalisation": {
+            "target_class": "ncit:AS002-02"
+          },
+          "Degeneration": {
+            "target_class": "ncit:AS002-03"
+          },
+          "Deposits": {
+            "target_class": "ncit:AS002-04"
+          },
+          "Dystrophy": {
+            "target_class": "ncit:AS002-05"
+          },
+          "Edema": {
+            "target_class": "ncit:AS009-08"
+          },
+          "Graft": {
+            "target_class": "ncit:AS002-08"
+          },
+          "Keratic Precipitates": {
+            "target_class": "ncit:AS002-09"
+          },
+          "Opacity": {
+            "target_class": "ncit:AS002-10"
+          },
+          "Pannus": {
+            "target_class": "ncit:AS002-11"
+          },
+          "Sensation": {
+            "target_class": "ncit:AS002-12"
+          },
+          "Staphyloma": {
+            "target_class": "ncit:AS002-13"
+          },
+          "Ulcer": {
+            "target_class": "ncit:AS009-30"
+          },
+          "Vascularization": {
+            "target_class": "ncit:AS002-16"
+          },
+          "Blood Clot": {
+            "target_class": "ncit:AS003-01"
+          },
+          "Cells": {
+            "target_class": "ncit:AS003-02"
+          },
+          "Depth": {
+            "target_class": "ncit:AS003-03"
+          },
+          "Flare": {
+            "target_class": "ncit:AS003-04"
+          },
+          "Haptic of PCIOL in the AC": {
+            "target_class": "ncit:AS003-05"
+          },
+          "Hyphema": {
+            "target_class": "ncit:AS003-06"
+          },
+          "Hypopyon": {
+            "target_class": "ncit:AS003-07"
+          },
+          "Lens matter in AC": {
+            "target_class": "ncit:AS003-08"
+          },
+          "Vitreous in the AC": {
+            "target_class": "ncit:AS003-09"
+          },
+          "Anterior Synechiae": {
+            "target_class": "ncit:AS004-01"
+          },
+          "Atrophy": {
+            "target_class": "ncit:AS004-02"
+          },
+          "Color": {
+            "target_class": "ncit:AS004-03"
+          },
+          "Cyst": {
+            "target_class": "ncit:AS004-04"
+          },
+          "Hole": {
+            "target_class": "ncit:AS004-05"
+          },
+          "Neovascularization": {
+            "target_class": "ncit:AS004-06"
+          },
+          "Pattern": {
+            "target_class": "ncit:AS004-08"
+          },
+          "Peripheral Anterior Synechiae": {
+            "target_class": "ncit:AS004-09"
+          },
+          "Peripheral Iridectomy": {
+            "target_class": "ncit:AS004-10"
+          },
+          "Posterior Synechiae": {
+            "target_class": "ncit:AS004-11"
+          },
+          "Sector Iridectomy": {
+            "target_class": "ncit:AS004-12"
+          },
+          "Optic Capture": {
+            "target_class": "ncit:AS005-01"
+          },
+          "RAPD": {
+            "target_class": "ncit:AS005-02"
+          },
+          "Reaction To Light": {
+            "target_class": "ncit:AS005-03"
+          },
+          "Shape": {
+            "target_class": "ncit:AS005-04"
+          },
+          "Size": {
+            "target_class": "ncit:AS005-05"
+          },
+          "Cataract": {
+            "target_class": "ncit:AS006-01"
+          },
+          "Ectopia Lentis": {
+            "target_class": "ncit:AS006-02"
+          },
+          "Nuclear Sclerosis": {
+            "target_class": "ncit:AS006-03"
+          },
+          "PCO": {
+            "target_class": "ncit:AS006-04"
+          },
+          "Pseudophakia": {
+            "target_class": "ncit:AS006-05"
+          },
+          "Subluxated": {
+            "target_class": "ncit:AS006-06"
+          },
+          "Esotropia": {
+            "target_class": "ncit:AS007-01"
+          },
+          "Exotropia": {
+            "target_class": "ncit:AS007-02"
+          },
+          "Nystagmus": {
+            "target_class": "ncit:AS008-01"
+          },
+          "Restricted": {
+            "target_class": "ncit:AS008-02"
+          },
+          "Bell's Phenomenon": {
+            "target_class": "ncit:AS009-01"
+          },
+          "Blepharitis": {
+            "target_class": "ncit:AS009-02"
+          },
+          "Chalazion": {
+            "target_class": "ncit:AS009-03"
+          },
+          "Coloboma": {
+            "target_class": "ncit:AS009-04"
+          },
+          "Congenital Distichiasis": {
+            "target_class": "ncit:AS009-05"
+          },
+          "Ecchymosis": {
+            "target_class": "ncit:AS009-06"
+          },
+          "Ectropion": {
+            "target_class": "ncit:AS009-07"
+          },
+          "Entropion": {
+            "target_class": "ncit:AS009-09"
+          },
+          "Hordeolum Internum": {
+            "target_class": "ncit:AS009-10"
+          },
+          "Hordeolum Interum": {
+            "target_class": "ncit:AS009-11"
+          },
+          "Hordeolum externum (stye)": {
+            "target_class": "ncit:AS009-12"
+          },
+          "Laceration": {
+            "target_class": "ncit:AS009-13"
+          },
+          "Lagophthalmos": {
+            "target_class": "ncit:AS009-14"
+          },
+          "Lid lag": {
+            "target_class": "ncit:AS009-15"
+          },
+          "Lid retraction": {
+            "target_class": "ncit:AS009-16"
+          },
+          "Madarosis": {
+            "target_class": "ncit:AS009-17"
+          },
+          "Matted Lashes": {
+            "target_class": "ncit:AS009-18"
+          },
+          "Meibomian Capping": {
+            "target_class": "ncit:AS009-19"
+          },
+          "Nodule": {
+            "target_class": "ncit:AS009-20"
+          },
+          "Normal": {
+            "target_class": "ncit:AS009-21"
+          },
+          "Poliosis": {
+            "target_class": "ncit:AS009-22"
+          },
+          "Pthriasis palpebrum": {
+            "target_class": "ncit:AS009-23"
+          },
+          "Ptosis": {
+            "target_class": "ncit:AS009-24"
+          },
+          "Pustule": {
+            "target_class": "ncit:AS009-25"
+          },
+          "Scar": {
+            "target_class": "ncit:AS009-26"
+          },
+          "Skin": {
+            "target_class": "ncit:AS009-27"
+          },
+          "Trichiasis": {
+            "target_class": "ncit:AS009-28"
+          },
+          "Tumour": {
+            "target_class": "ncit:AS009-29"
+          }
+        }
+      }
+    },
+    "as_value_1": {
+      "local_definition": "Further definition of the finding in terms of part, or the finding itself.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+        },
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "as_value_2": {
+      "local_definition": "Further definition of the finding. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+        },
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "as_value_3": {
+      "local_definition": "Numerical measure of the finding.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+        },
+        {
+          "class_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "fe_part_name": {
+      "local_definition": "Part of the fundus this refers to. Has fixed coded values in the values list. The values are 'Media', 'Disc', 'Vessels', 'Background Retina' and 'Macula/Foveal Reflex'.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Fundus Exam ( fe - refers to fundus examination )",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Fundus Exam ( fe - refers to fundus examination )"
+        },
+        {
+          "class_label": "Fundus Exam ( fe - refers to fundus examination ) Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Fundus Exam ( fe - refers to fundus examination ) Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Disc": {
+            "target_class": "ncit:F003"
+          },
+          "Vessels": {
+            "target_class": "ncit:F004"
+          },
+          "Media": {
+            "target_class": "ncit:F002"
+          },
+          "Background Retina": {
+            "target_class": "ncit:F005"
+          },
+          "Macula / Foveal Reflex": {
+            "target_class": "ncit:F006"
+          }
+        }
+      }
+    },
+    "fe_part_laterality": {
+      "local_definition": "This field indicates the laterality of the eye this exam refers to. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Fundus Exam ( fe - refers to fundus examination )",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Fundus Exam ( fe - refers to fundus examination )"
+        },
+        {
+          "class_label": "Fundus Exam ( fe - refers to fundus examination ) Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Fundus Exam ( fe - refers to fundus examination ) Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "fe_finding": {
+      "local_definition": "Name of issue found in this part. Has fixed values in the vocabulary for each one of the fundus parts. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Fundus Exam ( fe - refers to fundus examination )",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Fundus Exam ( fe - refers to fundus examination )"
+        },
+        {
+          "class_label": "Fundus Exam ( fe - refers to fundus examination ) Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Fundus Exam ( fe - refers to fundus examination ) Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Color": {
+            "target_class": "ncit:F003-01"
+          },
+          "cup disc ratio": {
+            "target_class": "ncit:F003-02"
+          },
+          "Arteriosclerotic Changes": {
+            "target_class": "ncit:F004-01"
+          },
+          "Deferred": {
+            "target_class": "ncit:F002-01"
+          },
+          "Hazy": {
+            "target_class": "ncit:F002-02"
+          },
+          "Disc pallor": {
+            "target_class": "ncit:F003-03"
+          },
+          "Margins": {
+            "target_class": "ncit:F003-04"
+          },
+          "Myelinated optic nerve head": {
+            "target_class": "ncit:F003-05"
+          },
+          "Neovascularization": {
+            "target_class": "ncit:F003-06"
+          },
+          "Neuroretinal rim thinning/loss": {
+            "target_class": "ncit:F003-07"
+          },
+          "Notching": {
+            "target_class": "ncit:F003-08"
+          },
+          "Shape": {
+            "target_class": "ncit:F003-09"
+          },
+          "Neovascularization(NVE)": {
+            "target_class": "ncit:F004-02"
+          },
+          "Vascular Occlusions": {
+            "target_class": "ncit:F004-03"
+          },
+          "ARMD": {
+            "target_class": "ncit:F005-01"
+          },
+          "BRAO": {
+            "target_class": "ncit:F005-02"
+          },
+          "BRVO": {
+            "target_class": "ncit:F005-03"
+          },
+          "Choroidal Detachment": {
+            "target_class": "ncit:F005-04"
+          },
+          "DR": {
+            "target_class": "ncit:F005-05"
+          },
+          "Exudates": {
+            "target_class": "ncit:F005-06"
+          },
+          "Haemorrhage": {
+            "target_class": "ncit:F005-07"
+          },
+          "PRP laser mark": {
+            "target_class": "ncit:F005-08"
+          },
+          "Retinal Detachment": {
+            "target_class": "ncit:F005-09"
+          },
+          "Absent": {
+            "target_class": "ncit:F006-01"
+          }
+        }
+      }
+    },
+    "fe_value_1": {
+      "local_definition": "This is the numerical value of the finding with a fixed vocabulary for each finding. Unit values are defined in the vocabulary for each finding.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Fundus Exam ( fe - refers to fundus examination )",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Fundus Exam ( fe - refers to fundus examination )"
+        },
+        {
+          "class_label": "Fundus Exam ( fe - refers to fundus examination ) Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Fundus Exam ( fe - refers to fundus examination ) Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Pink": {
+            "target_class": "ncit:F003-01-01"
+          },
+          "Hyperemic": {
+            "target_class": "ncit:F003-01-02"
+          },
+          "Pale": {
+            "target_class": "ncit:F003-04-01"
+          },
+          "0.2": {
+            "target_class": "ncit:F003-02-01"
+          },
+          "0.3": {
+            "target_class": "ncit:F003-02-02"
+          },
+          "Present": {
+            "target_class": "ncit:F004-01-01"
+          },
+          "Absent": {
+            "target_class": "ncit:F004-01-02"
+          },
+          "ACCO": {
+            "target_class": "ncit:F002-01-01"
+          },
+          "Small Pupil": {
+            "target_class": "ncit:F002-01-02"
+          },
+          "Corneal Edema": {
+            "target_class": "ncit:F002-02-01"
+          },
+          "Asteroid hyalosis": {
+            "target_class": "ncit:F002-02-02"
+          },
+          "Vitreous Haemorrhage": {
+            "target_class": "ncit:F002-02-03"
+          },
+          "Corneal Opacity": {
+            "target_class": "ncit:F002-02-04"
+          },
+          "Cataract": {
+            "target_class": "ncit:F002-02-05"
+          },
+          "PCO": {
+            "target_class": "ncit:F002-02-06"
+          },
+          "0.4": {
+            "target_class": "ncit:F003-02-03"
+          },
+          "0.5": {
+            "target_class": "ncit:F003-02-04"
+          },
+          "0.6": {
+            "target_class": "ncit:F003-02-05"
+          },
+          "0.7": {
+            "target_class": "ncit:F003-02-06"
+          },
+          "0.8": {
+            "target_class": "ncit:F003-02-07"
+          },
+          "0.9": {
+            "target_class": "ncit:F003-02-08"
+          },
+          "GOA": {
+            "target_class": "ncit:F003-02-09"
+          },
+          "Waxy pallor": {
+            "target_class": "ncit:F003-03-01"
+          },
+          "Chalky pallor": {
+            "target_class": "ncit:F003-03-02"
+          },
+          "Dirty pallor": {
+            "target_class": "ncit:F003-03-03"
+          },
+          "Blurred": {
+            "target_class": "ncit:F003-04-02"
+          },
+          "Superior": {
+            "target_class": "ncit:F005-08-01"
+          },
+          "Inferior": {
+            "target_class": "ncit:F005-08-02"
+          },
+          "Nasal": {
+            "target_class": "ncit:F003-08-03"
+          },
+          "Temporal": {
+            "target_class": "ncit:F003-08-04"
+          },
+          "Horizontaly Oval": {
+            "target_class": "ncit:F003-09-01"
+          },
+          "Verticaly Oval": {
+            "target_class": "ncit:F003-09-02"
+          },
+          "Size": {
+            "target_class": "ncit:F004-02-01"
+          },
+          "Quadrant": {
+            "target_class": "ncit:F004-02-02"
+          },
+          "Vein": {
+            "target_class": "ncit:F004-03-01"
+          },
+          "Artery": {
+            "target_class": "ncit:F004-03-02"
+          },
+          "Dry": {
+            "target_class": "ncit:F005-01-01"
+          },
+          "Wet": {
+            "target_class": "ncit:F005-01-02"
+          },
+          "Superior Temporal": {
+            "target_class": "ncit:F005-03-01"
+          },
+          "Inferior Temporal": {
+            "target_class": "ncit:F005-03-02"
+          },
+          "Superior Nasal": {
+            "target_class": "ncit:F005-03-03"
+          },
+          "Inferior Nasal": {
+            "target_class": "ncit:F005-03-04"
+          },
+          "Drusens": {
+            "target_class": "ncit:F005-04-01"
+          },
+          "Pigmentations": {
+            "target_class": "ncit:F005-04-02"
+          },
+          "Chorioretinal": {
+            "target_class": "ncit:F005-04-03"
+          },
+          "Choroidal Tears": {
+            "target_class": "ncit:F005-04-04"
+          },
+          "Intraocular foreign body": {
+            "target_class": "ncit:F005-04-05"
+          },
+          "Coloboma": {
+            "target_class": "ncit:F005-04-06"
+          },
+          "Tumors": {
+            "target_class": "ncit:F005-04-07"
+          },
+          "NPDR": {
+            "target_class": "ncit:F005-05-01"
+          },
+          "PDR": {
+            "target_class": "ncit:F005-05-02"
+          },
+          "Cotton wool spots": {
+            "target_class": "ncit:F005-06-01"
+          },
+          "Soft": {
+            "target_class": "ncit:F005-06-02"
+          },
+          "Hard Exudates": {
+            "target_class": "ncit:F006-01-08"
+          },
+          "Dot & blot": {
+            "target_class": "ncit:F005-07-01"
+          },
+          "Pre Retinal Haemorrhage": {
+            "target_class": "ncit:F005-07-02"
+          },
+          "Sub Retinal Haemorrhage": {
+            "target_class": "ncit:F005-07-03"
+          },
+          "Splinter": {
+            "target_class": "ncit:F005-07-04"
+          },
+          "Total": {
+            "target_class": "ncit:F005-09-01"
+          },
+          "Old": {
+            "target_class": "ncit:F005-09-02"
+          },
+          "Rhegmatogenous": {
+            "target_class": "ncit:F005-09-03"
+          },
+          "Tractional": {
+            "target_class": "ncit:F005-09-04"
+          },
+          "Combined": {
+            "target_class": "ncit:F005-09-05"
+          },
+          "Bullous": {
+            "target_class": "ncit:F005-09-06"
+          },
+          "Macula Holes": {
+            "target_class": "ncit:F006-01-01"
+          },
+          "ILM folds": {
+            "target_class": "ncit:F006-01-02"
+          },
+          "Edema": {
+            "target_class": "ncit:F006-01-03"
+          },
+          "Haemorrhage": {
+            "target_class": "ncit:F006-01-04"
+          },
+          "Dry ARMD": {
+            "target_class": "ncit:F006-01-05"
+          },
+          "Wet ARMD": {
+            "target_class": "ncit:F006-01-06"
+          },
+          "RPE Degeneration": {
+            "target_class": "ncit:F006-01-07"
+          },
+          "Others Specify": {
+            "target_class": "ncit:F006-01-09"
+          },
+          "CME": {
+            "target_class": "ncit:F006-01-10"
+          },
+          "CSME": {
+            "target_class": "ncit:F006-01-11"
+          },
+          "TRD": {
+            "target_class": "ncit:F006-01-12"
+          },
+          "CSR": {
+            "target_class": "ncit:F006-01-13"
+          },
+          "Macular Edema": {
+            "target_class": "ncit:F006-01-14"
+          },
+          "PED": {
+            "target_class": "ncit:F006-01-15"
+          },
+          "CNVM": {
+            "target_class": "ncit:F006-01-16"
+          },
+          "IJT": {
+            "target_class": "ncit:F006-01-17"
+          },
+          "ERM": {
+            "target_class": "ncit:F006-01-18"
+          },
+          "CR S": {
+            "target_class": "ncit:F006-01-19"
+          }
+        }
+      }
+    },
+    "fe_value_2": {
+      "local_definition": "Measure of the finding",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Fundus Exam ( fe - refers to fundus examination )",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Fundus Exam ( fe - refers to fundus examination )"
+        },
+        {
+          "class_label": "Fundus Exam ( fe - refers to fundus examination ) Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Fundus Exam ( fe - refers to fundus examination ) Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Central": {
+            "target_class": "ncit:F004-03-01-01"
+          },
+          "Branch": {
+            "target_class": "ncit:F004-03-01-02"
+          },
+          "Macular": {
+            "target_class": "ncit:F004-03-02-01"
+          },
+          "Cilioretinal": {
+            "target_class": "ncit:F004-03-02-02"
+          },
+          "Scars": {
+            "target_class": "ncit:F005-04-03-01"
+          },
+          "Degeneration": {
+            "target_class": "ncit:F005-04-03-02"
+          },
+          "Hemangioma": {
+            "target_class": "ncit:F005-04-07-01"
+          },
+          "Melacoma": {
+            "target_class": "ncit:F005-04-07-02"
+          },
+          "Retinoblastoma": {
+            "target_class": "ncit:F005-04-07-03"
+          },
+          "Others": {
+            "target_class": "ncit:F005-04-07-04"
+          },
+          "Mild": {
+            "target_class": "ncit:F005-05-02-01"
+          },
+          "Moderate": {
+            "target_class": "ncit:F005-05-02-02"
+          },
+          "Severe": {
+            "target_class": "ncit:F005-05-02-03"
+          },
+          "Tear": {
+            "target_class": "ncit:F005-09-03-01"
+          },
+          "Hole": {
+            "target_class": "ncit:F005-09-03-02"
+          }
+        }
+      }
+    },
+    "vision_glasses": {
+      "local_definition": "Does patient wear glasses. Yes/No.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Vision Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam"
+        },
+        {
+          "class_label": "Vision Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "vision_curr_glass_duration": {
+      "local_definition": "number of months since patient has been wearing glasses.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Vision Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam"
+        },
+        {
+          "class_label": "Vision Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "vision_type": {
+      "local_definition": "Corrected Vision ( Visual Acuity ) / Uncorrected Vision ( Visual Acuity) ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Vision Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam"
+        },
+        {
+          "class_label": "Vision Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Uncorrected V/A": {
+            "target_class": "ncit:VS001"
+          },
+          "Corrected V/A": {
+            "target_class": "ncit:VS002"
+          },
+          "V/A": {
+            "target_class": "ncit:VS003"
+          }
+        }
+      }
+    },
+    "vision_method_used_for_reading": {
+      "local_definition": "Method used for reading",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Vision Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam"
+        },
+        {
+          "class_label": "Vision Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "vision_type_of_chart": {
+      "local_definition": "Type of chart used to check vision ( Snellen/ Logmar)",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Vision Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam"
+        },
+        {
+          "class_label": "Vision Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Levalue": {
+      "local_definition": "Left eye vision value",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Vision Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam"
+        },
+        {
+          "class_label": "Vision Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Revalue": {
+      "local_definition": "Right eye vision value",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Vision Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam"
+        },
+        {
+          "class_label": "Vision Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vision Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "RESP_DV": {
+      "local_definition": "Right Eye Spherical Equivalent for distance vision, in diopters.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "RECY_DV": {
+      "local_definition": "Right Eye Cylinder value for distance vision, indicating astigmatism.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "REAxis_DV": {
+      "local_definition": "Right Eye Axis for distance vision, indicating the orientation of astigmatism in degrees (D)",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "REVA_DV": {
+      "local_definition": "Right Eye Visual Acuity for distance vision.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Rephva_DV": {
+      "local_definition": "Right Eye Presenting Visual Acuity for distance vision.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "REBCVA_DV": {
+      "local_definition": "Left Eye Best Corrected Visual Acuity for distance vision.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "LESP_DV": {
+      "local_definition": "Left Eye Spherical Equivalent for distance vision.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "LECY_DV": {
+      "local_definition": "Left Eye Cylinder value for distance vision, indicating astigmatism.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "LEAxis_DV": {
+      "local_definition": "Left Eye Axis for distance vision, indicating the orientation of astigmatism.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "LEVA_DV": {
+      "local_definition": "Left Eye Visual Acuity for distance vision.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "LEPhva_DV": {
+      "local_definition": "Left Eye Presenting Visual Acuity for distance vision.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Leucva_DV": {
+      "local_definition": "Left Eye best Corrected Visual Acuity for distance vision.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "REMPD_DV": {
+      "local_definition": "Right Eye Mean Pupil Diameter for distance vision measure in mm.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "LEMPD_DV": {
+      "local_definition": "Left Eye Mean Pupil Diameter for distance vision.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refraction Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam"
+        },
+        {
+          "class_label": "Refraction Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refraction Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "BPCystole": {
+      "local_definition": "Systolic blood pressure measurement  in mm Hg at the time of examination.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Vitals Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vitals Exam"
+        },
+        {
+          "class_label": "Vitals Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vitals Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "BPDiastole": {
+      "local_definition": "Diastolic blood pressure measurement  in mm Hg at the time of examination.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Vitals Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vitals Exam"
+        },
+        {
+          "class_label": "Vitals Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vitals Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "BSStatus": {
+      "local_definition": "Blood sugar status or level at the time of examination in mg/dL",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Vitals Exam",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vitals Exam"
+        },
+        {
+          "class_label": "Vitals Exam Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Vitals Exam Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "investigation_name": {
+      "local_definition": "Name of the investigation performed. Codes from a vocabulary",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Investigation advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice"
+        },
+        {
+          "class_label": "Investigation advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "IOP": {
+            "target_class": "ncit:IV001"
+          },
+          "Duct LE": {
+            "target_class": "ncit:IV002"
+          },
+          "Blood Pressure": {
+            "target_class": "ncit:IV003"
+          },
+          "Blood Sugar": {
+            "target_class": "ncit:IV004"
+          },
+          "Refraction": {
+            "target_class": "ncit:IV005"
+          },
+          "Dilate RR": {
+            "target_class": "ncit:IV006"
+          },
+          "Colour Vision": {
+            "target_class": "ncit:IV007"
+          },
+          "BSV": {
+            "target_class": "ncit:IV008"
+          },
+          "Schirmer's 1 test": {
+            "target_class": "ncit:IV009"
+          },
+          "Schirmer's 2 test": {
+            "target_class": "ncit:IV010"
+          },
+          "Muscle Balance": {
+            "target_class": "ncit:IV011"
+          },
+          "Dilate": {
+            "target_class": "ncit:IV012"
+          },
+          "Duct": {
+            "target_class": "ncit:IV013"
+          },
+          "GDX": {
+            "target_class": "ncit:IV014"
+          },
+          "Culture": {
+            "target_class": "ncit:IV015"
+          },
+          "Repeat RR": {
+            "target_class": "ncit:IV016"
+          },
+          "Pulse": {
+            "target_class": "ncit:IV017"
+          },
+          "Resp Rate": {
+            "target_class": "ncit:IV018"
+          },
+          "PMT": {
+            "target_class": "ncit:IV019"
+          },
+          "Dilate Fundus": {
+            "target_class": "ncit:IV020"
+          },
+          "SPO2": {
+            "target_class": "ncit:IV021"
+          },
+          "CCT": {
+            "target_class": "ncit:IV022"
+          },
+          "Central Fields": {
+            "target_class": "ncit:IV023"
+          },
+          "A-Scan-Test": {
+            "target_class": "ncit:IV024"
+          },
+          "Axial length": {
+            "target_class": "ncit:IV025"
+          },
+          "Roplas": {
+            "target_class": "ncit:IV026"
+          },
+          "Corrected IOP": {
+            "target_class": "ncit:IV027"
+          },
+          "K Reading": {
+            "target_class": "ncit:IV028"
+          },
+          "Repeat Vision": {
+            "target_class": "ncit:IV029"
+          },
+          "PH Vision": {
+            "target_class": "ncit:IV030"
+          },
+          "Temperature": {
+            "target_class": "ncit:IV031"
+          },
+          "Weight": {
+            "target_class": "ncit:IV032"
+          },
+          "Height": {
+            "target_class": "ncit:IV033"
+          },
+          "MPH Vision": {
+            "target_class": "ncit:IV034"
+          },
+          "Squint Evaluation": {
+            "target_class": "ncit:IV035"
+          },
+          "Paretic Squint Evaluation": {
+            "target_class": "ncit:IV036"
+          },
+          "BVA": {
+            "target_class": "ncit:IV037"
+          },
+          "Nystagmus": {
+            "target_class": "ncit:IV038"
+          },
+          "Patch Test": {
+            "target_class": "ncit:IV039"
+          },
+          "Stereopsis": {
+            "target_class": "ncit:IV040"
+          },
+          "Verion-Arcuate Incision": {
+            "target_class": "ncit:IV041"
+          },
+          "Vision with CL": {
+            "target_class": "ncit:IV042"
+          },
+          "Horizontal Corneal Diameter": {
+            "target_class": "ncit:IV043"
+          },
+          "Measure of Cup Disc Ratio": {
+            "target_class": "ncit:IV044"
+          }
+        }
+      }
+    },
+    "investigation_laterality": {
+      "local_definition": "Laterality of the eye the investigation was performed on.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Investigation advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice"
+        },
+        {
+          "class_label": "Investigation advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "ocular_nonocular": {
+      "local_definition": "Indicates whether this is an ocular investigation or not. Examples of non ocular investigations are Blood Pressure measurement.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Investigation advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice"
+        },
+        {
+          "class_label": "Investigation advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Ocular": {
+            "target_class": "ncit:IV044-01"
+          },
+          "Non Ocular": {
+            "target_class": "ncit:IV042-01"
+          }
+        }
+      }
+    },
+    "investigation_date": {
+      "local_definition": "Date and time when the investigation was performed",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Investigation advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice"
+        },
+        {
+          "class_label": "Investigation advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "investigation_result_numeric": {
+      "local_definition": "Numeric values from the investigation ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Investigation advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice"
+        },
+        {
+          "class_label": "Investigation advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "investigation_result_unit": {
+      "local_definition": "Unit of the numeric value",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Investigation advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice"
+        },
+        {
+          "class_label": "Investigation advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "mm of Hg": {
+            "target_class": "ncit:IV027-02"
+          },
+          "mm Hg": {
+            "target_class": "ncit:IV003-02"
+          },
+          "mg%": {
+            "target_class": "ncit:IV004-02"
+          },
+          "mm": {
+            "target_class": "ncit:IV044-02"
+          },
+          ".": {
+            "target_class": "ncit:IV026-02"
+          },
+          "/ min": {
+            "target_class": "ncit:IV018-02"
+          },
+          "%": {
+            "target_class": "ncit:IV021-02"
+          },
+          "\u00b5": {
+            "target_class": "ncit:IV022-02"
+          },
+          "D": {
+            "target_class": "ncit:IV028-02"
+          },
+          "\u2109": {
+            "target_class": "ncit:IV031-02"
+          },
+          "Kg": {
+            "target_class": "ncit:IV032-02"
+          },
+          "cm": {
+            "target_class": "ncit:IV033-02"
+          },
+          "\u1d52": {
+            "target_class": "ncit:IV041-02"
+          }
+        }
+      }
+    },
+    "investigation_result_desc": {
+      "local_definition": "Textual interpretation of a result",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Investigation advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice"
+        },
+        {
+          "class_label": "Investigation advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Investigation advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "special_investigation_name": {
+      "local_definition": "Name of the investigation performed. These are mostly imaging studies.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Special Investigation advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Special Investigation advice"
+        },
+        {
+          "class_label": "Special Investigation advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Special Investigation advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Fundus Photo": {
+            "target_class": "ncit:SI001"
+          },
+          "HFA": {
+            "target_class": "ncit:SI002"
+          },
+          "HRT": {
+            "target_class": "ncit:SI003"
+          },
+          "FFA": {
+            "target_class": "ncit:SI004"
+          },
+          "OCT": {
+            "target_class": "ncit:SI005"
+          },
+          "A-Scan": {
+            "target_class": "ncit:SI006"
+          },
+          "Amsler Chart": {
+            "target_class": "ncit:SI007"
+          },
+          "Clinical Photographs": {
+            "target_class": "ncit:SI008"
+          },
+          "Hess chart": {
+            "target_class": "ncit:SI009"
+          },
+          "Diplopia chart": {
+            "target_class": "ncit:SI010"
+          },
+          "Ultra Sound": {
+            "target_class": "ncit:SI011"
+          },
+          "ECG": {
+            "target_class": "ncit:SI012"
+          },
+          "ERG": {
+            "target_class": "ncit:SI013"
+          },
+          "EOG": {
+            "target_class": "ncit:SI014"
+          },
+          "VEP": {
+            "target_class": "ncit:SI015"
+          },
+          "MFERG": {
+            "target_class": "ncit:SI016"
+          },
+          "B Scan": {
+            "target_class": "ncit:SI017"
+          },
+          "UBM": {
+            "target_class": "ncit:SI018"
+          },
+          "Pentacam": {
+            "target_class": "ncit:SI019"
+          },
+          "Confocal Microscopy": {
+            "target_class": "ncit:SI020"
+          },
+          "AS OCT": {
+            "target_class": "ncit:SI021"
+          },
+          "Specular Microscopy": {
+            "target_class": "ncit:SI022"
+          },
+          "Orbscan": {
+            "target_class": "ncit:SI023"
+          },
+          "Orbsscan with I Design": {
+            "target_class": "ncit:SI024"
+          },
+          "XRay": {
+            "target_class": "ncit:SI025"
+          },
+          "Corneal Scrapping": {
+            "target_class": "ncit:SI026"
+          },
+          "Keratoconus": {
+            "target_class": "ncit:SI027"
+          },
+          "Postop iTrace": {
+            "target_class": "ncit:SI028"
+          },
+          "iTrace": {
+            "target_class": "ncit:SI029"
+          },
+          "MRI": {
+            "target_class": "ncit:SI030"
+          },
+          "Carotid doppler": {
+            "target_class": "ncit:SI031"
+          },
+          "Echo Cardiogram": {
+            "target_class": "ncit:SI032"
+          },
+          "XRay Chest PA view": {
+            "target_class": "ncit:SI033"
+          },
+          "Verion": {
+            "target_class": "ncit:SI034"
+          },
+          "CT Scan": {
+            "target_class": "ncit:SI035"
+          },
+          "MRA": {
+            "target_class": "ncit:SI036"
+          },
+          "Optos": {
+            "target_class": "ncit:SI037"
+          },
+          "Microperimetry": {
+            "target_class": "ncit:SI038"
+          },
+          "Meibography": {
+            "target_class": "ncit:SI039"
+          },
+          "ICG": {
+            "target_class": "ncit:SI040"
+          },
+          "Retina Photograph": {
+            "target_class": "ncit:SI041"
+          },
+          "Pathology": {
+            "target_class": "ncit:SI042"
+          },
+          "Clarus": {
+            "target_class": "ncit:SI043"
+          },
+          "Slit Lamp Photo": {
+            "target_class": "ncit:SI044"
+          },
+          "Ultra Sound Abdomen": {
+            "target_class": "ncit:SI045"
+          },
+          "Covid Photo": {
+            "target_class": "ncit:SI046"
+          },
+          "FFA and ICG": {
+            "target_class": "ncit:SI047"
+          },
+          "OCT ANGIO": {
+            "target_class": "ncit:SI048"
+          },
+          "Autofluorescence": {
+            "target_class": "ncit:SI049"
+          },
+          "Pre Auto Refraction VRF100": {
+            "target_class": "ncit:SI050"
+          },
+          "Pre Fundus Photo TCNW400": {
+            "target_class": "ncit:SI051"
+          },
+          "Fundus Crystal Vue": {
+            "target_class": "ncit:SI052"
+          },
+          "Post Fundus Photo TCNW400": {
+            "target_class": "ncit:SI053"
+          },
+          "Pre External Photo TCNW400": {
+            "target_class": "ncit:SI054"
+          },
+          "Post External Photo TCNW400": {
+            "target_class": "ncit:SI055"
+          },
+          "Corneal Topography": {
+            "target_class": "ncit:SI056"
+          },
+          "Aberrometry": {
+            "target_class": "ncit:SI057"
+          },
+          "Indirect Ophthalmoscopy": {
+            "target_class": "ncit:SI058"
+          },
+          "Cycloplegic refraction": {
+            "target_class": "ncit:SI059"
+          },
+          "Auto Refractometry": {
+            "target_class": "ncit:SI060"
+          },
+          "Dry Eye Workup": {
+            "target_class": "ncit:SI061"
+          },
+          "Topolyzer": {
+            "target_class": "ncit:SI062"
+          },
+          "Pre External RE MOBILE": {
+            "target_class": "ncit:SI063"
+          },
+          "Pre External LE MOBILE": {
+            "target_class": "ncit:SI064"
+          },
+          "Myopia": {
+            "target_class": "ncit:SI065"
+          }
+        }
+      }
+    },
+    "eye_laterality": {
+      "local_definition": "This field indicates the laterality of the eye this exam refers to. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Study",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study"
+        },
+        {
+          "class_label": "OCT Study Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "special_investigation_date": {
+      "local_definition": "Date and time when the investigation was performed",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Special Investigation advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Special Investigation advice"
+        },
+        {
+          "class_label": "Special Investigation advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Special Investigation advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "special_investigation_id": {
+      "local_definition": "Scan_id ( Study id ) of the investigation performed. Typically the id of the DICOM file or image file of this investigation.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Special Investigation advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Special Investigation advice"
+        },
+        {
+          "class_label": "Special Investigation advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Special Investigation advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "special_investigation_notes": {
+      "local_definition": "Remarks or Notes about the results of the investigation",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Special Investigation advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Special Investigation advice"
+        },
+        {
+          "class_label": "Special Investigation advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Special Investigation advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "RE_fl_investigation_method": {
+      "local_definition": "Method of investigation.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Follow-up Investigation Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Follow-up Investigation Advice"
+        },
+        {
+          "class_label": "Follow-up Investigation Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Follow-up Investigation Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "LE_fl_investigation_method": {
+      "local_definition": "Method of investigation",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Follow-up Investigation Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Follow-up Investigation Advice"
+        },
+        {
+          "class_label": "Follow-up Investigation Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Follow-up Investigation Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "diagnosis_name": {
+      "local_definition": "Name of the diagnosis given to the patient",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Diagnosis",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Diagnosis"
+        },
+        {
+          "class_label": "Diagnosis Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Diagnosis Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "diagnosis_date": {
+      "local_definition": "Date and time of diagnosis",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Diagnosis",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Diagnosis"
+        },
+        {
+          "class_label": "Diagnosis Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Diagnosis Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "drug_name": {
+      "local_definition": "",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Drug Prescription",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Drug Prescription"
+        },
+        {
+          "class_label": "Drug Prescription Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Drug Prescription Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "drug_duration": {
+      "local_definition": "",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Drug Prescription",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Drug Prescription"
+        },
+        {
+          "class_label": "Drug Prescription Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Drug Prescription Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "form_type": {
+      "local_definition": "",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Drug Prescription",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Drug Prescription"
+        },
+        {
+          "class_label": "Drug Prescription Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Drug Prescription Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "dosage": {
+      "local_definition": "",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Drug Prescription",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Drug Prescription"
+        },
+        {
+          "class_label": "Drug Prescription Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Drug Prescription Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "advice_date": {
+      "local_definition": "Date of the advice",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Treatment Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice"
+        },
+        {
+          "class_label": "Treatment Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "refractive_correction_type": {
+      "local_definition": "Refractive Correction Advised. Example (Same Gp, Lasik Counselling, Contact Lens)",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Refractive Correction",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refractive Correction"
+        },
+        {
+          "class_label": "Refractive Correction Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Refractive Correction Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "glass_precription_value": {
+      "local_definition": "Glass prescription advice",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "GP Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "GP Advice"
+        },
+        {
+          "class_label": "GP Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "GP Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "primary_procedure": {
+      "local_definition": "Primary surgical procedure advised",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Surgery Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice"
+        },
+        {
+          "class_label": "Surgery Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "secondary_procedure": {
+      "local_definition": "Secondary surgical procedure advised",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Surgery Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice"
+        },
+        {
+          "class_label": "Surgery Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "implant": {
+      "local_definition": "Implant advise",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Surgery Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice"
+        },
+        {
+          "class_label": "Surgery Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "adjunct": {
+      "local_definition": "adjunct advise",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Surgery Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice"
+        },
+        {
+          "class_label": "Surgery Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "anesthesia": {
+      "local_definition": "Whether to be done under anesthesia or not",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Surgery Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice"
+        },
+        {
+          "class_label": "Surgery Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "surgery_completed_date": {
+      "local_definition": "Date of completion of surgery",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Surgery Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice"
+        },
+        {
+          "class_label": "Surgery Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "surgery_done_at": {
+      "local_definition": "Hospital where surgery was done.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Surgery Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice"
+        },
+        {
+          "class_label": "Surgery Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Surgery Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "procedure_type": {
+      "local_definition": "Procedure type ( eg Injection, laser etc ) advised",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Procedure Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice"
+        },
+        {
+          "class_label": "Procedure Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Injection": {
+            "target_class": "ncit:PRT001"
+          },
+          "Surgery": {
+            "target_class": "ncit:PRT002"
+          },
+          "Medication": {
+            "target_class": "ncit:PRT003"
+          },
+          "Other": {
+            "target_class": "ncit:PRT004"
+          }
+        }
+      }
+    },
+    "procedure_name": {
+      "local_definition": "Exact name of the procedure advised",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Procedure Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice"
+        },
+        {
+          "class_label": "Procedure Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {
+          "Accessible PRP": {
+            "target_class": "ncit:PR001"
+          },
+          "BARRAGE LASER": {
+            "target_class": "ncit:PR002"
+          },
+          "Conformer removal": {
+            "target_class": "ncit:PR003"
+          },
+          "Custom fit prosthesis fitting": {
+            "target_class": "ncit:PR004"
+          },
+          "Custom fit prosthesis polishing": {
+            "target_class": "ncit:PR005"
+          },
+          "Cyst needling": {
+            "target_class": "ncit:PR006"
+          },
+          "Facial prosthesis appointment": {
+            "target_class": "ncit:PR007"
+          },
+          "Facial prosthesis fitting": {
+            "target_class": "ncit:PR008"
+          },
+          "FB Removed Under Topical": {
+            "target_class": "ncit:PR009"
+          },
+          "FDS bolster removal": {
+            "target_class": "ncit:PR010"
+          },
+          "FIRST SITTING": {
+            "target_class": "ncit:PR011"
+          },
+          "Focal": {
+            "target_class": "ncit:PR012"
+          },
+          "Grid": {
+            "target_class": "ncit:PR013"
+          },
+          "IMP": {
+            "target_class": "ncit:PR014"
+          },
+          "Impression cytology": {
+            "target_class": "ncit:PR015"
+          },
+          "Inj. PST": {
+            "target_class": "ncit:PR016"
+          },
+          "Inj.Clendamycin": {
+            "target_class": "ncit:PR017"
+          },
+          "Intra Cameral Injection - Avastin": {
+            "target_class": "ncit:PR018"
+          },
+          "Intra Vireal Injection Methotraxate": {
+            "target_class": "ncit:PR019"
+          },
+          "Intra Vitreal Injection - Accentrix": {
+            "target_class": "ncit:PR020"
+          },
+          "Intra Vitreal Injection - Avastin": {
+            "target_class": "ncit:PR021"
+          },
+          "Intra Vitreal Injection - Eylea": {
+            "target_class": "ncit:PR022"
+          },
+          "Intra Vitreal Injection - Ganciclovir": {
+            "target_class": "ncit:PR023"
+          },
+          "Intra Vitreal Injection - Lucentis": {
+            "target_class": "ncit:PR024"
+          },
+          "Intra Vitreal Injection - Ozurdex": {
+            "target_class": "ncit:PR025"
+          },
+          "Intra Vitreal Injection - Pagenax": {
+            "target_class": "ncit:PR026"
+          },
+          "Intra Vitreal Injection - Ranieyes": {
+            "target_class": "ncit:PR027"
+          },
+          "Intra Vitreal Injection - Razumab": {
+            "target_class": "ncit:PR028"
+          },
+          "Intra Vitreal Injection - Tricot": {
+            "target_class": "ncit:PR029"
+          },
+          "Intra vitreal Injection Vabysmo": {
+            "target_class": "ncit:PR030"
+          },
+          "INTRA VITREAL RANIZUREL": {
+            "target_class": "ncit:PR031"
+          },
+          "Intracameral Inj": {
+            "target_class": "ncit:PR032"
+          },
+          "Intracameral Injection - Accentrix": {
+            "target_class": "ncit:PR033"
+          },
+          "Intracameral Injection - Eylea": {
+            "target_class": "ncit:PR034"
+          },
+          "Intracameral Injection - Lucentis": {
+            "target_class": "ncit:PR035"
+          },
+          "Intracameral Injection - Ozurdex": {
+            "target_class": "ncit:PR036"
+          },
+          "Intracameral Injection - Tricort": {
+            "target_class": "ncit:PR037"
+          },
+          "IntraVit Inj": {
+            "target_class": "ncit:PR038"
+          },
+          "Intravitreal Injection Actilyse": {
+            "target_class": "ncit:PR039"
+          },
+          "Intravitreal Injection LRP AFLI study": {
+            "target_class": "ncit:PR040"
+          },
+          "Intravitreal Injection Melphalan": {
+            "target_class": "ncit:PR041"
+          },
+          "Intravitreal injection TOPOTECAN": {
+            "target_class": "ncit:PR042"
+          },
+          "INTRAVITREAL INJECTION-OCEVA": {
+            "target_class": "ncit:PR043"
+          },
+          "Intravitreal Methyl Prednisolone": {
+            "target_class": "ncit:PR044"
+          },
+          "Irrigation- eye cleaning": {
+            "target_class": "ncit:PR045"
+          },
+          "LSL": {
+            "target_class": "ncit:PR046"
+          },
+          "Manual Epilation": {
+            "target_class": "ncit:PR047"
+          },
+          "New Custom fit prosthesis appointment": {
+            "target_class": "ncit:PR048"
+          },
+          "Pad and Bandage": {
+            "target_class": "ncit:PR049"
+          },
+          "Probing": {
+            "target_class": "ncit:PR050"
+          },
+          "PRP": {
+            "target_class": "ncit:PR051"
+          },
+          "PRP + Focal": {
+            "target_class": "ncit:PR052"
+          },
+          "PRP + Grid": {
+            "target_class": "ncit:PR053"
+          },
+          "Repeat yag PI": {
+            "target_class": "ncit:PR054"
+          },
+          "Retina Laser": {
+            "target_class": "ncit:PR055"
+          },
+          "Saline wash": {
+            "target_class": "ncit:PR056"
+          },
+          "Scleral Abscess": {
+            "target_class": "ncit:PR057"
+          },
+          "Selective Laser Trabeculoplasty": {
+            "target_class": "ncit:PR058"
+          },
+          "Socket cleaning": {
+            "target_class": "ncit:PR059"
+          },
+          "Stent removal": {
+            "target_class": "ncit:PR060"
+          },
+          "Stock shell prosthesis fitting": {
+            "target_class": "ncit:PR061"
+          },
+          "Stock shell prosthesis polishing": {
+            "target_class": "ncit:PR062"
+          },
+          "Supra Tarsal Injection": {
+            "target_class": "ncit:PR063"
+          },
+          "Supra Tarsal Injection with Tricort": {
+            "target_class": "ncit:PR064"
+          },
+          "Suture Removal \u2013 OP": {
+            "target_class": "ncit:PR065"
+          },
+          "TTT": {
+            "target_class": "ncit:PR066"
+          },
+          "Tube/ stent repositioning": {
+            "target_class": "ncit:PR067"
+          },
+          "Wound cleaning(Betadine)": {
+            "target_class": "ncit:PR068"
+          },
+          "YAG ANTERIOR CAPSULOTOMY-AEH": {
+            "target_class": "ncit:PR069"
+          },
+          "YAG ANTERIOR CAPSULOTOMY-Surgery Done at Outside": {
+            "target_class": "ncit:PR070"
+          },
+          "YAG Cap": {
+            "target_class": "ncit:PR071"
+          },
+          "YAG CAPSULOTOMY-Surgery Done at Outside": {
+            "target_class": "ncit:PR072"
+          },
+          "YAG ENLARGEMENT - AEH": {
+            "target_class": "ncit:PR073"
+          },
+          "YAG ENLARGEMENT-Surgery Done at Outside": {
+            "target_class": "ncit:PR074"
+          },
+          "YAG Hyaloidotomy": {
+            "target_class": "ncit:PR075"
+          },
+          "Yag Laser Synechiolysis": {
+            "target_class": "ncit:PR076"
+          },
+          "YAG MEMBRANALYSIS - AEH": {
+            "target_class": "ncit:PR077"
+          },
+          "YAG MEMBRANOLYSIS-Surgery Done at Outside": {
+            "target_class": "ncit:PR078"
+          },
+          "YAG Phimosis release - AEH": {
+            "target_class": "ncit:PR079"
+          },
+          "YAG Phimosis release - Surgery done at outside": {
+            "target_class": "ncit:PR080"
+          },
+          "YAG PI": {
+            "target_class": "ncit:PR081"
+          },
+          "Yag PI Enlargement": {
+            "target_class": "ncit:PR082"
+          },
+          "YAG PIGMENT DISPERSION/SWEEPING - AEH": {
+            "target_class": "ncit:PR083"
+          },
+          "YAG PIGMENT DISPERSION/SWEEPING- Sx Done Outside": {
+            "target_class": "ncit:PR084"
+          },
+          "YAG VITREOLYSIS - AEH": {
+            "target_class": "ncit:PR085"
+          },
+          "YAG VITREOLYSIS-Surgery Done at Outside": {
+            "target_class": "ncit:PR086"
+          }
+        }
+      }
+    },
+    "number_of_sittings_advice": {
+      "local_definition": "Number of sittings required.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Procedure Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice"
+        },
+        {
+          "class_label": "Procedure Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "completion_date": {
+      "local_definition": "Date of completion of procedure.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Procedure Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice"
+        },
+        {
+          "class_label": "Procedure Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "sitting_num_completed": {
+      "local_definition": "How many sittings are done.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Procedure Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice"
+        },
+        {
+          "class_label": "Procedure Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "procedure_done_at": {
+      "local_definition": "Hospital where procedure was done.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Procedure Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice"
+        },
+        {
+          "class_label": "Procedure Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Procedure Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "treatment_type": {
+      "local_definition": "Treatment type. ( eg : Exercise, Patching, Lacriminal Sac Massage etc)",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Treatment Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice"
+        },
+        {
+          "class_label": "Treatment Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "treatment_duration": {
+      "local_definition": "Duration of treatment in days, months etc.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Treatment Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice"
+        },
+        {
+          "class_label": "Treatment Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "treatment_completion_date": {
+      "local_definition": "Date of completion of treatment",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Treatment Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice"
+        },
+        {
+          "class_label": "Treatment Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "treatment_done_at": {
+      "local_definition": "Hospital where treatment was done.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Treatment Advice",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice"
+        },
+        {
+          "class_label": "Treatment Advice Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Treatment Advice Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "scan_id ( StudyInstanceUid)": {
+      "local_definition": "Typically the Study Instance Uid of the DICOM field",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Study",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study"
+        },
+        {
+          "class_label": "OCT Study Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "anonymized patient id": {
+      "local_definition": "Anonymized Patient Id associated with the image.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Study",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study"
+        },
+        {
+          "class_label": "OCT Study Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "visit_id": {
+      "local_definition": "Unique identifier for patient encounters or visits. A PE is a patient event, and it means a visit to the hospital, which can be a fresh visit, a routine followup or a visit for a procedure. ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "scan_date": {
+      "local_definition": "The date of the study",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Study",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study"
+        },
+        {
+          "class_label": "OCT Study Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "device_type": {
+      "local_definition": "The type of OCT device. This will typically be the Manufacturer + Model ",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Study",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study"
+        },
+        {
+          "class_label": "OCT Study Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "scan_protocol": {
+      "local_definition": "Scan type (macula cube, raster)",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Study",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study"
+        },
+        {
+          "class_label": "OCT Study Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "signal_strength": {
+      "local_definition": "Image quality metric",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Study",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study"
+        },
+        {
+          "class_label": "OCT Study Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Study Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "image_id": {
+      "local_definition": "Typically, the Image Instance Uid of the DICOM image. Each study can have many images.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Image",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Image"
+        },
+        {
+          "class_label": "OCT Image Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Image Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "number_of_frames": {
+      "local_definition": "Number of frames captured in this image. Each image can have many frames.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Image",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Image"
+        },
+        {
+          "class_label": "OCT Image Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Image Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "frame_id": {
+      "local_definition": "Identification of the slice. Corresponds to the id of the actual image slice.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Frame",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame"
+        },
+        {
+          "class_label": "OCT Frame Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Pixel Spacing": {
+      "local_definition": "Dimensions of each pixel in mm/\u00b5m",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Frame",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame"
+        },
+        {
+          "class_label": "OCT Frame Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Inter Slice Spacing": {
+      "local_definition": "Distance between slices of OCT",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Frame",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame"
+        },
+        {
+          "class_label": "OCT Frame Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Image Position (Patient)": {
+      "local_definition": "Origin Location (top-left corner coordinates) of B-Scan slice in 3D space",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Frame",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame"
+        },
+        {
+          "class_label": "OCT Frame Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "slice_thickness": {
+      "local_definition": "Thickness of each slice",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Frame",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame"
+        },
+        {
+          "class_label": "OCT Frame Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "image_orientation": {
+      "local_definition": "Row and Column Direction Cosines",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "OCT Frame",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame"
+        },
+        {
+          "class_label": "OCT Frame Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "OCT Frame Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "scan_id": {
+      "local_definition": "Typically the Study Instance Uid of the DICOM field. Here, the locator for the Pentacam image files.",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "K1 (Flat Keratometry)": {
+      "local_definition": "Radius/curvature of the flattest corneal meridian (anterior surface)",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "K2 (Steep Keratometry)": {
+      "local_definition": "Radius/curvature of the steepest corneal meridian (anterior surface)",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Km (Mean Keratometry)": {
+      "local_definition": "Average of K1 and K2",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Posterior K1/K2/Km": {
+      "local_definition": "Same as above but for posterior corneal surface",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Central Corneal Thickness (CCT)": {
+      "local_definition": "Thickness at corneal apex (center)",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Thinnest Corneal Thickness": {
+      "local_definition": "Minimum corneal thickness detected across cornea",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Pachymetry Map": {
+      "local_definition": "Spatial corneal thickness map",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Anterior Chamber Depth (ACD)": {
+      "local_definition": "Distance from corneal endothelium to lens",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Anterior Chamber Volume (ACV)": {
+      "local_definition": "Total fluid-filled space volume between cornea & lens",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Anterior Chamber Angle (ACA)": {
+      "local_definition": "Angle between cornea & iris",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Anterior Elevation Map": {
+      "local_definition": "Height difference of anterior cornea vs. best-fit sphere",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Posterior Elevation Map": {
+      "local_definition": "Height difference of posterior cornea vs. best-fit sphere",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Corneal Volume (CV)": {
+      "local_definition": "Total corneal volume in defined diameter (e.g., 10 mm)",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Belin/Ambrosio Deviation (BAD-D)": {
+      "local_definition": "Composite ectasia index (combines curvature, pachymetry, elevation)",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Lens Densitometry": {
+      "local_definition": "Optical density within defined regions of crystalline lens",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "ISV (Index of Surface Variance)": {
+      "local_definition": "Standard deviation of individual corneal curvature values",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "IVA (Index of Vertical Asymmetry)": {
+      "local_definition": "Compares superior vs inferior corneal curvature",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "KI (Keratoconus Index)": {
+      "local_definition": "Ratio between steepest radius and average curvature",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "CKI (Central Keratoconus Index)": {
+      "local_definition": "Ratio of central vs paracentral corneal curvature",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    },
+    "Q-value (Asphericity)": {
+      "local_definition": "Describes whether cornea is prolate or oblate",
+      "predicate": "ncit:Concept_In_Subset",
+      "class": "ncit:C25190",
+      "schema_reconstruction": [
+        {
+          "class_label": "Keratoconus Ground Truth",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth"
+        },
+        {
+          "class_label": "Keratoconus Ground Truth Variables",
+          "predicate": "coda:hasConceptClass",
+          "aesthetic_label": "Keratoconus Ground Truth Variables"
+        }
+      ],
+      "value_mapping": {
+        "terms": {}
+      }
+    }
+  }
+}
