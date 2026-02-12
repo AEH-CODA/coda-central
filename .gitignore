@@ -1,0 +1,9 @@
+# ---- ENV ----
+.env
+**/.env
+.env.*
+**/.env.*
+
+# ---- Docker ----
+*.log
+docker-compose.override.yml

@@ -1,0 +1,4 @@
+fastapi
+uvicorn
+requests
+python-jose==3.5.0

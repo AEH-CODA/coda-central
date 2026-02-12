@@ -1,0 +1,56 @@
+version: "5.0.1"
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      - nl2sparql
+      - graphdb
+      - auth-service
+      - user-db
+    env_file:
+      - ./api-gateway/.env
+
+  nl2sparql:
+    build: ./nl2sparql
+    env_file:
+    - ./nl2sparql/.env
+
+  ui:
+    build: ./ui
+    ports:
+      - "5000:80"
+  
+  graphdb:
+    image: ontotext/graphdb:10.6.1
+    container_name: graphdb
+    ports:
+      - "7200:7200"
+    volumes:
+      - graphdb-data:/opt/graphdb/home
+  
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "7000:7000"
+    env_file:
+      - ./auth-service/.env
+
+  user-db:
+    image: postgres:16
+    container_name: user-db
+    restart: always
+    environment:
+      POSTGRES_DB: user-db
+      POSTGRES_USER: coda
+      POSTGRES_PASSWORD: coda-pass
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  graphdb-data:
+  user_db_data:

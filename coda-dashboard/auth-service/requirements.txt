@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+psycopg2-binary
+python-jose
+passlib[bcrypt]
+bcrypt<4.1
