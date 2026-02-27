@@ -20,7 +20,16 @@
 
 <script>
 
-// const accessToken = localStorage.getItem("token")
+// Handle token from OAuth callback
+const params = new URLSearchParams(window.location.search);
+const token = params.get('token');
+if (token) {
+  localStorage.setItem('token', token);
+  // Clean up URL and remove token param
+  window.history.replaceState({}, document.title, "/");
+}
+
+// Check if authenticated
 if (!localStorage.getItem("token")) {
   window.location.href = "/login.html";
 }

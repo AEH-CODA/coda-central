@@ -1,10 +1,10 @@
 import psycopg2
 import os
 
-DB_HOST = os.getenv("POSTGRES_HOST", "user-db")
-DB_NAME = os.getenv("POSTGRES_DB", "user-db")
-DB_USER = os.getenv("POSTGRES_USER", "coda")
-DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "coda-pass")
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 def get_connection():
     return psycopg2.connect(
@@ -22,7 +22,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             id UUID PRIMARY KEY,
             email TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
+            google_id TEXT UNIQUE NOT NULL,
             role TEXT NOT NULL DEFAULT 'user',
             created_at TIMESTAMPTZ DEFAULT NOW()
         );

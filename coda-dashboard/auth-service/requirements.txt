@@ -2,5 +2,7 @@ fastapi
 uvicorn
 psycopg2-binary
 python-jose
-passlib[bcrypt]
-bcrypt<4.1
+google-auth
+google-auth-httplib2
+google-auth-oauthlib
+requests
