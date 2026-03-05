@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Header
+from fastapi import FastAPI, HTTPException, Depends, Header, Request
 from pydantic import BaseModel
 import requests
 from fastapi.middleware.cors import CORSMiddleware
@@ -68,13 +68,21 @@ def health_check():
 
 # Proxy all auth endpoints to auth-service
 @app.get("/auth/login/google")
-def proxy_login_google(state: str = None):
-    """Proxy to auth-service login endpoint"""
+def proxy_login_google(request: Request, state: str = None):
+    """Proxy to auth-service login endpoint with original request headers"""
     try:
         url = f"{AUTH_SERVICE_URL}/auth/login/google"
         if state:
             url += f"?state={state}"
-        response = requests.get(url, allow_redirects=False, timeout=int(GOOGLE_TIMEOUT))
+        
+        # Forward original request headers to preserve client info
+        headers = {
+            "x-forwarded-host": request.headers.get("host", ""),
+            "x-forwarded-proto": request.headers.get("x-forwarded-proto") or request.url.scheme,
+            "x-forwarded-for": request.headers.get("x-forwarded-for") or request.client.host,
+        }
+        
+        response = requests.get(url, headers=headers, allow_redirects=False, timeout=int(GOOGLE_TIMEOUT))
 
         if response.status_code in [301, 302, 303, 307, 308]:
             return RedirectResponse(url=response.headers.get("location"), status_code=response.status_code)
@@ -84,11 +92,19 @@ def proxy_login_google(state: str = None):
         raise HTTPException(status_code=500, detail=f"Auth service error: {str(e)}")
 
 @app.get("/auth/callback")
-def proxy_auth_callback(code: str, state: str):
-    """Proxy to auth-service callback endpoint"""
+def proxy_auth_callback(request: Request, code: str, state: str):
+    """Proxy to auth-service callback endpoint with original request headers"""
     try:
         url = f"{AUTH_SERVICE_URL}/auth/callback?code={code}&state={state}"
-        response = requests.get(url, allow_redirects=False, timeout=int(GOOGLE_TIMEOUT))
+        
+        # Forward original request headers to preserve client info
+        headers = {
+            "x-forwarded-host": request.headers.get("host", ""),
+            "x-forwarded-proto": request.headers.get("x-forwarded-proto") or request.url.scheme,
+            "x-forwarded-for": request.headers.get("x-forwarded-for") or request.client.host,
+        }
+        
+        response = requests.get(url, headers=headers, allow_redirects=False, timeout=int(GOOGLE_TIMEOUT))
 
         if response.status_code in [301, 302, 303, 307, 308]:
             return RedirectResponse(url=response.headers.get("location"), status_code=response.status_code)
