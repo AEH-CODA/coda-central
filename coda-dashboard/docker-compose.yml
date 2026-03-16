@@ -10,6 +10,7 @@ services:
       - graphdb
       - auth-service
       - user-db
+      - dataset-service
     env_file:
       - ./api-gateway/.env
 
@@ -51,6 +52,32 @@ services:
     ports:
       - "5432:5432"
 
+  dataset-db:
+    image: postgres:16
+    container_name: dataset-db
+    restart: always
+    environment:
+      POSTGRES_DB: dataset-db
+      POSTGRES_USER: coda
+      POSTGRES_PASSWORD: coda-pass
+    volumes:
+      - dataset_db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  dataset-service:
+    build: ./dataset-service
+    ports:
+      - "8001:8001"
+    depends_on:
+      - dataset-db
+    env_file:
+      - ./dataset-service/.env
+    volumes:
+      - dataset_data:/app/data
+
 volumes:
   graphdb-data:
   user_db_data:
+  dataset_db_data:
+  dataset_data:

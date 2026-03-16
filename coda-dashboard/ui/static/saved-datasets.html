@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Saved Datasets - CODA</title>
+  <link rel="stylesheet" href="styles/common.css">
+  <link rel="stylesheet" href="styles/saved-datasets.css">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>CODA</h1>
+    <p>Data Discovery Platform</p>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="nav-btn" onclick="navigateToQuery()">
+      Query Data
+    </button>
+    <button class="nav-btn active">
+      Saved Datasets
+    </button>
+    <button class="nav-btn" onclick="setActiveNav(this)">
+      Model Workspace
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="signout-btn" onclick="logout()">
+      Sign Out
+    </button>
+  </div>
+</aside>
+
+<main class="main-content">
+  <div class="content-header">
+    <h2>MY DATASETS</h2>
+    <p>View and manage your saved query results</p>
+  </div>
+
+  <div class="datasets-section">
+    <div class="controls">
+      <input type="text" id="searchInput" class="search-box" placeholder="Search datasets by name...">
+      <select id="sortSelect" class="sort-dropdown">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="name-asc">Name (A-Z)</option>
+        <option value="name-desc">Name (Z-A)</option>
+      </select>
+    </div>
+
+    <div id="datasetsContainer" class="datasets-grid">
+      <!-- Datasets will be loaded here -->
+    </div>
+
+    <div id="noDatasets" class="no-datasets" style="display: none;">
+      <p>You have no saved datasets yet. <a href="/index.html">Go query data</a> and save results!</p>
+    </div>
+
+    <div id="loadingIndicator" class="loading" style="display: none;">
+      <p>Loading datasets...</p>
+    </div>
+  </div>
+</main>
+
+<!-- View Dataset Modal -->
+<div id="viewDatasetModal" class="modal" style="display: none;">
+  <div class="modal-content large">
+    <span class="close-btn" onclick="closeViewModal()">&times;</span>
+    <h2 id="viewDatasetTitle"></h2>
+    
+    <div class="dataset-metadata">
+      <div class="metadata-item">
+        <span class="label">Created:</span>
+        <span id="viewCreatedAt"></span>
+      </div>
+      <div class="metadata-item">
+        <span class="label">Description:</span>
+        <span id="viewDescription"></span>
+      </div>
+    </div>
+
+    <div class="query-display">
+      <div class="query-box">
+        <h4>Natural Language Query</h4>
+        <p id="viewNLQuery"></p>
+      </div>
+      <div class="query-box">
+        <h4>SPARQL Query</h4>
+        <pre id="viewSparqlQuery"></pre>
+      </div>
+    </div>
+
+    <div class="results-display">
+      <h4>Results</h4>
+      <div class="results-table-container">
+        <table id="viewResultsTable"></table>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="downloadDataset()">Export as JSON</button>
+      <button class="btn-secondary" onclick="closeViewModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Dataset Modal -->
+<div id="editDatasetModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeEditModal()">&times;</span>
+    <h2>Edit Dataset</h2>
+    <form id="editDatasetForm">
+      <div class="form-group">
+        <label for="editDatasetName">Dataset Name *</label>
+        <input type="text" id="editDatasetName" name="datasetName" required>
+      </div>
+      <div class="form-group">
+        <label for="editDatasetDescription">Description</label>
+        <textarea id="editDatasetDescription" name="datasetDescription"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">Save Changes</button>
+        <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+
+// Handle token from OAuth callback
+const params = new URLSearchParams(window.location.search);
+const token = params.get('token');
+if (token) {
+  localStorage.setItem('token', token);
+  window.history.replaceState({}, document.title, "/");
+}
+
+// Check if authenticated
+if (!localStorage.getItem("token")) {
+  window.location.href = "/login.html";
+}
+
+let allDatasets = [];
+let currentViewingDataset = null;
+let currentEditingDataset = null;
+
+function navigateToQuery() {
+  window.location.href = "/index.html";
+}
+
+function setActiveNav(button) {
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  button.classList.add('active');
+}
+
+// Load datasets on page load
+window.addEventListener('load', loadDatasets);
+
+async function loadDatasets() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    window.location.href = "/login.html";
+    return;
+  }
+
+  document.getElementById('loadingIndicator').style.display = 'block';
+  document.getElementById('datasetsContainer').innerHTML = '';
+
+  try {
+    const response = await fetch(
+      'http://' + window.location.hostname + ':8000/datasets?skip=0&limit=100',
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      }
+    );
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        window.location.href = "/login.html";
+        return;
+      }
+      throw new Error('Failed to load datasets');
+    }
+
+    const data = await response.json();
+    allDatasets = data.datasets || [];
+
+    document.getElementById('loadingIndicator').style.display = 'none';
+
+    if (allDatasets.length === 0) {
+      document.getElementById('noDatasets').style.display = 'block';
+      document.getElementById('datasetsContainer').innerHTML = '';
+    } else {
+      document.getElementById('noDatasets').style.display = 'none';
+      renderDatasets(allDatasets);
+    }
+  } catch (error) {
+    document.getElementById('loadingIndicator').style.display = 'none';
+    alert('Error loading datasets: ' + error.message);
+  }
+}
+
+function renderDatasets(datasets) {
+  const container = document.getElementById('datasetsContainer');
+  container.innerHTML = '';
+
+  datasets.forEach(dataset => {
+    const card = document.createElement('div');
+    card.className = 'dataset-card';
+    
+    const date = new Date(dataset.created_at).toLocaleDateString();
+    
+    card.innerHTML = `
+      <div class="card-header">
+        <h3>${dataset.name}</h3>
+        <span class="card-date">${date}</span>
+      </div>
+      <div class="card-description">
+        ${dataset.description ? dataset.description : '<em>No description</em>'}
+      </div>
+      <div class="card-query">
+        <strong>Query:</strong> ${dataset.nl_query.substring(0, 60)}${dataset.nl_query.length > 60 ? '...' : ''}
+      </div>
+      <div class="card-actions">
+        <button class="btn-small btn-primary" onclick="viewDataset('${dataset.id}')">View</button>
+        <button class="btn-small btn-info" onclick="editDataset('${dataset.id}')">Edit</button>
+        <button class="btn-small btn-danger" onclick="deleteDataset('${dataset.id}', '${dataset.name}')">Delete</button>
+      </div>
+    `;
+    
+    container.appendChild(card);
+  });
+}
+
+async function viewDataset(datasetId) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    window.location.href = "/login.html";
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      'http://' + window.location.hostname + ':8000/datasets/' + datasetId,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to load dataset details');
+    }
+
+    const dataset = await response.json();
+    currentViewingDataset = dataset;
+
+    // Populate modal
+    document.getElementById('viewDatasetTitle').textContent = dataset.name;
+    document.getElementById('viewCreatedAt').textContent = new Date(dataset.created_at).toLocaleString();
+    document.getElementById('viewDescription').textContent = dataset.description || 'N/A';
+    document.getElementById('viewNLQuery').textContent = dataset.nl_query;
+    document.getElementById('viewSparqlQuery').textContent = dataset.sparql_query;
+
+    // Render results table
+    renderResultsTable(dataset.results);
+
+    // Show modal
+    document.getElementById('viewDatasetModal').style.display = 'block';
+  } catch (error) {
+    alert('Error loading dataset: ' + error.message);
+  }
+}
+
+function renderResultsTable(results) {
+  const table = document.getElementById('viewResultsTable');
+  table.innerHTML = '';
+
+  if (!results || !results.results || !results.results.bindings.length) {
+    table.innerHTML = '<tr><td class="no-results" colspan="100">No results</td></tr>';
+    return;
+  }
+
+  const columns = results.head.vars;
+  const rows = results.results.bindings;
+
+  const headerRow = document.createElement('tr');
+  columns.forEach(col => {
+    const th = document.createElement('th');
+    th.textContent = col;
+    headerRow.appendChild(th);
+  });
+  table.appendChild(headerRow);
+
+  rows.forEach(row => {
+    const tr = document.createElement('tr');
+    columns.forEach(col => {
+      const td = document.createElement('td');
+      td.textContent = row[col]?.value || '';
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+}
+
+function closeViewModal() {
+  document.getElementById('viewDatasetModal').style.display = 'none';
+  currentViewingDataset = null;
+}
+
+function downloadDataset() {
+  if (!currentViewingDataset) return;
+
+  const dataStr = JSON.stringify(currentViewingDataset, null, 2);
+  const dataBlob = new Blob([dataStr], {type: 'application/json'});
+  const url = URL.createObjectURL(dataBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${currentViewingDataset.name}_${Date.now()}.json`;
+  link.click();
+}
+
+async function editDataset(datasetId) {
+  currentEditingDataset = allDatasets.find(d => d.id === datasetId);
+  if (!currentEditingDataset) return;
+
+  document.getElementById('editDatasetName').value = currentEditingDataset.name;
+  document.getElementById('editDatasetDescription').value = currentEditingDataset.description || '';
+  
+  document.getElementById('editDatasetModal').style.display = 'block';
+}
+
+function closeEditModal() {
+  document.getElementById('editDatasetModal').style.display = 'none';
+  currentEditingDataset = null;
+  document.getElementById('editDatasetForm').reset();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('editDatasetForm');
+  if (form) {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      if (!currentEditingDataset) return;
+
+      const token = localStorage.getItem('token');
+      const name = document.getElementById('editDatasetName').value;
+      const description = document.getElementById('editDatasetDescription').value;
+
+      try {
+        const response = await fetch(
+          'http://' + window.location.hostname + ':8000/datasets/' + currentEditingDataset.id,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ name, description })
+          }
+        );
+
+        if (response.ok) {
+          alert('Dataset updated successfully');
+          closeEditModal();
+          loadDatasets();
+        } else {
+          alert('Failed to update dataset');
+        }
+      } catch (error) {
+        alert('Error updating dataset: ' + error.message);
+      }
+    });
+  }
+});
+
+async function deleteDataset(datasetId, datasetName) {
+  if (!confirm(`Are you sure you want to delete "${datasetName}"? This action cannot be undone.`)) {
+    return;
+  }
+
+  const token = localStorage.getItem('token');
+  if (!token) {
+    window.location.href = "/login.html";
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      'http://' + window.location.hostname + ':8000/datasets/' + datasetId,
+      {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      }
+    );
+
+    if (response.ok) {
+      alert('Dataset deleted successfully');
+      loadDatasets();
+    } else {
+      alert('Failed to delete dataset');
+    }
+  } catch (error) {
+    alert('Error deleting dataset: ' + error.message);
+  }
+}
+
+// Close modals when clicking outside
+window.onclick = function(event) {
+  const viewModal = document.getElementById('viewDatasetModal');
+  const editModal = document.getElementById('editDatasetModal');
+  
+  if (event.target === viewModal) {
+    viewModal.style.display = 'none';
+  }
+  if (event.target === editModal) {
+    editModal.style.display = 'none';
+  }
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/login.html";
+}
+
+</script>
+
+</body>
+</html>

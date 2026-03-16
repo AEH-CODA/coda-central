@@ -11,6 +11,7 @@ app = FastAPI(title="CODA API Gateway")
 NL2SPARQL_URL = os.getenv("NL2SPARQL_URL")
 GRAPHDB_ENDPOINT = os.getenv("GRAPHDB_ENDPOINT")
 AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL")
+DATASET_SERVICE_URL = os.getenv("DATASET_SERVICE_URL")
 SECRET_KEY = os.getenv("JWT_SECRET")
 ALGORITHM = os.getenv("JWT_ALGORITHM")
 
@@ -31,6 +32,9 @@ app.add_middleware(
 
 class QueryRequest(BaseModel):
     query: str
+    save_dataset: bool = False  # Whether to save dataset after query
+    dataset_name: str = None  # Name for saved dataset (required if save_dataset=True)
+    dataset_description: str = None  # Optional description for dataset
 
 def verify_token(authorization: str = Header(...)):
     """
@@ -117,9 +121,10 @@ def proxy_auth_callback(request: Request, code: str, state: str):
 def handle_query(req: QueryRequest, user=Depends(verify_token)):
     """
     Execute NL query with JWT verification.
+    Optionally save results as a dataset.
     
     Args:
-        req: Natural language query
+        req: Natural language query + optional save_dataset flag
         user: Verified JWT payload (user_id, role, exp)
     """
     # user contains: {"sub": user_id, "role": role, "exp": timestamp}
@@ -154,8 +159,155 @@ def handle_query(req: QueryRequest, user=Depends(verify_token)):
             "raw_response": graphdb_resp.text
         }
     
-    return {
+    results = graphdb_resp.json()
+    response = {
         "nl_query": req.query,
         "sparql": sparql_query,
-        "results": graphdb_resp.json()
+        "results": results
     }
+    
+    # 3) Save dataset if requested
+    if req.save_dataset:
+        if not req.dataset_name:
+            raise HTTPException(
+                status_code=400,
+                detail="dataset_name is required when save_dataset=True"
+            )
+        
+        try:
+            # Call dataset-service to save the dataset
+            save_response = requests.post(
+                f"{DATASET_SERVICE_URL}/datasets",
+                json={
+                    "nl_query": req.query,
+                    "sparql_query": sparql_query,
+                    "results": results,
+                    "name": req.dataset_name,
+                    "description": req.dataset_description
+                },
+                headers={"Authorization": f"Bearer {req.__dict__.get('token', '')}"},  # Will use the auth header from request
+                timeout=int(DOCKER_API_TIMEOUT)
+            )
+            
+            if save_response.status_code == 200:
+                save_data = save_response.json()
+                response["dataset_id"] = save_data.get("dataset_id")
+                response["message"] = "Dataset saved successfully"
+            else:
+                response["dataset_error"] = "Failed to save dataset"
+        except Exception as e:
+            response["dataset_error"] = f"Failed to save dataset: {str(e)}"
+    
+    return response
+
+# Proxy all dataset endpoints to dataset-service
+@app.post("/datasets")
+async def proxy_save_dataset(request: Request):
+    """Proxy POST /datasets to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail="Missing authorization header")
+        
+        body = await request.json()
+        
+        response = requests.post(
+            f"{DATASET_SERVICE_URL}/datasets",
+            json=body,
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save dataset: {str(e)}")
+
+@app.get("/datasets")
+async def proxy_list_datasets(request: Request, skip: int = 0, limit: int = 10):
+    """Proxy GET /datasets to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail="Missing authorization header")
+        
+        response = requests.get(
+            f"{DATASET_SERVICE_URL}/datasets?skip={skip}&limit={limit}",
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list datasets: {str(e)}")
+
+@app.get("/datasets/{dataset_id}")
+async def proxy_get_dataset(dataset_id: str, request: Request):
+    """Proxy GET /datasets/{dataset_id} to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail="Missing authorization header")
+        
+        response = requests.get(
+            f"{DATASET_SERVICE_URL}/datasets/{dataset_id}",
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        if response.status_code == 404:
+            raise HTTPException(status_code=404, detail="Dataset not found")
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get dataset: {str(e)}")
+
+@app.put("/datasets/{dataset_id}")
+async def proxy_update_dataset(dataset_id: str, request: Request):
+    """Proxy PUT /datasets/{dataset_id} to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail="Missing authorization header")
+        
+        body = await request.json()
+        
+        response = requests.put(
+            f"{DATASET_SERVICE_URL}/datasets/{dataset_id}",
+            json=body,
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        if response.status_code == 404:
+            raise HTTPException(status_code=404, detail="Dataset not found")
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update dataset: {str(e)}")
+
+@app.delete("/datasets/{dataset_id}")
+async def proxy_delete_dataset(dataset_id: str, request: Request):
+    """Proxy DELETE /datasets/{dataset_id} to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail="Missing authorization header")
+        
+        response = requests.delete(
+            f"{DATASET_SERVICE_URL}/datasets/{dataset_id}",
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        if response.status_code == 404:
+            raise HTTPException(status_code=404, detail="Dataset not found")
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete dataset: {str(e)}")
