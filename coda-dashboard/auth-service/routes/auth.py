@@ -91,7 +91,8 @@ def auth_callback(request: Request, code: str = Query(...), state: str = Query(.
             id_token_decoded = id_token.verify_oauth2_token(
                 id_token_str,
                 request_obj,
-                GOOGLE_CLIENT_ID
+                GOOGLE_CLIENT_ID,
+                clock_skew_in_seconds=10
             )
         except Exception as e:
             raise HTTPException(status_code=401, detail=f"Invalid ID token: {str(e)}")

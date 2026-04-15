@@ -6,10 +6,10 @@ def strip_sparql(text):
 
 def header_footer(text):
     if "PREFIX" not in text.upper():
-        text = "PREFIX : <http://example.org/schema#>\n" + text
+        text = "PREFIX ns1: <http://clinical-example.org/ontology/>\n" + text
 
-    if "LIMIT" not in text.upper():
-        text += "\nLIMIT 10"
+    # if "LIMIT" not in text.upper():
+    #     text += "\nLIMIT 10"
     
     return text
 

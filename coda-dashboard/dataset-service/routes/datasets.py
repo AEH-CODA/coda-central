@@ -4,9 +4,13 @@ from uuid import UUID
 from jose import jwt, JWTError
 
 from db import get_db
-from config import JWT_SECRET, JWT_ALGORITHM
-from models import DatasetSaveRequest, DatasetUpdateRequest, DatasetListResponse, DatasetDetailResponse
+from config import JWT_SECRET, JWT_ALGORITHM, SPARQL_QUERY_TIMEOUT
+from models import (
+    DatasetSaveRequest, DatasetUpdateRequest, DatasetListResponse, DatasetDetailResponse,
+    PreviewRequest, PreviewResponse
+)
 from services.dataset_service import DatasetService
+from services.preview_service import PreviewService
 
 router = APIRouter(prefix="/datasets", tags=["datasets"])
 
@@ -75,6 +79,40 @@ def save_dataset(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save dataset: {str(e)}")
+
+@router.post("/preview")
+def preview_dataset(
+    req: PreviewRequest,
+    user_id: UUID = Depends(verify_token)
+) -> PreviewResponse:
+    """
+    Generate a dataset preview (metadata only) for a SPARQL query.
+    
+    Args:
+        req: Preview request containing SPARQL query
+        user_id: Verified user ID from JWT (for audit/logging)
+    
+    Returns:
+        Dataset preview with metadata: dataset_summary, column stats, and sample rows
+    """
+    try:
+        # Generate preview metadata
+        preview_data = PreviewService.generate_preview(
+            req.sparql_query, 
+            timeout=SPARQL_QUERY_TIMEOUT
+        )
+        
+        return PreviewResponse(**preview_data)
+        
+    except ValueError as e:
+        # Invalid query format
+        raise HTTPException(status_code=400, detail="Invalid SPARQL query or malformed request")
+    except TimeoutError as e:
+        # Query execution timeout
+        raise HTTPException(status_code=408, detail="Query execution timeout")
+    except Exception as e:
+        # Other errors
+        raise HTTPException(status_code=500, detail="Error processing query results")
 
 @router.get("")
 def list_datasets(

@@ -311,3 +311,33 @@ async def proxy_delete_dataset(dataset_id: str, request: Request):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete dataset: {str(e)}")
+
+@app.post("/datasets/preview")
+async def proxy_preview_dataset(request: Request):
+    """Proxy POST /datasets/preview to dataset-service for metadata preview"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail="Missing authorization header")
+        
+        body = await request.json()
+        
+        response = requests.post(
+            f"{DATASET_SERVICE_URL}/datasets/preview",
+            json=body,
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        if response.status_code == 400:
+            raise HTTPException(status_code=400, detail="Invalid SPARQL query")
+        elif response.status_code == 408:
+            raise HTTPException(status_code=408, detail="Query timeout")
+        elif response.status_code == 500:
+            raise HTTPException(status_code=500, detail="Error processing query")
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate preview: {str(e)}")

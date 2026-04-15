@@ -4,6 +4,7 @@
   <title>CODA Data Discovery UI</title>
   <link rel="stylesheet" href="styles/common.css">
   <link rel="stylesheet" href="styles/index.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 </head>
 <body>
 
@@ -51,6 +52,9 @@
       <button class="save-dataset-btn" id="saveDatasetBtn" onclick="showSaveDatasetDialog()" style="display: none;">
         Save Dataset
       </button>
+      <button class="preview-btn" id="previewBtn" onclick="showPreviewModal()" style="display: none;">
+        Preview Dataset
+      </button>
     </div>
     <div class="results-table-container">
       <table id="resultsTable"></table>
@@ -81,6 +85,76 @@
           <button type="button" class="btn-secondary" onclick="closeSaveDatasetDialog()">Cancel</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Dataset Preview Modal -->
+  <div id="previewModal" class="modal" style="display: none;">
+    <div class="modal-content preview-modal-content">
+      <span class="close-btn" onclick="closePreviewModal()">&times;</span>
+      <h2>Dataset Preview</h2>
+      
+      <div id="previewLoading" class="loading" style="display: none;">
+        <p>Loading preview...</p>
+      </div>
+      
+      <div id="previewContent" style="display: none;">
+        <!-- Dataset Summary -->
+        <div class="preview-section">
+          <h3>Dataset Summary</h3>
+          <div class="summary-stats">
+            <div class="stat-card">
+              <span class="stat-label">Row Count</span>
+              <span class="stat-value" id="rowCount">-</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Column Count</span>
+              <span class="stat-value" id="columnCount">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Patient Insights (conditional) -->
+        <div class="preview-section" id="patientInsightsSection" style="display: none;">
+          <h3>Patient Coverage</h3>
+          <div class="patient-stats">
+            <div class="stat-card patient-stat">
+              <span class="stat-label">Unique Patients</span>
+              <span class="stat-value" id="uniquePatients">-</span>
+            </div>
+            <div class="stat-card patient-stat">
+              <span class="stat-label">Repeating Patients</span>
+              <span class="stat-value" id="returningPatients">-</span>
+            </div>
+            <div class="stat-card patient-stat">
+              <span class="stat-label">Repeat Rate</span>
+              <span class="stat-value" id="returnRate">-</span>
+            </div>
+          </div>
+          <div id="patientAppearanceContainer" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px solid #efefef;">
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: #999;">Rows per Patient</p>
+            <div style="display: flex; justify-content: flex-start; overflow-x: auto;">
+              <canvas id="patientAppearanceChart" style="max-height: 100px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column Metadata -->
+        <div class="preview-section">
+          <h3>Column Information</h3>
+          <div id="columnsContainer" class="columns-container"></div>
+        </div>
+
+        <!-- Sample Rows -->
+        <div class="preview-section">
+          <h3>Sample Data (First 5 Rows)</h3>
+          <div class="sample-rows-container">
+            <table id="sampleRowsTable" class="sample-rows-table"></table>
+          </div>
+        </div>
+      </div>
+
+      <div id="previewError" class="error-message" style="display: none;"></div>
     </div>
   </div>
 </main>
@@ -182,13 +256,339 @@ async function submitQuery() {
     // Show save dataset button if query was successful
     if (!data.error) {
       document.getElementById("saveDatasetBtn").style.display = "block";
+      document.getElementById("previewBtn").style.display = "block";
       // Reset button to default state when new query is executed
       resetSaveDatasetButton();
     }
   } catch (error) {
     document.getElementById("result").textContent = "Error: " + error.message;
     document.getElementById("saveDatasetBtn").style.display = "none";
+    document.getElementById("previewBtn").style.display = "none";
   }
+}
+
+async function showPreviewModal() {
+  if (!currentQueryData || !currentQueryData.sparql) {
+    alert("No query to preview. Please run a query first.");
+    return;
+  }
+
+  document.getElementById("previewModal").style.display = "block";
+  document.getElementById("previewLoading").style.display = "block";
+  document.getElementById("previewContent").style.display = "none";
+  document.getElementById("previewError").style.display = "none";
+
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+      "http://" + window.location.hostname + ":8000/datasets/preview",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          sparql_query: currentQueryData.sparql
+        })
+      }
+    );
+
+    document.getElementById("previewLoading").style.display = "none";
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+
+    const preview = await response.json();
+    renderPreview(preview);
+    document.getElementById("previewContent").style.display = "block";
+
+  } catch (error) {
+    document.getElementById("previewLoading").style.display = "none";
+    document.getElementById("previewError").style.display = "block";
+    document.getElementById("previewError").textContent = "Error loading preview: " + error.message;
+  }
+}
+
+function renderPreview(preview) {
+  // Initialize chart storage for cleanup
+  window.previewCharts = window.previewCharts || [];
+  window.previewCharts.forEach(chart => chart.destroy());
+  window.previewCharts = [];
+
+  // Render dataset summary
+  document.getElementById("rowCount").textContent = preview.dataset_summary.row_count.toLocaleString();
+  document.getElementById("columnCount").textContent = preview.dataset_summary.column_count;
+
+  // Render patient insights if available
+  if (preview.patient_insights) {
+    document.getElementById("patientInsightsSection").style.display = "block";
+    document.getElementById("uniquePatients").textContent = preview.patient_insights.unique_patients.toLocaleString();
+    document.getElementById("returningPatients").textContent = preview.patient_insights.returning_patients.toLocaleString();
+    document.getElementById("returnRate").textContent = preview.patient_insights.return_rate_percentage.toFixed(1) + "%";
+    
+    // Render patient appearance distribution chart if available
+    if (preview.patient_insights.appearance_distribution) {
+      const distData = preview.patient_insights.appearance_distribution;
+      const chartContainer = document.getElementById("patientAppearanceContainer");
+      const chartCanvas = document.getElementById("patientAppearanceChart");
+      
+      // Show the container
+      chartContainer.style.display = "block";
+      
+      // Destroy existing chart if any
+      if (chartCanvas.chart) {
+        chartCanvas.chart.destroy();
+      }
+      
+      // Simple clean bar chart
+      chartCanvas.chart = new Chart(chartCanvas, {
+        type: 'bar',
+        data: {
+          labels: distData.labels,
+          datasets: [{
+            data: distData.counts,
+            backgroundColor: '#2563eb',
+            borderWidth: 0,
+            borderRadius: 2
+          }]
+        },
+        options: {
+          indexAxis: 'x',
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(0,0,0,0.8)',
+              padding: 8,
+              titleFont: { size: 12 },
+              bodyFont: { size: 11 },
+              callbacks: {
+                label: () => null,
+                afterLabel: function(context) {
+                  return context.parsed.y + ' patient' + (context.parsed.y !== 1 ? 's' : '');
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1, font: { size: 10 } },
+              grid: { color: '#f3f3f3', drawBorder: false },
+              title: {
+                display: true,
+                text: ['Number of', 'Patients'],
+                font: { size: 11, weight: 'bold' }
+              }
+            },
+            x: {
+              ticks: { font: { size: 10 } },
+              grid: { display: false, drawBorder: false },
+              title: {
+                display: true,
+                text: 'Number of Rows',
+                font: { size: 11, weight: 'bold' }
+              }
+            }
+          }
+        }
+      });
+      
+      window.previewCharts.push(chartCanvas.chart);
+    } else {
+      document.getElementById("patientAppearanceContainer").style.display = "none";
+    }
+  } else {
+    document.getElementById("patientInsightsSection").style.display = "none";
+  }
+
+  // Render column information
+  const columnsContainer = document.getElementById("columnsContainer");
+  columnsContainer.innerHTML = "";
+
+  preview.columns.forEach((col, idx) => {
+    // Skip rendering regular column cards for patient ID column
+    // (it's handled in the patient_insights section)
+    if (col.is_patient_id) {
+      return;
+    }
+    
+    const colDiv = document.createElement("div");
+    colDiv.className = "column-info";
+    
+    let statsHtml = `<strong>Type:</strong> <span class="type-badge">${col.dtype}</span>`;
+    statsHtml += `<br><strong>Unique:</strong> ${col.unique_values}`;
+    
+    if (col.missing_percentage > 0) {
+      statsHtml += `<br><strong>Missing:</strong> ${col.missing_percentage.toFixed(2)}%`;
+    }
+
+    // Add type-specific stats (never for patient ID columns)
+    if (col.dtype === "numeric") {
+      statsHtml += `
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-name">Mean</span>
+            <span class="stat-val">${(col.mean !== null ? col.mean.toFixed(2) : "N/A")}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-name">Min</span>
+            <span class="stat-val">${(col.min !== null ? col.min.toFixed(2) : "N/A")}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-name">Max</span>
+            <span class="stat-val">${(col.max !== null ? col.max.toFixed(2) : "N/A")}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-name">Std Dev</span>
+            <span class="stat-val">${(col.std !== null ? col.std.toFixed(2) : "N/A")}</span>
+          </div>
+        </div>
+      `;
+      // Add histogram placeholder
+      statsHtml += `<canvas id="chart-${idx}" class="distribution-chart" style="max-height: 150px; margin-top: 10px;"></canvas>`;
+    } else if (col.dtype === "categorical") {
+      if (col.top_values) {
+        statsHtml += `<div class="top-values">`;
+        Object.entries(col.top_values).forEach(([value, count]) => {
+          const percentage = col.unique_values > 0 ? ((count / preview.dataset_summary.row_count) * 100).toFixed(1) : 0;
+          statsHtml += `<div class="value-bar">
+            <span class="value-label">${value}</span>
+            <span class="value-count">${count} (${percentage}%)</span>
+          </div>`;
+        });
+        statsHtml += `</div>`;
+      }
+      // Add distribution chart placeholder
+      statsHtml += `<canvas id="chart-${idx}" class="distribution-chart" style="max-height: 150px; margin-top: 10px;"></canvas>`;
+    } else if (col.dtype === "datetime") {
+      statsHtml += `<br><strong>Date Range:</strong> ${col.min_date || "N/A"} to ${col.max_date || "N/A"}`;
+    }
+
+    colDiv.innerHTML = `
+      <div class="column-header">
+        <span class="column-name">${col.name}</span>
+      </div>
+      <div class="column-stats">${statsHtml}</div>
+    `;
+    
+    columnsContainer.appendChild(colDiv);
+    
+    // Render chart after element is added to DOM
+    setTimeout(() => {
+      renderChart(col, idx, preview.dataset_summary.row_count);
+    }, 0);
+  });
+
+  // Render sample rows
+  const sampleTable = document.getElementById("sampleRowsTable");
+  sampleTable.innerHTML = "";
+
+  if (preview.sample_rows.length === 0) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td class="no-data" colspan="${preview.columns.length}">No sample data available</td>`;
+    sampleTable.appendChild(tr);
+    return;
+  }
+
+  // Header row
+  const headerRow = document.createElement("tr");
+  preview.columns.forEach(col => {
+    const th = document.createElement("th");
+    th.textContent = col.name;
+    headerRow.appendChild(th);
+  });
+  sampleTable.appendChild(headerRow);
+
+  // Data rows
+  preview.sample_rows.forEach(row => {
+    const tr = document.createElement("tr");
+    preview.columns.forEach(col => {
+      const td = document.createElement("td");
+      const value = row[col.name];
+      td.textContent = value !== null && value !== undefined ? value : "-";
+      tr.appendChild(td);
+    });
+    sampleTable.appendChild(tr);
+  });
+}
+
+function renderChart(column, idx, totalRows) {
+  const ctx = document.getElementById(`chart-${idx}`);
+  if (!ctx) return;
+
+  let config;
+  
+  if (column.dtype === "numeric" && column.distribution) {
+    // Histogram for numeric columns
+    config = {
+      type: "bar",
+      data: {
+        labels: column.distribution.bins || [],
+        datasets: [{
+          label: "Frequency",
+          data: column.distribution.counts || [],
+          backgroundColor: "rgba(102, 126, 234, 0.6)",
+          borderColor: "rgba(102, 126, 234, 1)",
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+      }
+    };
+  } else if (column.dtype === "categorical" && column.distribution) {
+    // Bar chart for categorical columns
+    config = {
+      type: "bar",
+      data: {
+        labels: column.distribution.categories || [],
+        datasets: [{
+          label: "Count",
+          data: column.distribution.counts || [],
+          backgroundColor: "rgba(17, 153, 142, 0.6)",
+          borderColor: "rgba(17, 153, 142, 1)",
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        indexAxis: column.distribution.categories?.length > 5 ? "y" : "x",
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: { beginAtZero: true },
+          y: { ticks: { autoSkip: false } }
+        }
+      }
+    };
+  }
+
+  if (config) {
+    try {
+      const chart = new Chart(ctx, config);
+      if (!window.previewCharts) window.previewCharts = [];
+      window.previewCharts.push(chart);
+    } catch (e) {
+      console.error("Chart rendering failed:", e);
+    }
+  }
+}
+
+function closePreviewModal() {
+  document.getElementById("previewModal").style.display = "none";
 }
 
 function renderTable(sparqlResults) {
@@ -307,9 +707,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Close modal when clicking outside of it
 window.onclick = function(event) {
-  const modal = document.getElementById("saveDatasetModal");
-  if (event.target == modal) {
-    modal.style.display = "none";
+  const saveModal = document.getElementById("saveDatasetModal");
+  const previewModal = document.getElementById("previewModal");
+  
+  if (event.target == saveModal) {
+    saveModal.style.display = "none";
+  }
+  if (event.target == previewModal) {
+    previewModal.style.display = "none";
   }
 }
 

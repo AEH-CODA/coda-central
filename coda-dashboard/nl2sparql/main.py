@@ -29,39 +29,85 @@ def translate(nl: NLQuery):
     - Use ONLY the classes and predicates defined below.
     - Do NOT invent new classes or predicates.
     - Generate READ-ONLY SPARQL (SELECT only) and nothing else.
-    - Always include LIMIT 10 unless explicitly specified.
     - Output ONLY valid SPARQL or a JSON error object.
     - Return only the final SparQL query. NEVER include your warning messages, reasons or errors.
 
     Ontology:
-    PREFIX : <http://example.org/schema#>
+    PREFIX ns1: <http://clinical-example.org/ontology/>
 
     Classes:
-    Patient, Visit, Diagnosis, Complaint, Investigation, Refraction,
-    AnteriorSegmentExam, FundusExam, SocialHistory, BirthHistory, SystemicDisease
+    - Patient
+    - Visit
+    - Complaint
+    - Investigation
+    - VitalDetails
+    - VisionDetails
+    - VisionItem
+    - RefractionDetails
+    - RefractionItem
+    - AnteriorSegmentExam
+    - ExamFinding
+    - ReportedHistory
+    - SystemicHistory
+    - AdviceDetails
 
     Relationships:
-    Patient -> hasVisit -> Visit
-    Patient -> hasSocialHistory -> SocialHistory
-    Patient -> hasBirthHistory -> BirthHistory
-    Patient -> hasSystemicDisease -> SystemicDisease
-    Visit -> hasDiagnosis -> Diagnosis
-    Visit -> hasComplaint -> Complaint
-    Visit -> hasInvestigation -> Investigation
-    Visit -> hasRefraction -> Refraction
-    Visit -> hasAnteriorSegExam -> AnteriorSegmentExam
-    Visit -> hasFundusExam -> FundusExam
+    - Patient → hasVisit → Visit
+    - Patient → hasReportedHistory → ReportedHistory
+    - ReportedHistory → hasSystemicHistory → SystemicHistory
 
-    Attributes:
-    Visit: visitDate
-    Diagnosis: diagnosisName
-    Complaint: complaintName, complaintSummary, subComplaint, subComplaintValue, eye
-    Investigation: investigationName, investigationResult, investigationResultFile
-    Refraction: chartType, spectacleType
-    AnteriorSegmentExam: part, examValue, examValueQualifier
-    SocialHistory: smokingStatus ("Daily", "Frequently", "Rarely", "Never"), alcoholConsumption ("Daily", "Frequently", "Rarely", "Never"), maritalStatus ("Married", "Single", "Divorced", "Widow"), consanginousParents
-    BirthHistory: birthWeight, birthMode
-    SystemicDisease: diseaseName, prescription, numberOfYears, remarks
+    - Visit → hasComplaint → Complaint
+    - Visit → hasInvestigation → Investigation
+    - Visit → hasVitals → VitalDetails
+    - Visit → hasVisionDetails → VisionDetails
+    - Visit → hasRefraction → RefractionDetails
+    - Visit → hasAsExam → AnteriorSegmentExam
+    - Visit → hasAdvice → AdviceDetails
+
+    - VisionDetails → hasVisionItem → VisionItem
+    - RefractionDetails → hasRefractionItem → RefractionItem
+    - AnteriorSegmentExam → hasFinding → ExamFinding
+
+    Key Attributes:
+
+    Patient:
+    - patientId (string)
+
+    Visit:
+    - visitDate (date)
+
+    Complaint:
+    - complaintName (string)
+    - duration (string)
+
+    SystemicHistory:
+    - conditionCode (string)
+    - duration (string)
+    - hasPrescription (boolean)
+
+    Investigation:
+    - investigationName (string)
+    - resultNumeric (decimal)
+    - resultUnit (string)
+    - laterality (string)
+
+    VitalDetails:
+    - systolicBP (int)
+    - diastolicBP (int)
+
+    VisionItem:
+    - visionType (string)
+    - chartType (string)
+    - leftEyeValue (string)
+    - rightEyeValue (string)
+
+    ExamFinding:
+    - partName (string)
+    - findingValue (string)
+
+    RefractionItem:
+    - reSphere, reCylinder, reAxis, rePHVA
+    - leSphere, leCylinder, leAxis, lePHVA
 
     Natural language query:
     '''
@@ -71,7 +117,7 @@ def translate(nl: NLQuery):
     print("Calling Groq")
     
     response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="meta-llama/llama-4-scout-17b-16e-instruct",
         messages=[
             {"role": "system", "content": "You convert natural language to SPARQL."},
             {"role": "user", "content": prompt},
