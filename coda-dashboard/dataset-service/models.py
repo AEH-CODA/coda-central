@@ -110,3 +110,71 @@ class PreviewResponse(BaseModel):
     patient_insights: Optional[PatientInsights] = None
     columns: List[ColumnMetadata]
     sample_rows: List[Dict[str, Any]]
+
+
+# Access Request models
+
+class AccessRequestCreateRequest(BaseModel):
+    """Request to create a new data access request."""
+    reason: str  # Why user needs this data (10-500 chars)
+    nl_query: str
+    sparql_query: str
+    data_preview: Optional[Dict[str, Any]] = None  # Preview data from frontend
+
+
+class AccessRequestResponse(BaseModel):
+    """Response showing access request details."""
+    id: UUID
+    user_id: UUID
+    reason: str
+    nl_query: str
+    sparql_query: str
+    data_preview: Optional[Dict[str, Any]] = None
+    status: str  # pending, approved, rejected
+    created_at: datetime
+    reviewed_by_id: Optional[UUID] = None
+    reviewed_at: Optional[datetime] = None
+    review_reason: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class AccessRequestListResponse(BaseModel):
+    """Response for listing access requests (for data manager view)."""
+    id: UUID
+    user_id: UUID
+    reason: str
+    nl_query: str
+    status: str
+    created_at: datetime
+    reviewed_at: Optional[datetime] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class AccessRequestDetailResponse(BaseModel):
+    """Response with full request details including full results (for data manager)."""
+    id: UUID
+    user_id: UUID
+    reason: str
+    nl_query: str
+    sparql_query: str
+    data_preview: Optional[Dict[str, Any]] = None
+    full_results: Optional[Any] = None  # Full results loaded from file or DB
+    status: str
+    created_at: datetime
+    reviewed_by_id: Optional[UUID] = None
+    reviewed_at: Optional[datetime] = None
+    review_reason: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class AccessRequestApprovalRequest(BaseModel):
+    """Request to approve/reject an access request."""
+    action: str  # "approve" or "reject"
+    review_reason: Optional[str] = None  # Reason for rejection
+

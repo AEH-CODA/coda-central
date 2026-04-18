@@ -2,11 +2,17 @@ from fastapi import FastAPI, HTTPException, Depends, Header, Request
 from pydantic import BaseModel
 import requests
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 import os
 from jose import jwt, JWTError
 
 app = FastAPI(title="CODA API Gateway")
+
+class ErrorResponse(BaseModel):
+    """Standardized error response format"""
+    error: str
+    detail: str
+    action: str = None  # Suggested action for user
 
 NL2SPARQL_URL = os.getenv("NL2SPARQL_URL")
 GRAPHDB_ENDPOINT = os.getenv("GRAPHDB_ENDPOINT")
@@ -54,15 +60,50 @@ def verify_token(authorization: str = Header(...)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
+        raise HTTPException(
+            status_code=401, 
+            detail={
+                "error": "Token Expired",
+                "detail": "Your session has expired due to inactivity.",
+                "action": "Please sign out and sign in again to continue."
+            }
+        )
     except jwt.InvalidSignatureError:
-        raise HTTPException(status_code=401, detail="Invalid token signature")
+        raise HTTPException(
+            status_code=401, 
+            detail={
+                "error": "Invalid Token",
+                "detail": "Your authentication token is invalid.",
+                "action": "Please sign out and sign in again."
+            }
+        )
     except jwt.DecodeError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(
+            status_code=401, 
+            detail={
+                "error": "Invalid Token",
+                "detail": "Your authentication token could not be verified.",
+                "action": "Please sign out and sign in again."
+            }
+        )
     except JWTError as e:
-        raise HTTPException(status_code=401, detail=f"Token validation failed: {str(e)}")
+        raise HTTPException(
+            status_code=401, 
+            detail={
+                "error": "Token Validation Failed",
+                "detail": "Your authentication could not be verified.",
+                "action": "Please sign out and sign in again."
+            }
+        )
     except Exception as e:
-        raise HTTPException(status_code=401, detail="Token validation error")
+        raise HTTPException(
+            status_code=401, 
+            detail={
+                "error": "Authentication Error",
+                "detail": "An error occurred during authentication.",
+                "action": "Please sign out and sign in again."
+            }
+        )
     
     return payload
 
@@ -207,7 +248,11 @@ async def proxy_save_dataset(request: Request):
     try:
         auth_header = request.headers.get("authorization")
         if not auth_header:
-            raise HTTPException(status_code=401, detail="Missing authorization header")
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
         
         body = await request.json()
         
@@ -228,7 +273,11 @@ async def proxy_list_datasets(request: Request, skip: int = 0, limit: int = 10):
     try:
         auth_header = request.headers.get("authorization")
         if not auth_header:
-            raise HTTPException(status_code=401, detail="Missing authorization header")
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
         
         response = requests.get(
             f"{DATASET_SERVICE_URL}/datasets?skip={skip}&limit={limit}",
@@ -246,7 +295,11 @@ async def proxy_get_dataset(dataset_id: str, request: Request):
     try:
         auth_header = request.headers.get("authorization")
         if not auth_header:
-            raise HTTPException(status_code=401, detail="Missing authorization header")
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
         
         response = requests.get(
             f"{DATASET_SERVICE_URL}/datasets/{dataset_id}",
@@ -269,7 +322,11 @@ async def proxy_update_dataset(dataset_id: str, request: Request):
     try:
         auth_header = request.headers.get("authorization")
         if not auth_header:
-            raise HTTPException(status_code=401, detail="Missing authorization header")
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
         
         body = await request.json()
         
@@ -295,7 +352,11 @@ async def proxy_delete_dataset(dataset_id: str, request: Request):
     try:
         auth_header = request.headers.get("authorization")
         if not auth_header:
-            raise HTTPException(status_code=401, detail="Missing authorization header")
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
         
         response = requests.delete(
             f"{DATASET_SERVICE_URL}/datasets/{dataset_id}",
@@ -318,7 +379,11 @@ async def proxy_preview_dataset(request: Request):
     try:
         auth_header = request.headers.get("authorization")
         if not auth_header:
-            raise HTTPException(status_code=401, detail="Missing authorization header")
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
         
         body = await request.json()
         
@@ -341,3 +406,211 @@ async def proxy_preview_dataset(request: Request):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate preview: {str(e)}")
+
+# ============================================================================
+# ACCESS REQUESTS PROXY ENDPOINTS
+# ============================================================================
+
+@app.post("/datasets/access-requests/create")
+async def proxy_create_access_request(request: Request):
+    """Proxy POST /datasets/access-requests/create to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+        
+        body = await request.json()
+        
+        response = requests.post(
+            f"{DATASET_SERVICE_URL}/datasets/access-requests/create",
+            json=body,
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create access request: {str(e)}")
+
+@app.post("/datasets/access-requests/{request_id}/full-results")
+async def proxy_store_full_results(request_id: str, request: Request):
+    """Proxy POST /datasets/access-requests/{id}/full-results to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+        
+        body = await request.json()
+        
+        response = requests.post(
+            f"{DATASET_SERVICE_URL}/datasets/access-requests/{request_id}/full-results",
+            json=body,
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to store full results: {str(e)}")
+
+@app.get("/datasets/access-requests/pending")
+async def proxy_get_pending_requests(request: Request, skip: int = 0, limit: int = 100):
+    """Proxy GET /datasets/access-requests/pending to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+        
+        response = requests.get(
+            f"{DATASET_SERVICE_URL}/datasets/access-requests/pending?skip={skip}&limit={limit}",
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get pending requests: {str(e)}")
+
+@app.get("/datasets/access-requests/all")
+async def proxy_get_all_requests(request: Request, skip: int = 0, limit: int = 100):
+    """Proxy GET /datasets/access-requests/all to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+        
+        response = requests.get(
+            f"{DATASET_SERVICE_URL}/datasets/access-requests/all?skip={skip}&limit={limit}",
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get all requests: {str(e)}")
+
+@app.get("/datasets/access-requests/{request_id}")
+async def proxy_get_request_detail(request_id: str, request: Request):
+    """Proxy GET /datasets/access-requests/{id} to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+        
+        response = requests.get(
+            f"{DATASET_SERVICE_URL}/datasets/access-requests/{request_id}",
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get request detail: {str(e)}")
+
+@app.post("/datasets/access-requests/{request_id}/approve")
+async def proxy_approve_request(request_id: str, request: Request):
+    """Proxy POST /datasets/access-requests/{id}/approve to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+        
+        body = await request.json() if await request.body() else {}
+        
+        response = requests.post(
+            f"{DATASET_SERVICE_URL}/datasets/access-requests/{request_id}/approve",
+            json=body,
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to approve request: {str(e)}")
+
+@app.post("/datasets/access-requests/{request_id}/reject")
+async def proxy_reject_request(request_id: str, request: Request):
+    """Proxy POST /datasets/access-requests/{id}/reject to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+        
+        body = await request.json() if await request.body() else {}
+        
+        response = requests.post(
+            f"{DATASET_SERVICE_URL}/datasets/access-requests/{request_id}/reject",
+            json=body,
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to reject request: {str(e)}")
+
+@app.get("/datasets/access-requests/user/history")
+async def proxy_get_user_history(request: Request, skip: int = 0, limit: int = 20):
+    """Proxy GET /datasets/access-requests/user/history to dataset-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+        
+        response = requests.get(
+            f"{DATASET_SERVICE_URL}/datasets/access-requests/user/history?skip={skip}&limit={limit}",
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+        
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get user history: {str(e)}")

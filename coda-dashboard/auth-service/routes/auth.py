@@ -100,15 +100,16 @@ def auth_callback(request: Request, code: str = Query(...), state: str = Query(.
         # Step 4: Extract user information
         google_id = id_token_decoded.get("sub")
         email = id_token_decoded.get("email")
+        name = id_token_decoded.get("name")
         
         if not google_id or not email:
             raise HTTPException(status_code=400, detail="Missing sub or email in ID token")
         
         # Step 5: Get or create user in database
-        user_id, role = get_or_create_user(email, google_id)
+        user_id, role = get_or_create_user(email, google_id, name)
         
-        # Step 6: Issue our internal JWT token
-        our_token = create_token(user_id, role)
+        # Step 6: Issue our internal JWT token (include user name)
+        our_token = create_token(user_id, role, name)
         
         # Step 7: Redirect to frontend with token (use frontend URL with UI port)
         frontend_url = get_frontend_url(request)

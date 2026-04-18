@@ -29,13 +29,14 @@ def get_db_connection():
         raise
 
 
-def get_or_create_user(email: str, google_id: str) -> tuple:
+def get_or_create_user(email: str, google_id: str, name: str = None) -> tuple:
     """
     Get existing user by google_id, or create a new user.
     
     Args:
         email: User's email address
         google_id: Google's unique user ID (sub claim from ID token)
+        name: User's full name (from Google profile)
     
     Returns:
         Tuple of (user_id, role)
@@ -66,11 +67,11 @@ def get_or_create_user(email: str, google_id: str) -> tuple:
         role = "user"  # default role for new users
         
         cur.execute(
-            "INSERT INTO users (id, email, google_id, role) VALUES (%s, %s, %s, %s)",
-            (user_id, email, google_id, role)
+            "INSERT INTO users (id, email, google_id, name, role) VALUES (%s, %s, %s, %s, %s)",
+            (user_id, email, google_id, name, role)
         )
         db.commit()
-        logger.info(f"User created: {user_id} with email: {email}")
+        logger.info(f"User created: {user_id} with email: {email}, name: {name}")
         return user_id, role
         
     except psycopg2.IntegrityError as e:

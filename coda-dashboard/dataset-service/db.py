@@ -29,6 +29,25 @@ class Dataset(Base):
         # No native composite index in SQLAlchemy declarative, but can be added via raw SQL if needed
     )
 
+
+class AccessRequest(Base):
+    """Data access request from user to data manager."""
+    __tablename__ = "access_requests"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), nullable=False, index=True)  # User requesting access
+    reason = Column(Text, nullable=False)  # Why they need this data
+    nl_query = Column(Text, nullable=False)  # Original natural language query
+    sparql_query = Column(Text, nullable=False)  # SPARQL query executed
+    data_preview = Column(Text, nullable=True)  # JSON string of preview data
+    result_file_path = Column(String(1024), nullable=True)  # Path to full results if large
+    result_json = Column(Text, nullable=True)  # JSON string of full results if small
+    status = Column(String(20), nullable=False, default="pending", index=True)  # pending, approved, rejected
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
+    reviewed_by_id = Column(UUID(as_uuid=True), nullable=True, index=True)  # Data manager who reviewed
+    reviewed_at = Column(DateTime, nullable=True)  # When data manager took action
+    review_reason = Column(Text, nullable=True)  # Reason for rejection (optional)
+
 def get_db():
     db = SessionLocal()
     try:

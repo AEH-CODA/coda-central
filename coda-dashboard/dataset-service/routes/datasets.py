@@ -7,10 +7,13 @@ from db import get_db
 from config import JWT_SECRET, JWT_ALGORITHM, SPARQL_QUERY_TIMEOUT
 from models import (
     DatasetSaveRequest, DatasetUpdateRequest, DatasetListResponse, DatasetDetailResponse,
-    PreviewRequest, PreviewResponse
+    PreviewRequest, PreviewResponse,
+    AccessRequestCreateRequest, AccessRequestResponse, AccessRequestListResponse,
+    AccessRequestDetailResponse, AccessRequestApprovalRequest
 )
 from services.dataset_service import DatasetService
 from services.preview_service import PreviewService
+from services.access_request_service import AccessRequestService
 
 router = APIRouter(prefix="/datasets", tags=["datasets"])
 
@@ -33,6 +36,43 @@ def verify_token(authorization: str = Header(...)) -> UUID:
         if not user_id:
             raise HTTPException(status_code=401, detail="Invalid token: missing sub claim")
         return UUID(user_id)
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidSignatureError:
+        raise HTTPException(status_code=401, detail="Invalid token signature")
+    except jwt.DecodeError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    except (JWTError, ValueError) as e:
+        raise HTTPException(status_code=401, detail=f"Token validation failed: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Token validation error")
+
+
+def extract_user_role(authorization: str = Header(...)) -> tuple:
+    """
+    Extract user_id and role from JWT token.
+    
+    Returns:
+        Tuple of (user_id, role)
+    """
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token format",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    
+    token = authorization.split(" ")[1]
+    
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get("sub")
+        role = payload.get("role", "user")  # Default to "user" if role not in token
+        
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token: missing sub claim")
+        
+        return UUID(user_id), role
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.InvalidSignatureError:
@@ -259,3 +299,383 @@ def delete_dataset(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete dataset: {str(e)}")
+
+
+# ============================================================================
+# ACCESS REQUEST ENDPOINTS
+# ============================================================================
+
+@router.post("/access-requests/create")
+def create_access_request(
+    req: AccessRequestCreateRequest,
+    authorization: str = Header(...),
+    db: Session = Depends(get_db)
+):
+    """
+    Create a new data access request.
+    
+    Args:
+        req: Access request details (reason, nl_query, sparql_query, data_preview, full results)
+        authorization: Bearer token
+        db: Database session
+    
+    Returns:
+        Access request ID and status
+    """
+    try:
+        # Extract user_id and role from token
+        user_id, role = extract_user_role(authorization)
+        
+        # Validate reason length
+        if not req.reason or len(req.reason) < 10 or len(req.reason) > 500:
+            raise HTTPException(
+                status_code=400,
+                detail="Reason must be between 10 and 500 characters"
+            )
+        
+        access_request = AccessRequestService.create_access_request(
+            db=db,
+            user_id=user_id,
+            reason=req.reason,
+            nl_query=req.nl_query,
+            sparql_query=req.sparql_query,
+            data_preview=req.data_preview,
+            full_results=None  # Will be populated by frontend after query execution
+        )
+        
+        return {
+            "request_id": str(access_request.id),
+            "status": access_request.status,
+            "created_at": access_request.created_at,
+            "message": "Access request submitted successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create access request: {str(e)}")  
+
+
+@router.post("/access-requests/{request_id}/full-results")
+def store_access_request_full_results(
+    request_id: str,
+    full_results: dict,
+    user_id: UUID = Depends(verify_token),
+    db: Session = Depends(get_db)
+):
+    """
+    Store full query results for an access request (called after full query executes).
+    
+    Args:
+        request_id: Access request ID
+        full_results: Full query results dictionary
+        user_id: Verified user ID from JWT
+        db: Database session
+    
+    Returns:
+        Success message
+    """
+    try:
+        request_uuid = UUID(request_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid request ID format")
+    
+    try:
+        access_request = AccessRequestService.get_request_by_id(db, request_uuid)
+        
+        if not access_request:
+            raise HTTPException(status_code=404, detail="Access request not found")
+        
+        if access_request.user_id != user_id:
+            raise HTTPException(status_code=403, detail="Not authorized to update this request")
+        
+        # Store full results (will handle file/DB storage automatically)
+        import json
+        import os
+        from config import DATA_DIRECTORY
+        
+        results_json = json.dumps(full_results)
+        
+        if len(results_json) > 100000:
+            from datetime import datetime
+            filename = f"access_request_{user_id}_{datetime.utcnow().timestamp()}.json"
+            result_file_path = f"access_requests/{filename}"
+            filepath = os.path.join(DATA_DIRECTORY, result_file_path)
+            
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            with open(filepath, "w") as f:
+                json.dump(full_results, f)
+            
+            access_request.result_file_path = result_file_path
+            access_request.result_json = None
+        else:
+            access_request.result_json = results_json
+            access_request.result_file_path = None
+        
+        db.commit()
+        
+        return {"message": "Full results stored successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to store results: {str(e)}")
+
+
+@router.get("/access-requests/pending")
+def get_pending_requests(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    authorization: str = Header(...),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all pending access requests (data manager only).
+    
+    Args:
+        skip: Pagination offset
+        limit: Pagination limit
+        authorization: Bearer token
+        db: Database session
+    
+    Returns:
+        List of pending access requests
+    """
+    try:
+        user_id, role = extract_user_role(authorization)
+        
+        if role != "data-manager":
+            raise HTTPException(status_code=403, detail="Only data managers can view pending requests")
+        
+        requests = AccessRequestService.get_pending_requests(db, skip, limit)
+        total = AccessRequestService.get_pending_requests_count(db)
+        
+        return {
+            "requests": [
+                AccessRequestListResponse.from_orm(r) for r in requests
+            ],
+            "total": total,
+            "skip": skip,
+            "limit": limit
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list pending requests: {str(e)}")
+
+
+@router.get("/access-requests/all")
+def get_all_requests(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    authorization: str = Header(...),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all access requests (data manager only) - pending, approved, and rejected.
+    
+    Args:
+        skip: Pagination offset
+        limit: Pagination limit
+        authorization: Bearer token
+        db: Database session
+    
+    Returns:
+        List of all access requests
+    """
+    try:
+        user_id, role = extract_user_role(authorization)
+        
+        if role != "data-manager":
+            raise HTTPException(status_code=403, detail="Only data managers can view requests")
+        
+        requests = AccessRequestService.get_all_requests(db, skip, limit)
+        total = db.query(db.func.count()).from_statement(
+            "SELECT COUNT(*) FROM access_requests"
+        ).scalar() if hasattr(db, 'func') else len(requests)
+        
+        return {
+            "requests": [
+                AccessRequestListResponse.from_orm(r) for r in requests
+            ],
+            "total": total,
+            "skip": skip,
+            "limit": limit
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list requests: {str(e)}")
+
+
+@router.get("/access-requests/user/history")
+def get_user_request_history(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    user_id: UUID = Depends(verify_token),
+    db: Session = Depends(get_db)
+):
+    """
+    Get access request history for the authenticated user.
+    
+    Args:
+        skip: Pagination offset
+        limit: Pagination limit
+        user_id: Verified user ID from JWT
+        db: Database session
+    
+    Returns:
+        List of user's access requests
+    """
+    try:
+        requests = AccessRequestService.get_user_request_history(db, user_id, skip, limit)
+        
+        return {
+            "requests": [
+                AccessRequestListResponse.from_orm(r) for r in requests
+            ],
+            "skip": skip,
+            "limit": limit
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve request history: {str(e)}")
+
+
+@router.get("/access-requests/{request_id}")
+def get_request_detail(
+    request_id: str,
+    authorization: str = Header(...),
+    db: Session = Depends(get_db)
+):
+    """
+    Get detailed view of an access request (including full results).
+    
+    Args:
+        request_id: Access request ID
+        authorization: Bearer token
+        db: Database session
+    
+    Returns:
+        Full access request details with results
+    """
+    try:
+        request_uuid = UUID(request_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid request ID format")
+    
+    try:
+        user_id, role = extract_user_role(authorization)
+        
+        # Only data managers and the requester can view details
+        access_request = AccessRequestService.get_request_by_id(db, request_uuid)
+        
+        if not access_request:
+            raise HTTPException(status_code=404, detail="Access request not found")
+        
+        if role != "data-manager" and access_request.user_id != user_id:
+            raise HTTPException(status_code=403, detail="Not authorized to view this request")
+        
+        request_detail = AccessRequestService.get_request_detail(db, request_uuid)
+        
+        return request_detail
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve request: {str(e)}")
+
+
+@router.post("/access-requests/{request_id}/approve")
+def approve_access_request(
+    request_id: str,
+    authorization: str = Header(...),
+    db: Session = Depends(get_db)
+):
+    """
+    Approve an access request (data manager only).
+    Creates a new dataset for the user.
+    
+    Args:
+        request_id: Access request ID to approve
+        authorization: Bearer token
+        db: Database session
+    
+    Returns:
+        Success message with created dataset ID
+    """
+    try:
+        request_uuid = UUID(request_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid request ID format")
+    
+    try:
+        user_id, role = extract_user_role(authorization)
+        
+        if role != "data-manager":
+            raise HTTPException(status_code=403, detail="Only data managers can approve requests")
+        
+        access_request = AccessRequestService.approve_request(db, request_uuid, user_id)
+        
+        if not access_request:
+            raise HTTPException(status_code=404, detail="Access request not found")
+        
+        return {
+            "message": "Access request approved successfully",
+            "request_id": str(access_request.id),
+            "status": access_request.status,
+            "approved_at": access_request.reviewed_at
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to approve request: {str(e)}")
+
+
+@router.post("/access-requests/{request_id}/reject")
+def reject_access_request(
+    request_id: str,
+    req: AccessRequestApprovalRequest,
+    authorization: str = Header(...),
+    db: Session = Depends(get_db)
+):
+    """
+    Reject an access request (data manager only).
+    
+    Args:
+        request_id: Access request ID to reject
+        req: Rejection details (action, optional review_reason)
+        authorization: Bearer token
+        db: Database session
+    
+    Returns:
+        Success message
+    """
+    try:
+        request_uuid = UUID(request_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid request ID format")
+    
+    try:
+        user_id, role = extract_user_role(authorization)
+        
+        if role != "data-manager":
+            raise HTTPException(status_code=403, detail="Only data managers can reject requests")
+        
+        if req.action != "reject":
+            raise HTTPException(status_code=400, detail="Invalid action for this endpoint")
+        
+        access_request = AccessRequestService.reject_request(
+            db, request_uuid, user_id, req.review_reason
+        )
+        
+        if not access_request:
+            raise HTTPException(status_code=404, detail="Access request not found")
+        
+        return {
+            "message": "Access request rejected successfully",
+            "request_id": str(access_request.id),
+            "status": access_request.status,
+            "rejected_at": access_request.reviewed_at
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to reject request: {str(e)}")
+

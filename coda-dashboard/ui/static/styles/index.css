@@ -161,6 +161,28 @@
   background: #28a745;
 }
 
+.request-access-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(17, 153, 142, 0.2);
+}
+
+.request-access-btn:hover {
+  box-shadow: 0 4px 10px rgba(17, 153, 142, 0.3);
+  transform: translateY(-1px);
+}
+
+.request-access-btn:active {
+  transform: translateY(0);
+}
+
 /* Modal */
 .modal {
   position: fixed;
