@@ -28,6 +28,7 @@ jobs:
 
       - name: Build Pages artifact
         run: python build_pages_site.py
+        working-directory: coda-data-model
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -35,7 +36,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: coda-data-model/site
 
   deploy:
     environment:
