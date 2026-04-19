@@ -1,0 +1,5263 @@
+{
+  "$schema": "https://raw.githubusercontent.com/MaastrichtU-CDS/Flyover/refs/heads/main/triplifier/data_descriptor/schemas/mapping_schema.json",
+  "@context": {
+    "@vocab": "https://github.com/MaastrichtU-CDS/Flyover/",
+    "sio": "http://semanticscience.org/resource/",
+    "ncit": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#",
+    "coda": "https://aeh-coda.github.io/coda-data-model/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "schema": "schema/",
+    "mapping": "mapping/"
+  },
+  "@id": "https://aeh-coda.github.io/coda-data-model/coda_schema.jsonld",
+  "@type": "mapping:DataMapping",
+  "name": "AEH CODA Semantic Mapping",
+  "description": "Semantic mapping for CODA data model derived from the Excel-based data dictionary and vocabulary. Source DB: coda_db",
+  "version": "0.0.2",
+  "created": "2026-04-19",
+  "endpoint": "http://localhost:7200/repositories/userRepo/statements",
+  "schema": {
+    "@id": "schema:coda/v0.0.2",
+    "@type": "schema:SemanticSchema",
+    "name": "CODA Semantic Schema",
+    "version": "0.0.2",
+    "description": "JSON-LD schema for CODA variable-to-ontology semantic mapping",
+    "prefixes": {
+      "sio": "http://semanticscience.org/resource/",
+      "ncit": "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#",
+      "coda": "https://aeh-coda.github.io/coda-data-model/"
+    },
+    "variables": {
+      "anonymous_uid": {
+        "@id": "schema:variable/anonymous_uid",
+        "@type": "schema:IdentifierVariable",
+        "dataType": "identifier",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25364",
+        "fieldType": "Alphanumeric Identifier",
+        "sqlType": "varchar(255)",
+        "description": "A unique identifier for the patient, anonymized to protect privacy. This UID represents the patient's identification and is common across hospitals in the network. It is system generated and not visible to the patient or clinicians.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient_Information"
+          }
+        ]
+      },
+      "anonymous_mrno": {
+        "@id": "schema:variable/anonymous_mrno",
+        "@type": "schema:IdentifierVariable",
+        "dataType": "identifier",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25364",
+        "fieldType": "Alphanumeric Identifier",
+        "sqlType": "varchar(255)",
+        "description": "Anonymized medical record number of the patient. This number is specific to the patient's medical record number in the specific hospital and is used for tracking visits. It is visible to the users of the system and is used by clinicians to track visits, diagnosis, history etc of the patient.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient_Information"
+          }
+        ]
+      },
+      "age": {
+        "@id": "schema:variable/age",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Patient_Identification",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Integer",
+        "description": "Age of Patient",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient_Information"
+          }
+        ]
+      },
+      "gender": {
+        "@id": "schema:variable/gender",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Patient_Identification",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Gender of Patient",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient_Information"
+          }
+        ]
+      },
+      "sh_history_code": {
+        "@id": "schema:variable/sh_history_code",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Systemic History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "The name of the disease as reported by the patient and noted in the systemic history during initial examination.",
+        "schemaReconstruction": [
+    
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Systemic History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Systemic History"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Diabetes": {
+              "targetClass": "coda:SH001"
+            },
+            "Hypertension": {
+              "targetClass": "coda:SH002"
+            },
+            "Cardiac": {
+              "targetClass": "coda:SH003"
+            },
+            "Asthma": {
+              "targetClass": "coda:SH004"
+            },
+            "Other Allergies": {
+              "targetClass": "coda:SH005"
+            },
+            "Non-Ocular Sx": {
+              "targetClass": "coda:SH006"
+            },
+            "GIT": {
+              "targetClass": "coda:SH007"
+            },
+            "Renal": {
+              "targetClass": "coda:SH008"
+            },
+            "RS": {
+              "targetClass": "coda:SH009"
+            },
+            "Others": {
+              "targetClass": "coda:SH010"
+            },
+            "GluacomaYoga": {
+              "targetClass": "coda:SH011"
+            },
+            "GluacomaDriving": {
+              "targetClass": "coda:SH012"
+            },
+            "FamilyH/O": {
+              "targetClass": "coda:SH013"
+            },
+            "GluacomaFamilyH/O": {
+              "targetClass": "coda:SH014"
+            },
+            "GluacomaFamilyH/OTxt1": {
+              "targetClass": "coda:SH015"
+            },
+            "GluacomaFamilyH/OTxt2": {
+              "targetClass": "coda:SH016"
+            },
+            "GluacomaFamilyH/OTxt3": {
+              "targetClass": "coda:SH017"
+            },
+            "Stroke": {
+              "targetClass": "coda:SH018"
+            },
+            "Ischemic heart disease": {
+              "targetClass": "coda:SH019"
+            },
+            "Bronchial Asthma": {
+              "targetClass": "coda:SH020"
+            },
+            "TB": {
+              "targetClass": "coda:SH021"
+            },
+            "Epilepsy": {
+              "targetClass": "coda:SH022"
+            },
+            "Renal failure": {
+              "targetClass": "coda:SH023"
+            },
+            "BowelBladder": {
+              "targetClass": "coda:SH024"
+            },
+            "Menstruation": {
+              "targetClass": "coda:SH025"
+            },
+            "MenstruationDays": {
+              "targetClass": "coda:SH026"
+            },
+            "SimilarComplaints": {
+              "targetClass": "coda:SH027"
+            },
+            "Sarcoid": {
+              "targetClass": "coda:SH028"
+            },
+            "Arthritis": {
+              "targetClass": "coda:SH029"
+            },
+            "Syphilis": {
+              "targetClass": "coda:SH030"
+            },
+            "Leprosy": {
+              "targetClass": "coda:SH031"
+            },
+            "Collagen vascular disease": {
+              "targetClass": "coda:SH032"
+            },
+            "Skin": {
+              "targetClass": "coda:SH033"
+            },
+            "Joints": {
+              "targetClass": "coda:SH034"
+            },
+            "GI": {
+              "targetClass": "coda:SH035"
+            },
+            "CNS": {
+              "targetClass": "coda:SH036"
+            },
+            "Pulmonary": {
+              "targetClass": "coda:SH037"
+            },
+            "Genitourinary": {
+              "targetClass": "coda:SH038"
+            },
+            "UveaFamilyHx": {
+              "targetClass": "coda:SH039"
+            },
+            "UveaFamilyHxOthers": {
+              "targetClass": "coda:SH040"
+            },
+            "UveaContactWith": {
+              "targetClass": "coda:SH041"
+            },
+            "UveaContactWithOthers": {
+              "targetClass": "coda:SH042"
+            },
+            "UveaBathIn": {
+              "targetClass": "coda:SH043"
+            },
+            "UveaDiet": {
+              "targetClass": "coda:SH044"
+            },
+            "UveaOthers": {
+              "targetClass": "coda:SH045"
+            },
+            "Hyperlipidemia": {
+              "targetClass": "coda:SH046"
+            },
+            "Epilepsy/Seizures": {
+              "targetClass": "coda:SH047"
+            },
+            "Any hospital admissions": {
+              "targetClass": "coda:SH048"
+            },
+            "Liver Problems": {
+              "targetClass": "coda:SH049"
+            },
+            "Renal Problems": {
+              "targetClass": "coda:SH050"
+            },
+            "Ear discharge": {
+              "targetClass": "coda:SH051"
+            },
+            "Skin lesions": {
+              "targetClass": "coda:SH052"
+            },
+            "Any oral steroids": {
+              "targetClass": "coda:SH053"
+            },
+            "Nocturnal cough": {
+              "targetClass": "coda:SH054"
+            },
+            "Frequent cold/cough": {
+              "targetClass": "coda:SH055"
+            },
+            "Congenital Heart problems": {
+              "targetClass": "coda:SH056"
+            },
+            "Do they see cardiologist regularly?": {
+              "targetClass": "coda:SH057"
+            },
+            "Have they had an ECHO?": {
+              "targetClass": "coda:SH058"
+            },
+            "How frequent is the occurrence of fits?": {
+              "targetClass": "coda:SH059"
+            },
+            "Date of last fits": {
+              "targetClass": "coda:SH060"
+            },
+            "Drug Allergies": {
+              "targetClass": "coda:SH061"
+            },
+            "Remarks": {
+              "targetClass": "coda:SH062"
+            },
+            "H/O COVID 19": {
+              "targetClass": "coda:SH063"
+            },
+            "H/O COVID VACCINE": {
+              "targetClass": "coda:SH064"
+            },
+            "Collagen vascular diseases": {
+              "targetClass": "coda:SH065"
+            },
+            "Hormonal therapy": {
+              "targetClass": "coda:SH066"
+            },
+            "Pregnancy": {
+              "targetClass": "coda:SH067"
+            },
+            "Lactation": {
+              "targetClass": "coda:SH068"
+            },
+            "Thyroid": {
+              "targetClass": "coda:SH069"
+            },
+            "ConcernOnVision": {
+              "targetClass": "coda:SH070"
+            },
+            "ConcernOnVisionYesOthers": {
+              "targetClass": "coda:SH071"
+            },
+            "ConceptionType": {
+              "targetClass": "coda:SH072"
+            },
+            "LowVisionSimilarComplaints": {
+              "targetClass": "coda:SH073"
+            },
+            "LowVisionSimilarComplaintsOthers": {
+              "targetClass": "coda:SH074"
+            },
+            "Keloid Tendency": {
+              "targetClass": "coda:SH075"
+            },
+            "Isotretinoin Therapy": {
+              "targetClass": "coda:SH076"
+            },
+            "PCOS / Irregular periods": {
+              "targetClass": "coda:SH077"
+            },
+            "Renal Disease": {
+              "targetClass": "coda:SH078"
+            },
+            "Liver Disease": {
+              "targetClass": "coda:SH079"
+            },
+            "Stroke/Neuro": {
+              "targetClass": "coda:SH080"
+            },
+            "Lungs Problem": {
+              "targetClass": "coda:SH081"
+            },
+            "Malignancy-site": {
+              "targetClass": "coda:SH082"
+            },
+            "Rheumatoid Arthritis": {
+              "targetClass": "coda:SH083"
+            }
+          }
+        }
+      },
+      "sh_duration": {
+        "@id": "schema:variable/sh_duration",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Systemic History",
+        "fieldType": "Temporal",
+        "sqlType": "varchar(255)",
+        "description": "The number of days, months or years which the patient has reported having the disease in the systemic history. Temporal field, but not Datetime.",
+        "schemaReconstruction": [
+          
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Systemic History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Systemic History"
+          }
+        ]
+       
+      },
+      "sh_prescription": {
+        "@id": "schema:variable/sh_prescription",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Systemic History",
+        "fieldType": "Categorical Binary",
+        "sqlType": "Boolean",
+        "description": "Denotes whether the disease reported in the systemic history is being treated via a prescription medicine. Boolean value, 0 or 1.",
+        "schemaReconstruction": [
+          
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Systemic History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Systemic History"
+          }
+        ]
+      },
+      "sh_medicine": {
+        "@id": "schema:variable/sh_medicine",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Systemic History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "The name of the medicine that is being used to treat the condition reported in the Systemic History. Located from a fixed vocabulary, but can also be mentioned in the drugdesc field.",
+        "schemaReconstruction": [
+          
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Systemic History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Systemic History"
+          }
+        ]
+      },
+      "sh_non_ocular_sx": {
+        "@id": "schema:variable/sh_non_ocular_sx",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Systemic History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Type of non ocular surgery done as part of systemic history",
+        "schemaReconstruction": [
+          
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Systemic History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Systemic History"
+          }
+        ],
+         "valueMapping": {
+          "terms": {
+            "Cardiothoracic surgery": {
+              "targetClass": "coda:SH084"
+            },
+            "Vascular surgery": {
+              "targetClass": "coda:SH085"
+            },
+            "Plastic surgery": {
+              "targetClass": "coda:SH086"
+            },
+            "Paediatric surgery": {
+              "targetClass": "coda:SH087"
+            },
+            "Colorectal surgery": {
+              "targetClass": "coda:SH088"
+            },
+            "Transplant surgery": {
+              "targetClass": "coda:SH089"
+            },
+            "Surgical oncology": {
+              "targetClass": "coda:SH090"
+            },
+            "Trauma surgery": {
+              "targetClass": "coda:SH091"
+            },
+            "Endocrine surgery": {
+              "targetClass": "coda:SH092"
+            },
+            "Breast surgery": {
+              "targetClass": "coda:SH093"
+            },
+            "Skin surgery": {
+              "targetClass": "coda:SH094"
+            },
+            "Hysterectomy": {
+              "targetClass": "coda:SH095"
+            }
+          }
+        }
+        
+      },
+      "sh_non_ocular_sx_duration": {
+        "@id": "schema:variable/sh_non_ocular_sx_duration",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Systemic History",
+        "fieldType": "Temporal",
+        "sqlType": "varchar(255)",
+        "description": "Number of days, months or years since the non ocular surgery.",
+        "schemaReconstruction": [
+          
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Systemic History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Systemic History"
+          }
+        ]
+      },
+      "sh_other_allergies": {
+        "@id": "schema:variable/sh_other_allergies",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Systemic History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Patient allergy information",
+        "schemaReconstruction": [
+          
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Systemic History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Systemic History"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Penicillin": {
+              "targetClass": "coda:SH096"
+            },
+            "Sulpha Drugs": {
+              "targetClass": "coda:SH097"
+            },
+            "Tropicamide+": {
+              "targetClass": "coda:SH098"
+            },
+            "Pupil will not dilate": {
+              "targetClass": "coda:SH099"
+            }
+          }
+        }
+      },
+      "sh_diabetes_control": {
+        "@id": "schema:variable/sh_diabetes_control",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Systemic History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Method of control of diabetes.",
+        "schemaReconstruction": [
+          
+           {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Systemic History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Systemic History"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Insulin": {
+              "targetClass": "coda:SH100"
+            },
+            "Tablets": {
+              "targetClass": "coda:SH101"
+            },
+            "Diet Control": {
+              "targetClass": "coda:SH102"
+            },
+            "Lifestyle Changes": {
+              "targetClass": "coda:SH103"
+            },
+            "Ayurveda": {
+              "targetClass": "coda:SH104"
+            },
+            "Homoeopathy": {
+              "targetClass": "coda:SH105"
+            }
+          }
+        }
+      },
+      "bh_consanguinous_parents": {
+        "@id": "schema:variable/bh_consanguinous_parents",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Birth History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Indicates whether the patient has consanguinous parents. If the value is non-null, indicates that there is consanguinity, and the value indicates the level of it. Note: Birth history is generally noted only for minor patients.",
+        "schemaReconstruction": [
+           {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Birth History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Birth History"
+          }
+        ]
+      },
+      "bh_gestation_period": {
+        "@id": "schema:variable/bh_gestation_period",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Birth History",
+        "fieldType": "Temporal",
+        "sqlType": "Integer",
+        "description": "Gestation period at birth of the patient, indicates if it was a premature birth. Format #weeks.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Birth History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Birth History"
+          }
+        ]
+      },
+      "bh_mode_of_delivery": {
+        "@id": "schema:variable/bh_mode_of_delivery",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Birth History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Mode of delivery, whether C-section or natural birth of the patient.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Birth History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Birth History"
+          }
+        ]
+      },
+      "bh_birthweight": {
+        "@id": "schema:variable/bh_birthweight",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Birth History",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Weight at birth noted as per the Birth History, of the patient. Format #lbs",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Birth History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Birth History"
+          }
+        ]
+      },
+      "oh_procedure_type": {
+        "@id": "schema:variable/oh_procedure_type",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Ocular History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(10)",
+        "description": "Procedure or surgery or medication taken in the past.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Ocular History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Ocular History"
+          }
+        ]
+      },
+      "oh_procedure_name": {
+        "@id": "schema:variable/oh_procedure_name",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Ocular History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Name of past procedure, surgery, medication",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Ocular History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Ocular History"
+          }
+        ]
+      },
+      "oh_procedure_date": {
+        "@id": "schema:variable/oh_procedure_date",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Ocular History",
+        "fieldType": "Datetime",
+        "sqlType": "Datetime",
+        "description": "Date of past procedure, surgery or medication",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Ocular History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Ocular History"
+          }
+        ]
+      },
+      "oh_procedure_laterality": {
+        "@id": "schema:variable/oh_procedure_laterality",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Ocular History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(10)",
+        "description": "Eye Laterality related to the procedure.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Ocular History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Ocular History"
+          }
+        ]
+      },
+      "sch_consanginous_parents": {
+        "@id": "schema:variable/sch_consanginous_parents",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Social History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Indicates whether the patient has consanguinous parents. If the value is non-null, indicates that there is consanguinity, and the value indicates the grade.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Social History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Social History"
+          }
+        ]
+      },
+      "sch_marital_status": {
+        "@id": "schema:variable/sch_marital_status",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Social History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Indicates the marital status of the patient. Values can be single, married, unreported.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Social History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Social History"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Married": {
+              "targetClass": "coda:SCH001"
+            },
+            "Single": {
+              "targetClass": "coda:SCH002"
+            }
+          }
+        }
+      },
+      "sch_smoking": {
+        "@id": "schema:variable/sch_smoking",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Social History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Indicates the smoking habit of the patient. Its a temporal value. A null value indicates non smoker, and a non null indicates level of smoking: occasional, heavy or chain.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Social History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Social History"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Occasional": {
+              "targetClass": "coda:SCH003"
+            },
+            "Regular": {
+              "targetClass": "coda:SCH004"
+            },
+            "Heavy": {
+              "targetClass": "coda:SCH005"
+            }
+          }
+        }
+      },
+      "sch_alcohol": {
+        "@id": "schema:variable/sch_alcohol",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Social History",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Indicates the alcohol intake of the patient. A null value indicates no alcohol consumption, a non null value indicates level of consumption.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Patient Reported History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Patient Reported History"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Social History",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Social History"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Occasional": {
+              "targetClass": "coda:SCH006"
+            },
+            "Regular": {
+              "targetClass": "coda:SCH007"
+            },
+            "Heavy": {
+              "targetClass": "coda:SCH008"
+            }
+          }
+        }
+      },
+      "peid": {
+        "@id": "schema:variable/peid",
+        "@type": "schema:IdentifierVariable",
+        "dataType": "identifier",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Visit Details",
+        "fieldType": "Alphanumeric Identifier",
+        "sqlType": "varchar(255)",
+        "description": "Unique identifier for patient encounters or visits. A PE is a patient event, and it means a visit to the hospital, which can be a fresh visit, a routine followup or a visit for a procedure.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Visit Details",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Visit Details"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Visit Details Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Visit Details Variables"
+          }
+        ]
+      },
+      "pedate": {
+        "@id": "schema:variable/pedate",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Visit Details",
+        "fieldType": "Datetime",
+        "sqlType": "varchar(255)",
+        "description": "The date of the patient encounter or visit.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Visit Details",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Visit Details"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Visit Details Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Visit Details Variables"
+          }
+        ]
+      },
+      "purpose_of_visit": {
+        "@id": "schema:variable/purpose_of_visit",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Visit Details",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Purpose of Visit",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Visit Details",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Visit Details"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Visit Details Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Visit Details Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Routine Check-up": {
+              "targetClass": "PVT001"
+            },
+            "FollowUp": {
+              "targetClass": "PVT002"
+            },
+            "Certificate": {
+              "targetClass": "PVT003"
+            },
+            "Post-op Followup": {
+              "targetClass": "PVT004"
+            },
+            "Review with Reports": {
+              "targetClass": "PVT005"
+            },
+            "Review for Inv": {
+              "targetClass": "PVT006"
+            }
+          }
+        }
+      },
+      "complaint_name": {
+        "@id": "schema:variable/complaint_name",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Complaint",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "A coded name for the patient complaint. The complaint is a set of vocabulary fields that are filled in the patient record by the initial examiner.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Complaint",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Complaint"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Complaint Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Complaint Variables"
+          }
+        ]
+      },
+      "laterality": {
+        "@id": "schema:variable/laterality",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Treatment Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(10)",
+        "description": "Treatment laterality",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "OS": {
+              "targetClass": "LA001"
+            },
+            "OU": {
+              "targetClass": "LA002"
+            },
+            "OD": {
+              "targetClass": "LA003"
+            }
+          }
+        }
+      },
+      "sub_complaint": {
+        "@id": "schema:variable/sub_complaint",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Complaint",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "There are further information points about each complaint. Further data points about the complaint.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Complaint",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Complaint"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Complaint Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Complaint Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Course": {
+              "targetClass": "C041-02"
+            },
+            "No History": {
+              "targetClass": "C041-03"
+            },
+            "Onset": {
+              "targetClass": "C041-04"
+            },
+            "Severity": {
+              "targetClass": "C041-05"
+            },
+            "Type": {
+              "targetClass": "C040-03"
+            },
+            "Status": {
+              "targetClass": "C004-04"
+            },
+            "For": {
+              "targetClass": "C006-02"
+            },
+            "Biocular": {
+              "targetClass": "C009-01"
+            },
+            "Gaze Evolved": {
+              "targetClass": "C009-02"
+            },
+            "Progression": {
+              "targetClass": "C009-04"
+            },
+            "Separation": {
+              "targetClass": "C009-05"
+            },
+            "Uniocular": {
+              "targetClass": "C009-07"
+            },
+            "Episodes": {
+              "targetClass": "C011-01"
+            },
+            "Location": {
+              "targetClass": "C028-02"
+            },
+            "Chemical": {
+              "targetClass": "C016-01"
+            },
+            "Aggravated By": {
+              "targetClass": "C035-01"
+            },
+            "Aggravated during": {
+              "targetClass": "C020-02"
+            },
+            "Associated with": {
+              "targetClass": "C041-01"
+            },
+            "H/O aura": {
+              "targetClass": "C020-05"
+            },
+            "Pain Radiation": {
+              "targetClass": "C020-08"
+            },
+            "Relieving Factors": {
+              "targetClass": "C020-09"
+            },
+            "Duration": {
+              "targetClass": "C024-01"
+            },
+            "Frequency": {
+              "targetClass": "C040-01"
+            },
+            "Associations": {
+              "targetClass": "C035-02"
+            },
+            "Deviated Inwards": {
+              "targetClass": "C035-03"
+            },
+            "Deviated Outwards": {
+              "targetClass": "C035-04"
+            },
+            "Deviation": {
+              "targetClass": "C035-05"
+            },
+            "Time of Onset": {
+              "targetClass": "C037-02"
+            },
+            "Grade": {
+              "targetClass": "C038-01"
+            }
+          }
+        }
+      },
+      "sub_complaint_value": {
+        "@id": "schema:variable/sub_complaint_value",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Complaint",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Each complaint_qualifier has a list of coded values. This field is filled from that list.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Complaint",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Complaint"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Complaint Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Complaint Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Intermittent": {
+              "targetClass": "C041-02-01"
+            },
+            "Recurrent": {
+              "targetClass": "C041-02-03"
+            },
+            "Slowly Progressive": {
+              "targetClass": "C041-02-04"
+            },
+            "Sub acute": {
+              "targetClass": "C034-01-04"
+            },
+            "Gradual": {
+              "targetClass": "C041-04-01"
+            },
+            "Sudden": {
+              "targetClass": "C041-04-03"
+            },
+            "Mild": {
+              "targetClass": "C041-05-02"
+            },
+            "Moderate": {
+              "targetClass": "C041-05-03"
+            },
+            "Severe": {
+              "targetClass": "C041-05-04"
+            },
+            "Persistence": {
+              "targetClass": "C041-02-02"
+            },
+            "Continuous": {
+              "targetClass": "C008-05-01"
+            },
+            "Discontinuous": {
+              "targetClass": "C008-05-02"
+            },
+            "LE > RE": {
+              "targetClass": "C004-04-01"
+            },
+            "RE = LE": {
+              "targetClass": "C004-04-02"
+            },
+            "RE > LE": {
+              "targetClass": "C004-04-03"
+            },
+            "Black board": {
+              "targetClass": "C006-02-01"
+            },
+            "Bus number": {
+              "targetClass": "C006-02-02"
+            },
+            "Computer work": {
+              "targetClass": "C006-02-03"
+            },
+            "Face recognition": {
+              "targetClass": "C006-02-04"
+            },
+            "Medicine identification": {
+              "targetClass": "C006-02-05"
+            },
+            "Money identification": {
+              "targetClass": "C006-02-06"
+            },
+            "Name board": {
+              "targetClass": "C006-02-07"
+            },
+            "Street Sign": {
+              "targetClass": "C006-02-08"
+            },
+            "aggravated by reading": {
+              "targetClass": "C020-01-11"
+            },
+            "Distance": {
+              "targetClass": "C009-07-01"
+            },
+            "Near": {
+              "targetClass": "C009-07-02"
+            },
+            "Down": {
+              "targetClass": "C009-02-01"
+            },
+            "LE": {
+              "targetClass": "C009-02-02"
+            },
+            "RE": {
+              "targetClass": "C009-02-03"
+            },
+            "Up": {
+              "targetClass": "C009-02-04"
+            },
+            "Progressing": {
+              "targetClass": "C013-05-01"
+            },
+            "Regressing": {
+              "targetClass": "C013-05-02"
+            },
+            "Horizontal": {
+              "targetClass": "C009-05-01"
+            },
+            "Tilting": {
+              "targetClass": "C009-05-02"
+            },
+            "Vertical": {
+              "targetClass": "C009-05-03"
+            },
+            "Latent": {
+              "targetClass": "C009-06-02"
+            },
+            "Stationary": {
+              "targetClass": "C013-05-03"
+            },
+            "1 Time": {
+              "targetClass": "C040-01-01"
+            },
+            "2 Times": {
+              "targetClass": "C040-01-02"
+            },
+            "3 Times": {
+              "targetClass": "C040-01-03"
+            },
+            "4 Times": {
+              "targetClass": "C040-01-04"
+            },
+            "5 Times": {
+              "targetClass": "C040-01-05"
+            },
+            ">5 Times": {
+              "targetClass": "C040-01-06"
+            },
+            "Central": {
+              "targetClass": "C013-02-01"
+            },
+            "Peripheral": {
+              "targetClass": "C013-02-02"
+            },
+            "Acid": {
+              "targetClass": "C016-01-01"
+            },
+            "Alkaline": {
+              "targetClass": "C016-01-02"
+            },
+            "Others": {
+              "targetClass": "C018-04-04"
+            },
+            "Dust": {
+              "targetClass": "C016-03-01"
+            },
+            "Insect": {
+              "targetClass": "C016-03-02"
+            },
+            "Iron": {
+              "targetClass": "C016-03-03"
+            },
+            "Plant": {
+              "targetClass": "C016-03-05"
+            },
+            "Stone": {
+              "targetClass": "C016-03-06"
+            },
+            "Unknown": {
+              "targetClass": "C016-03-07"
+            },
+            "Conjuctiva": {
+              "targetClass": "C018-01-01"
+            },
+            "Cornea": {
+              "targetClass": "C018-01-02"
+            },
+            "Lid": {
+              "targetClass": "C018-01-03"
+            },
+            "Cystic": {
+              "targetClass": "C018-04-01"
+            },
+            "Fleshy": {
+              "targetClass": "C018-04-02"
+            },
+            "Nodular": {
+              "targetClass": "C018-04-03"
+            },
+            "Aggravated by TV": {
+              "targetClass": "C020-01-01"
+            },
+            "Aggravated by noise": {
+              "targetClass": "C020-01-02"
+            },
+            "Exposure to sunlight": {
+              "targetClass": "C020-01-03"
+            },
+            "Increases after a bath": {
+              "targetClass": "C020-01-04"
+            },
+            "Increases after cold": {
+              "targetClass": "C020-01-05"
+            },
+            "Increases after cough": {
+              "targetClass": "C020-01-06"
+            },
+            "Increases after exertion": {
+              "targetClass": "C020-01-07"
+            },
+            "Increases in crowded places": {
+              "targetClass": "C020-01-08"
+            },
+            "Screen usage": {
+              "targetClass": "C020-01-09"
+            },
+            "Travelling": {
+              "targetClass": "C020-01-10"
+            },
+            "Afternoon": {
+              "targetClass": "C020-02-01"
+            },
+            "Morning": {
+              "targetClass": "C020-02-02"
+            },
+            "Night": {
+              "targetClass": "C020-02-03"
+            },
+            "Throughout the day": {
+              "targetClass": "C020-02-04"
+            },
+            "Vomiting": {
+              "targetClass": "C020-03-01"
+            },
+            "H/O aura absent": {
+              "targetClass": "C020-05-01"
+            },
+            "H/O aura present": {
+              "targetClass": "C020-05-02"
+            },
+            "Diffuse": {
+              "targetClass": "C020-06-01"
+            },
+            "Frontal": {
+              "targetClass": "C020-06-02"
+            },
+            "Occipital": {
+              "targetClass": "C020-06-03"
+            },
+            "Non Radiating": {
+              "targetClass": "C020-08-01"
+            },
+            "Radiating": {
+              "targetClass": "C020-08-02"
+            },
+            "Relief after vomitting": {
+              "targetClass": "C020-09-01"
+            },
+            "Relief with medication": {
+              "targetClass": "C020-09-02"
+            },
+            "Relief with rest": {
+              "targetClass": "C020-09-03"
+            },
+            "Dull aching": {
+              "targetClass": "C020-11-01"
+            },
+            "Pricking": {
+              "targetClass": "C020-11-02"
+            },
+            "Throbbing": {
+              "targetClass": "C020-11-03"
+            },
+            "1 Hour": {
+              "targetClass": "C024-01-01"
+            },
+            "2 Hours": {
+              "targetClass": "C024-01-02"
+            },
+            "3 Hours": {
+              "targetClass": "C024-01-03"
+            },
+            "4 Hours": {
+              "targetClass": "C024-01-04"
+            },
+            "5 Hours": {
+              "targetClass": "C024-01-05"
+            },
+            ">5 Hours": {
+              "targetClass": "C024-01-06"
+            },
+            "Around the eyes": {
+              "targetClass": "C028-02-01"
+            },
+            "In the eyes": {
+              "targetClass": "C028-02-02"
+            },
+            "Acute": {
+              "targetClass": "C041-05-01"
+            },
+            "bright light": {
+              "targetClass": "C035-01-01"
+            },
+            "Double vision": {
+              "targetClass": "C035-02-01"
+            },
+            "Constant": {
+              "targetClass": "C035-08-01"
+            },
+            "Inward": {
+              "targetClass": "C035-05-01"
+            },
+            "Outward": {
+              "targetClass": "C035-05-02"
+            },
+            "Change of Posture": {
+              "targetClass": "C037-02-01"
+            },
+            "Early Morning": {
+              "targetClass": "C037-02-02"
+            },
+            "Exposure to Bright light": {
+              "targetClass": "C037-02-03"
+            },
+            "High": {
+              "targetClass": "C038-01-01"
+            },
+            "low": {
+              "targetClass": "C038-01-02"
+            },
+            "Inhaler": {
+              "targetClass": "C039-01-01"
+            },
+            "Oral": {
+              "targetClass": "C039-01-02"
+            },
+            "Topical": {
+              "targetClass": "C039-01-03"
+            },
+            "Bile Stained": {
+              "targetClass": "C040-03-01"
+            },
+            "Blood Stained": {
+              "targetClass": "C040-03-02"
+            },
+            "Food Particle": {
+              "targetClass": "C040-03-03"
+            },
+            "Non-Projectile": {
+              "targetClass": "C040-03-04"
+            },
+            "Projectile": {
+              "targetClass": "C040-03-05"
+            },
+            "Discharge": {
+              "targetClass": "C041-01-01"
+            },
+            "Since Birth": {
+              "targetClass": "C041-04-02"
+            }
+          }
+        }
+      },
+      "complaint_duration": {
+        "@id": "schema:variable/complaint_duration",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Complaint",
+        "fieldType": "Temporal",
+        "sqlType": "varchar(255)",
+        "description": "A temporal value suggesting how many days, years or months the patient has had this complaint.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Complaint",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Complaint"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Complaint Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Complaint Variables"
+          }
+        ]
+      },
+      "as_part_name": {
+        "@id": "schema:variable/as_part_name",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Part of the anterior segment this value refers to. Has fixed values in the vocabulary",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Conjunctiva": {
+              "targetClass": "AS001"
+            },
+            "Cornea": {
+              "targetClass": "AS002"
+            },
+            "Anterior Chamber": {
+              "targetClass": "AS003"
+            },
+            "Iris": {
+              "targetClass": "AS004"
+            },
+            "Pupil": {
+              "targetClass": "AS005"
+            },
+            "Lens": {
+              "targetClass": "AS006"
+            },
+            "Corneal Reflex": {
+              "targetClass": "AS007"
+            },
+            "Ocular Movements": {
+              "targetClass": "AS008"
+            },
+            "Lid": {
+              "targetClass": "AS009"
+            }
+          }
+        }
+      },
+      "as_laterality": {
+        "@id": "schema:variable/as_laterality",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(10)",
+        "description": "This field indicates the laterality of the eye this exam refers to.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+          }
+        ]
+      },
+      "as_finding": {
+        "@id": "schema:variable/as_finding",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Name of issue found in this part. Has fixed values in the vocabulary.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Bleb": {
+              "targetClass": "AS001-01"
+            },
+            "Chemosis": {
+              "targetClass": "AS001-02"
+            },
+            "Concretions": {
+              "targetClass": "AS001-03"
+            },
+            "Congestion": {
+              "targetClass": "AS001-04"
+            },
+            "Corneo-Scleral Wound": {
+              "targetClass": "AS001-05"
+            },
+            "Discharge": {
+              "targetClass": "AS001-06"
+            },
+            "Episcleritis": {
+              "targetClass": "AS001-07"
+            },
+            "Foreign Body": {
+              "targetClass": "AS002-07"
+            },
+            "Lower Tarsal": {
+              "targetClass": "AS001-09"
+            },
+            "Maggots": {
+              "targetClass": "AS001-10"
+            },
+            "Membrane": {
+              "targetClass": "AS001-11"
+            },
+            "Nodules": {
+              "targetClass": "AS004-07"
+            },
+            "Palpebral": {
+              "targetClass": "AS001-13"
+            },
+            "Phlycten": {
+              "targetClass": "AS001-14"
+            },
+            "Pinguecula": {
+              "targetClass": "AS001-15"
+            },
+            "Pterygium": {
+              "targetClass": "AS001-16"
+            },
+            "Scarring": {
+              "targetClass": "AS001-17"
+            },
+            "Scleral Thinning": {
+              "targetClass": "AS001-18"
+            },
+            "Symblepheron": {
+              "targetClass": "AS001-19"
+            },
+            "Tear": {
+              "targetClass": "AS002-14"
+            },
+            "Upper Tarsal": {
+              "targetClass": "AS001-21"
+            },
+            "Abrasion": {
+              "targetClass": "AS002-01"
+            },
+            "Conjunctivalisation": {
+              "targetClass": "AS002-02"
+            },
+            "Degeneration": {
+              "targetClass": "AS002-03"
+            },
+            "Deposits": {
+              "targetClass": "AS002-04"
+            },
+            "Dystrophy": {
+              "targetClass": "AS002-05"
+            },
+            "Edema": {
+              "targetClass": "AS009-08"
+            },
+            "Graft": {
+              "targetClass": "AS002-08"
+            },
+            "Keratic Precipitates": {
+              "targetClass": "AS002-09"
+            },
+            "Opacity": {
+              "targetClass": "AS002-10"
+            },
+            "Pannus": {
+              "targetClass": "AS002-11"
+            },
+            "Sensation": {
+              "targetClass": "AS002-12"
+            },
+            "Staphyloma": {
+              "targetClass": "AS002-13"
+            },
+            "Ulcer": {
+              "targetClass": "AS009-30"
+            },
+            "Vascularization": {
+              "targetClass": "AS002-16"
+            },
+            "Blood Clot": {
+              "targetClass": "AS003-01"
+            },
+            "Cells": {
+              "targetClass": "AS003-02"
+            },
+            "Depth": {
+              "targetClass": "AS003-03"
+            },
+            "Flare": {
+              "targetClass": "AS003-04"
+            },
+            "Haptic of PCIOL in the AC": {
+              "targetClass": "AS003-05"
+            },
+            "Hyphema": {
+              "targetClass": "AS003-06"
+            },
+            "Hypopyon": {
+              "targetClass": "AS003-07"
+            },
+            "Lens matter in AC": {
+              "targetClass": "AS003-08"
+            },
+            "Vitreous in the AC": {
+              "targetClass": "AS003-09"
+            },
+            "Anterior Synechiae": {
+              "targetClass": "AS004-01"
+            },
+            "Atrophy": {
+              "targetClass": "AS004-02"
+            },
+            "Color": {
+              "targetClass": "AS004-03"
+            },
+            "Cyst": {
+              "targetClass": "AS004-04"
+            },
+            "Hole": {
+              "targetClass": "AS004-05"
+            },
+            "Neovascularization": {
+              "targetClass": "AS004-06"
+            },
+            "Pattern": {
+              "targetClass": "AS004-08"
+            },
+            "Peripheral Anterior Synechiae": {
+              "targetClass": "AS004-09"
+            },
+            "Peripheral Iridectomy": {
+              "targetClass": "AS004-10"
+            },
+            "Posterior Synechiae": {
+              "targetClass": "AS004-11"
+            },
+            "Sector Iridectomy": {
+              "targetClass": "AS004-12"
+            },
+            "Optic Capture": {
+              "targetClass": "AS005-01"
+            },
+            "RAPD": {
+              "targetClass": "AS005-02"
+            },
+            "Reaction To Light": {
+              "targetClass": "AS005-03"
+            },
+            "Shape": {
+              "targetClass": "AS005-04"
+            },
+            "Size": {
+              "targetClass": "AS005-05"
+            },
+            "Cataract": {
+              "targetClass": "AS006-01"
+            },
+            "Ectopia Lentis": {
+              "targetClass": "AS006-02"
+            },
+            "Nuclear Sclerosis": {
+              "targetClass": "AS006-03"
+            },
+            "PCO": {
+              "targetClass": "AS006-04"
+            },
+            "Pseudophakia": {
+              "targetClass": "AS006-05"
+            },
+            "Subluxated": {
+              "targetClass": "AS006-06"
+            },
+            "Esotropia": {
+              "targetClass": "AS007-01"
+            },
+            "Exotropia": {
+              "targetClass": "AS007-02"
+            },
+            "Nystagmus": {
+              "targetClass": "AS008-01"
+            },
+            "Restricted": {
+              "targetClass": "AS008-02"
+            },
+            "Bell's Phenomenon": {
+              "targetClass": "AS009-01"
+            },
+            "Blepharitis": {
+              "targetClass": "AS009-02"
+            },
+            "Chalazion": {
+              "targetClass": "AS009-03"
+            },
+            "Coloboma": {
+              "targetClass": "AS009-04"
+            },
+            "Congenital Distichiasis": {
+              "targetClass": "AS009-05"
+            },
+            "Ecchymosis": {
+              "targetClass": "AS009-06"
+            },
+            "Ectropion": {
+              "targetClass": "AS009-07"
+            },
+            "Entropion": {
+              "targetClass": "AS009-09"
+            },
+            "Hordeolum Internum": {
+              "targetClass": "AS009-10"
+            },
+            "Hordeolum Interum": {
+              "targetClass": "AS009-11"
+            },
+            "Hordeolum externum (stye)": {
+              "targetClass": "AS009-12"
+            },
+            "Laceration": {
+              "targetClass": "AS009-13"
+            },
+            "Lagophthalmos": {
+              "targetClass": "AS009-14"
+            },
+            "Lid lag": {
+              "targetClass": "AS009-15"
+            },
+            "Lid retraction": {
+              "targetClass": "AS009-16"
+            },
+            "Madarosis": {
+              "targetClass": "AS009-17"
+            },
+            "Matted Lashes": {
+              "targetClass": "AS009-18"
+            },
+            "Meibomian Capping": {
+              "targetClass": "AS009-19"
+            },
+            "Nodule": {
+              "targetClass": "AS009-20"
+            },
+            "Normal": {
+              "targetClass": "AS009-21"
+            },
+            "Poliosis": {
+              "targetClass": "AS009-22"
+            },
+            "Pthriasis palpebrum": {
+              "targetClass": "AS009-23"
+            },
+            "Ptosis": {
+              "targetClass": "AS009-24"
+            },
+            "Pustule": {
+              "targetClass": "AS009-25"
+            },
+            "Scar": {
+              "targetClass": "AS009-26"
+            },
+            "Skin": {
+              "targetClass": "AS009-27"
+            },
+            "Trichiasis": {
+              "targetClass": "AS009-28"
+            },
+            "Tumour": {
+              "targetClass": "AS009-29"
+            }
+          }
+        }
+      },
+      "as_value_1": {
+        "@id": "schema:variable/as_value_1",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Further definition of the finding in terms of part, or the finding itself.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+          }
+        ]
+      },
+      "as_value_2": {
+        "@id": "schema:variable/as_value_2",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Further definition of the finding.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+          }
+        ]
+      },
+      "as_value_3": {
+        "@id": "schema:variable/as_value_3",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Double",
+        "description": "Numerical measure of the finding.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination)"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Anterior Segment Exam (as - refers to Anterior Segment examination) Variables"
+          }
+        ]
+      },
+      "fe_part_name": {
+        "@id": "schema:variable/fe_part_name",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Fundus Exam ( fe - refers to fundus examination )",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Part of the fundus this refers to. Has fixed coded values in the values list. The values are 'Media', 'Disc', 'Vessels', 'Background Retina' and 'Macula/Foveal Reflex'.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Fundus Exam ( fe - refers to fundus examination )",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Fundus Exam ( fe - refers to fundus examination )"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Fundus Exam ( fe - refers to fundus examination ) Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Fundus Exam ( fe - refers to fundus examination ) Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Disc": {
+              "targetClass": "F003"
+            },
+            "Vessels": {
+              "targetClass": "F004"
+            },
+            "Media": {
+              "targetClass": "F002"
+            },
+            "Background Retina": {
+              "targetClass": "F005"
+            },
+            "Macula / Foveal Reflex": {
+              "targetClass": "F006"
+            }
+          }
+        }
+      },
+      "fe_part_laterality": {
+        "@id": "schema:variable/fe_part_laterality",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Fundus Exam ( fe - refers to fundus examination )",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(10)",
+        "description": "This field indicates the laterality of the eye this exam refers to.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Fundus Exam ( fe - refers to fundus examination )",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Fundus Exam ( fe - refers to fundus examination )"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Fundus Exam ( fe - refers to fundus examination ) Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Fundus Exam ( fe - refers to fundus examination ) Variables"
+          }
+        ]
+      },
+      "fe_finding": {
+        "@id": "schema:variable/fe_finding",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Fundus Exam ( fe - refers to fundus examination )",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Name of issue found in this part. Has fixed values in the vocabulary for each one of the fundus parts.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Fundus Exam ( fe - refers to fundus examination )",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Fundus Exam ( fe - refers to fundus examination )"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Fundus Exam ( fe - refers to fundus examination ) Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Fundus Exam ( fe - refers to fundus examination ) Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Color": {
+              "targetClass": "F003-01"
+            },
+            "cup disc ratio": {
+              "targetClass": "F003-02"
+            },
+            "Arteriosclerotic Changes": {
+              "targetClass": "F004-01"
+            },
+            "Deferred": {
+              "targetClass": "F002-01"
+            },
+            "Hazy": {
+              "targetClass": "F002-02"
+            },
+            "Disc pallor": {
+              "targetClass": "F003-03"
+            },
+            "Margins": {
+              "targetClass": "F003-04"
+            },
+            "Myelinated optic nerve head": {
+              "targetClass": "F003-05"
+            },
+            "Neovascularization": {
+              "targetClass": "F003-06"
+            },
+            "Neuroretinal rim thinning/loss": {
+              "targetClass": "F003-07"
+            },
+            "Notching": {
+              "targetClass": "F003-08"
+            },
+            "Shape": {
+              "targetClass": "F003-09"
+            },
+            "Neovascularization(NVE)": {
+              "targetClass": "F004-02"
+            },
+            "Vascular Occlusions": {
+              "targetClass": "F004-03"
+            },
+            "ARMD": {
+              "targetClass": "F005-01"
+            },
+            "BRAO": {
+              "targetClass": "F005-02"
+            },
+            "BRVO": {
+              "targetClass": "F005-03"
+            },
+            "Choroidal Detachment": {
+              "targetClass": "F005-04"
+            },
+            "DR": {
+              "targetClass": "F005-05"
+            },
+            "Exudates": {
+              "targetClass": "F005-06"
+            },
+            "Haemorrhage": {
+              "targetClass": "F005-07"
+            },
+            "PRP laser mark": {
+              "targetClass": "F005-08"
+            },
+            "Retinal Detachment": {
+              "targetClass": "F005-09"
+            },
+            "Absent": {
+              "targetClass": "F006-01"
+            }
+          }
+        }
+      },
+      "fe_value_1": {
+        "@id": "schema:variable/fe_value_1",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Fundus Exam ( fe - refers to fundus examination )",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "This is the numerical value of the finding with a fixed vocabulary for each finding. Unit values are defined in the vocabulary for each finding.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Fundus Exam ( fe - refers to fundus examination )",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Fundus Exam ( fe - refers to fundus examination )"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Fundus Exam ( fe - refers to fundus examination ) Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Fundus Exam ( fe - refers to fundus examination ) Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Pink": {
+              "targetClass": "F003-01-01"
+            },
+            "Hyperemic": {
+              "targetClass": "F003-01-02"
+            },
+            "Pale": {
+              "targetClass": "F003-04-01"
+            },
+            "0.2": {
+              "targetClass": "F003-02-01"
+            },
+            "0.3": {
+              "targetClass": "F003-02-02"
+            },
+            "Present": {
+              "targetClass": "F004-01-01"
+            },
+            "Absent": {
+              "targetClass": "F004-01-02"
+            },
+            "ACCO": {
+              "targetClass": "F002-01-01"
+            },
+            "Small Pupil": {
+              "targetClass": "F002-01-02"
+            },
+            "Corneal Edema": {
+              "targetClass": "F002-02-01"
+            },
+            "Asteroid hyalosis": {
+              "targetClass": "F002-02-02"
+            },
+            "Vitreous Haemorrhage": {
+              "targetClass": "F002-02-03"
+            },
+            "Corneal Opacity": {
+              "targetClass": "F002-02-04"
+            },
+            "Cataract": {
+              "targetClass": "F002-02-05"
+            },
+            "PCO": {
+              "targetClass": "F002-02-06"
+            },
+            "0.4": {
+              "targetClass": "F003-02-03"
+            },
+            "0.5": {
+              "targetClass": "F003-02-04"
+            },
+            "0.6": {
+              "targetClass": "F003-02-05"
+            },
+            "0.7": {
+              "targetClass": "F003-02-06"
+            },
+            "0.8": {
+              "targetClass": "F003-02-07"
+            },
+            "0.9": {
+              "targetClass": "F003-02-08"
+            },
+            "GOA": {
+              "targetClass": "F003-02-09"
+            },
+            "Waxy pallor": {
+              "targetClass": "F003-03-01"
+            },
+            "Chalky pallor": {
+              "targetClass": "F003-03-02"
+            },
+            "Dirty pallor": {
+              "targetClass": "F003-03-03"
+            },
+            "Blurred": {
+              "targetClass": "F003-04-02"
+            },
+            "Superior": {
+              "targetClass": "F005-08-01"
+            },
+            "Inferior": {
+              "targetClass": "F005-08-02"
+            },
+            "Nasal": {
+              "targetClass": "F003-08-03"
+            },
+            "Temporal": {
+              "targetClass": "F003-08-04"
+            },
+            "Horizontaly Oval": {
+              "targetClass": "F003-09-01"
+            },
+            "Verticaly Oval": {
+              "targetClass": "F003-09-02"
+            },
+            "Size": {
+              "targetClass": "F004-02-01"
+            },
+            "Quadrant": {
+              "targetClass": "F004-02-02"
+            },
+            "Vein": {
+              "targetClass": "F004-03-01"
+            },
+            "Artery": {
+              "targetClass": "F004-03-02"
+            },
+            "Dry": {
+              "targetClass": "F005-01-01"
+            },
+            "Wet": {
+              "targetClass": "F005-01-02"
+            },
+            "Superior Temporal": {
+              "targetClass": "F005-03-01"
+            },
+            "Inferior Temporal": {
+              "targetClass": "F005-03-02"
+            },
+            "Superior Nasal": {
+              "targetClass": "F005-03-03"
+            },
+            "Inferior Nasal": {
+              "targetClass": "F005-03-04"
+            },
+            "Drusens": {
+              "targetClass": "F005-04-01"
+            },
+            "Pigmentations": {
+              "targetClass": "F005-04-02"
+            },
+            "Chorioretinal": {
+              "targetClass": "F005-04-03"
+            },
+            "Choroidal Tears": {
+              "targetClass": "F005-04-04"
+            },
+            "Intraocular foreign body": {
+              "targetClass": "F005-04-05"
+            },
+            "Coloboma": {
+              "targetClass": "F005-04-06"
+            },
+            "Tumors": {
+              "targetClass": "F005-04-07"
+            },
+            "NPDR": {
+              "targetClass": "F005-05-01"
+            },
+            "PDR": {
+              "targetClass": "F005-05-02"
+            },
+            "Cotton wool spots": {
+              "targetClass": "F005-06-01"
+            },
+            "Soft": {
+              "targetClass": "F005-06-02"
+            },
+            "Hard Exudates": {
+              "targetClass": "F006-01-08"
+            },
+            "Dot & blot": {
+              "targetClass": "F005-07-01"
+            },
+            "Pre Retinal Haemorrhage": {
+              "targetClass": "F005-07-02"
+            },
+            "Sub Retinal Haemorrhage": {
+              "targetClass": "F005-07-03"
+            },
+            "Splinter": {
+              "targetClass": "F005-07-04"
+            },
+            "Total": {
+              "targetClass": "F005-09-01"
+            },
+            "Old": {
+              "targetClass": "F005-09-02"
+            },
+            "Rhegmatogenous": {
+              "targetClass": "F005-09-03"
+            },
+            "Tractional": {
+              "targetClass": "F005-09-04"
+            },
+            "Combined": {
+              "targetClass": "F005-09-05"
+            },
+            "Bullous": {
+              "targetClass": "F005-09-06"
+            },
+            "Macula Holes": {
+              "targetClass": "F006-01-01"
+            },
+            "ILM folds": {
+              "targetClass": "F006-01-02"
+            },
+            "Edema": {
+              "targetClass": "F006-01-03"
+            },
+            "Haemorrhage": {
+              "targetClass": "F006-01-04"
+            },
+            "Dry ARMD": {
+              "targetClass": "F006-01-05"
+            },
+            "Wet ARMD": {
+              "targetClass": "F006-01-06"
+            },
+            "RPE Degeneration": {
+              "targetClass": "F006-01-07"
+            },
+            "Others Specify": {
+              "targetClass": "F006-01-09"
+            },
+            "CME": {
+              "targetClass": "F006-01-10"
+            },
+            "CSME": {
+              "targetClass": "F006-01-11"
+            },
+            "TRD": {
+              "targetClass": "F006-01-12"
+            },
+            "CSR": {
+              "targetClass": "F006-01-13"
+            },
+            "Macular Edema": {
+              "targetClass": "F006-01-14"
+            },
+            "PED": {
+              "targetClass": "F006-01-15"
+            },
+            "CNVM": {
+              "targetClass": "F006-01-16"
+            },
+            "IJT": {
+              "targetClass": "F006-01-17"
+            },
+            "ERM": {
+              "targetClass": "F006-01-18"
+            },
+            "CR S": {
+              "targetClass": "F006-01-19"
+            }
+          }
+        }
+      },
+      "fe_value_2": {
+        "@id": "schema:variable/fe_value_2",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Fundus Exam ( fe - refers to fundus examination )",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Measure of the finding",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Fundus Exam ( fe - refers to fundus examination )",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Fundus Exam ( fe - refers to fundus examination )"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Fundus Exam ( fe - refers to fundus examination ) Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Fundus Exam ( fe - refers to fundus examination ) Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Central": {
+              "targetClass": "F004-03-01-01"
+            },
+            "Branch": {
+              "targetClass": "F004-03-01-02"
+            },
+            "Macular": {
+              "targetClass": "F004-03-02-01"
+            },
+            "Cilioretinal": {
+              "targetClass": "F004-03-02-02"
+            },
+            "Scars": {
+              "targetClass": "F005-04-03-01"
+            },
+            "Degeneration": {
+              "targetClass": "F005-04-03-02"
+            },
+            "Hemangioma": {
+              "targetClass": "F005-04-07-01"
+            },
+            "Melacoma": {
+              "targetClass": "F005-04-07-02"
+            },
+            "Retinoblastoma": {
+              "targetClass": "F005-04-07-03"
+            },
+            "Others": {
+              "targetClass": "F005-04-07-04"
+            },
+            "Mild": {
+              "targetClass": "F005-05-02-01"
+            },
+            "Moderate": {
+              "targetClass": "F005-05-02-02"
+            },
+            "Severe": {
+              "targetClass": "F005-05-02-03"
+            },
+            "Tear": {
+              "targetClass": "F005-09-03-01"
+            },
+            "Hole": {
+              "targetClass": "F005-09-03-02"
+            }
+          }
+        }
+      },
+      "vision_glasses": {
+        "@id": "schema:variable/vision_glasses",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Vision Exam",
+        "fieldType": "Boolean",
+        "sqlType": "Boolean",
+        "description": "Does patient wear glasses. Yes/No.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Vision Exam",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Vision Exam"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Vision Exam Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Vision Exam Variables"
+          }
+        ]
+      },
+      "vision_curr_glass_duration": {
+        "@id": "schema:variable/vision_curr_glass_duration",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Vision Exam",
+        "fieldType": "Temporal",
+        "sqlType": "Double",
+        "description": "number of months since patient has been wearing glasses.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Vision Exam",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Vision Exam"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Vision Exam Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Vision Exam Variables"
+          }
+        ]
+      },
+      "vision_type": {
+        "@id": "schema:variable/vision_type",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Vision Exam",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Corrected Vision ( Visual Acuity ) / Uncorrected Vision ( Visual Acuity)",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Vision Exam",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Vision Exam"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Vision Exam Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Vision Exam Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Uncorrected V/A": {
+              "targetClass": "VS001"
+            },
+            "Corrected V/A": {
+              "targetClass": "VS002"
+            },
+            "V/A": {
+              "targetClass": "VS003"
+            }
+          }
+        }
+      },
+      "vision_method_used_for_reading": {
+        "@id": "schema:variable/vision_method_used_for_reading",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Vision Exam",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Method used for reading",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Vision Exam",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Vision Exam"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Vision Exam Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Vision Exam Variables"
+          }
+        ]
+      },
+      "vision_type_of_chart": {
+        "@id": "schema:variable/vision_type_of_chart",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Vision Exam",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Type of chart used to check vision ( Snellen/ Logmar)",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Vision Exam",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Vision Exam"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Vision Exam Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Vision Exam Variables"
+          }
+        ]
+      },
+      "levalue": {
+        "@id": "schema:variable/levalue",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Vision Exam",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Left eye vision value"
+      },
+      "revalue": {
+        "@id": "schema:variable/revalue",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Vision Exam",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Right eye vision value"
+      },
+      "resp_dv": {
+        "@id": "schema:variable/resp_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Right Eye Spherical Equivalent for distance vision, in diopters."
+      },
+      "recy_dv": {
+        "@id": "schema:variable/recy_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Right Eye Cylinder value for distance vision, indicating astigmatism."
+      },
+      "reaxis_dv": {
+        "@id": "schema:variable/reaxis_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Right Eye Axis for distance vision, indicating the orientation of astigmatism in degrees (D)"
+      },
+      "reva_dv": {
+        "@id": "schema:variable/reva_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Right Eye Visual Acuity for distance vision."
+      },
+      "rephva_dv": {
+        "@id": "schema:variable/rephva_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Right Eye Presenting Visual Acuity for distance vision."
+      },
+      "rebcva_dv": {
+        "@id": "schema:variable/rebcva_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Right Eye Best Corrected Visual Acuity for distance vision."
+      },
+      "lesp_dv": {
+        "@id": "schema:variable/lesp_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Left Eye Spherical Equivalent for distance vision."
+      },
+      "lecy_dv": {
+        "@id": "schema:variable/lecy_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Left Eye Cylinder value for distance vision, indicating astigmatism."
+      },
+      "leaxis_dv": {
+        "@id": "schema:variable/leaxis_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Left Eye Axis for distance vision, indicating the orientation of astigmatism."
+      },
+      "leva_dv": {
+        "@id": "schema:variable/leva_dv",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(10)",
+        "description": "Left Eye Visual Acuity for distance vision."
+      },
+      "lephva_dv": {
+        "@id": "schema:variable/lephva_dv",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(10)",
+        "description": "Left Eye Presenting Visual Acuity for distance vision."
+      },
+      "lebcva_dv": {
+        "@id": "schema:variable/lebcva_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Left Eye best Corrected Visual Acuity for distance vision."
+      },
+      "rempd_dv": {
+        "@id": "schema:variable/rempd_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Double",
+        "description": "Right Eye Mean Pupil Diameter for distance vision measure in mm."
+      },
+      "lempd_dv": {
+        "@id": "schema:variable/lempd_dv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refraction Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Double",
+        "description": "Left Eye Mean Pupil Diameter for distance vision."
+      },
+      "bpcystole": {
+        "@id": "schema:variable/bpcystole",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Vitals Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Integer",
+        "description": "Systolic blood pressure measurement  in mm Hg at the time of examination."
+      },
+      "bpdiastole": {
+        "@id": "schema:variable/bpdiastole",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Vitals Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Integer",
+        "description": "Diastolic blood pressure measurement  in mm Hg at the time of examination."
+      },
+      "bsstatus": {
+        "@id": "schema:variable/bsstatus",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Vitals Exam",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Integer",
+        "description": "Blood sugar status or level at the time of examination in mg/dL"
+      },
+      "investigation_name": {
+        "@id": "schema:variable/investigation_name",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Investigation advice - list",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Name of the investigation performed. Codes from a vocabulary",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "IOP": {
+              "targetClass": "IV001"
+            },
+            "Duct LE": {
+              "targetClass": "IV002"
+            },
+            "Blood Pressure": {
+              "targetClass": "IV003"
+            },
+            "Blood Sugar": {
+              "targetClass": "IV004"
+            },
+            "Refraction": {
+              "targetClass": "IV005"
+            },
+            "Dilate RR": {
+              "targetClass": "IV006"
+            },
+            "Colour Vision": {
+              "targetClass": "IV007"
+            },
+            "BSV": {
+              "targetClass": "IV008"
+            },
+            "Schirmer's 1 test": {
+              "targetClass": "IV009"
+            },
+            "Schirmer's 2 test": {
+              "targetClass": "IV010"
+            },
+            "Muscle Balance": {
+              "targetClass": "IV011"
+            },
+            "Dilate": {
+              "targetClass": "IV012"
+            },
+            "Duct": {
+              "targetClass": "IV013"
+            },
+            "GDX": {
+              "targetClass": "IV014"
+            },
+            "Culture": {
+              "targetClass": "IV015"
+            },
+            "Repeat RR": {
+              "targetClass": "IV016"
+            },
+            "Pulse": {
+              "targetClass": "IV017"
+            },
+            "Resp Rate": {
+              "targetClass": "IV018"
+            },
+            "PMT": {
+              "targetClass": "IV019"
+            },
+            "Dilate Fundus": {
+              "targetClass": "IV020"
+            },
+            "SPO2": {
+              "targetClass": "IV021"
+            },
+            "CCT": {
+              "targetClass": "IV022"
+            },
+            "Central Fields": {
+              "targetClass": "IV023"
+            },
+            "A-Scan-Test": {
+              "targetClass": "IV024"
+            },
+            "Axial length": {
+              "targetClass": "IV025"
+            },
+            "Roplas": {
+              "targetClass": "IV026"
+            },
+            "Corrected IOP": {
+              "targetClass": "IV027"
+            },
+            "K Reading": {
+              "targetClass": "IV028"
+            },
+            "Repeat Vision": {
+              "targetClass": "IV029"
+            },
+            "PH Vision": {
+              "targetClass": "IV030"
+            },
+            "Temperature": {
+              "targetClass": "IV031"
+            },
+            "Weight": {
+              "targetClass": "IV032"
+            },
+            "Height": {
+              "targetClass": "IV033"
+            },
+            "MPH Vision": {
+              "targetClass": "IV034"
+            },
+            "Squint Evaluation": {
+              "targetClass": "IV035"
+            },
+            "Paretic Squint Evaluation": {
+              "targetClass": "IV036"
+            },
+            "BVA": {
+              "targetClass": "IV037"
+            },
+            "Nystagmus": {
+              "targetClass": "IV038"
+            },
+            "Patch Test": {
+              "targetClass": "IV039"
+            },
+            "Stereopsis": {
+              "targetClass": "IV040"
+            },
+            "Verion-Arcuate Incision": {
+              "targetClass": "IV041"
+            },
+            "Vision with CL": {
+              "targetClass": "IV042"
+            },
+            "Horizontal Corneal Diameter": {
+              "targetClass": "IV043"
+            },
+            "Measure of Cup Disc Ratio": {
+              "targetClass": "IV044"
+            }
+          }
+        }
+      },
+      "investigation_laterality": {
+        "@id": "schema:variable/investigation_laterality",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Investigation advice - list",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(10)",
+        "description": "Laterality of the eye the investigation was performed on.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice Variables"
+          }
+        ]
+      },
+      "ocular_nonocular": {
+        "@id": "schema:variable/ocular_nonocular",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Investigation advice - list",
+        "fieldType": "Categorical Boolean",
+        "sqlType": "Boolean",
+        "description": "Indicates whether this is an ocular investigation or not. Examples of non ocular investigations are Blood Pressure measurement.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Ocular": {
+              "targetClass": "IV044-01"
+            },
+            "Non Ocular": {
+              "targetClass": "IV042-01"
+            }
+          }
+        }
+      },
+      "investigation_date": {
+        "@id": "schema:variable/investigation_date",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Investigation advice - list",
+        "fieldType": "Datetime",
+        "sqlType": "Datetime",
+        "description": "Date and time when the investigation was performed",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice Variables"
+          }
+        ]
+      },
+      "investigation_result_numeric": {
+        "@id": "schema:variable/investigation_result_numeric",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Investigation advice - list",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Decimal(3,2)",
+        "description": "Numeric values from the investigation",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice Variables"
+          }
+        ]
+      },
+      "investigation_result_unit": {
+        "@id": "schema:variable/investigation_result_unit",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Investigation advice - list",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(10)",
+        "description": "Unit of the numeric value",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "mm of Hg": {
+              "targetClass": "IV027-02"
+            },
+            "mm Hg": {
+              "targetClass": "IV003-02"
+            },
+            "mg%": {
+              "targetClass": "IV004-02"
+            },
+            "mm": {
+              "targetClass": "IV044-02"
+            },
+            ".": {
+              "targetClass": "IV026-02"
+            },
+            "/ min": {
+              "targetClass": "IV018-02"
+            },
+            "%": {
+              "targetClass": "IV021-02"
+            },
+            "µ": {
+              "targetClass": "IV022-02"
+            },
+            "D": {
+              "targetClass": "IV028-02"
+            },
+            "℉": {
+              "targetClass": "IV031-02"
+            },
+            "Kg": {
+              "targetClass": "IV032-02"
+            },
+            "cm": {
+              "targetClass": "IV033-02"
+            },
+            "ᵒ": {
+              "targetClass": "IV041-02"
+            }
+          }
+        }
+      },
+      "investigation_result_desc": {
+        "@id": "schema:variable/investigation_result_desc",
+        "@type": "schema:TextVariable",
+        "dataType": "text",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Investigation advice - list",
+        "fieldType": "Free Text",
+        "sqlType": "varchar(255)",
+        "description": "Textual interpretation of a result",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Investigation advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Investigation advice Variables"
+          }
+        ]
+      },
+      "special_investigation_name": {
+        "@id": "schema:variable/special_investigation_name",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Special Investigation advice -single",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Name of the investigation performed. These are mostly imaging studies.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Special Investigation advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Special Investigation advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Special Investigation advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Special Investigation advice Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Fundus Photo": {
+              "targetClass": "SI001"
+            },
+            "HFA": {
+              "targetClass": "SI002"
+            },
+            "HRT": {
+              "targetClass": "SI003"
+            },
+            "FFA": {
+              "targetClass": "SI004"
+            },
+            "OCT": {
+              "targetClass": "SI005"
+            },
+            "A-Scan": {
+              "targetClass": "SI006"
+            },
+            "Amsler Chart": {
+              "targetClass": "SI007"
+            },
+            "Clinical Photographs": {
+              "targetClass": "SI008"
+            },
+            "Hess chart": {
+              "targetClass": "SI009"
+            },
+            "Diplopia chart": {
+              "targetClass": "SI010"
+            },
+            "Ultra Sound": {
+              "targetClass": "SI011"
+            },
+            "ECG": {
+              "targetClass": "SI012"
+            },
+            "ERG": {
+              "targetClass": "SI013"
+            },
+            "EOG": {
+              "targetClass": "SI014"
+            },
+            "VEP": {
+              "targetClass": "SI015"
+            },
+            "MFERG": {
+              "targetClass": "SI016"
+            },
+            "B Scan": {
+              "targetClass": "SI017"
+            },
+            "UBM": {
+              "targetClass": "SI018"
+            },
+            "Pentacam": {
+              "targetClass": "SI019"
+            },
+            "Confocal Microscopy": {
+              "targetClass": "SI020"
+            },
+            "AS OCT": {
+              "targetClass": "SI021"
+            },
+            "Specular Microscopy": {
+              "targetClass": "SI022"
+            },
+            "Orbscan": {
+              "targetClass": "SI023"
+            },
+            "Orbsscan with I Design": {
+              "targetClass": "SI024"
+            },
+            "XRay": {
+              "targetClass": "SI025"
+            },
+            "Corneal Scrapping": {
+              "targetClass": "SI026"
+            },
+            "Keratoconus": {
+              "targetClass": "SI027"
+            },
+            "Postop iTrace": {
+              "targetClass": "SI028"
+            },
+            "iTrace": {
+              "targetClass": "SI029"
+            },
+            "MRI": {
+              "targetClass": "SI030"
+            },
+            "Carotid doppler": {
+              "targetClass": "SI031"
+            },
+            "Echo Cardiogram": {
+              "targetClass": "SI032"
+            },
+            "XRay Chest PA view": {
+              "targetClass": "SI033"
+            },
+            "Verion": {
+              "targetClass": "SI034"
+            },
+            "CT Scan": {
+              "targetClass": "SI035"
+            },
+            "MRA": {
+              "targetClass": "SI036"
+            },
+            "Optos": {
+              "targetClass": "SI037"
+            },
+            "Microperimetry": {
+              "targetClass": "SI038"
+            },
+            "Meibography": {
+              "targetClass": "SI039"
+            },
+            "ICG": {
+              "targetClass": "SI040"
+            },
+            "Retina Photograph": {
+              "targetClass": "SI041"
+            },
+            "Pathology": {
+              "targetClass": "SI042"
+            },
+            "Clarus": {
+              "targetClass": "SI043"
+            },
+            "Slit Lamp Photo": {
+              "targetClass": "SI044"
+            },
+            "Ultra Sound Abdomen": {
+              "targetClass": "SI045"
+            },
+            "Covid Photo": {
+              "targetClass": "SI046"
+            },
+            "FFA and ICG": {
+              "targetClass": "SI047"
+            },
+            "OCT ANGIO": {
+              "targetClass": "SI048"
+            },
+            "Autofluorescence": {
+              "targetClass": "SI049"
+            },
+            "Pre Auto Refraction VRF100": {
+              "targetClass": "SI050"
+            },
+            "Pre Fundus Photo TCNW400": {
+              "targetClass": "SI051"
+            },
+            "Fundus Crystal Vue": {
+              "targetClass": "SI052"
+            },
+            "Post Fundus Photo TCNW400": {
+              "targetClass": "SI053"
+            },
+            "Pre External Photo TCNW400": {
+              "targetClass": "SI054"
+            },
+            "Post External Photo TCNW400": {
+              "targetClass": "SI055"
+            },
+            "Corneal Topography": {
+              "targetClass": "SI056"
+            },
+            "Aberrometry": {
+              "targetClass": "SI057"
+            },
+            "Indirect Ophthalmoscopy": {
+              "targetClass": "SI058"
+            },
+            "Cycloplegic refraction": {
+              "targetClass": "SI059"
+            },
+            "Auto Refractometry": {
+              "targetClass": "SI060"
+            },
+            "Dry Eye Workup": {
+              "targetClass": "SI061"
+            },
+            "Topolyzer": {
+              "targetClass": "SI062"
+            },
+            "Pre External RE MOBILE": {
+              "targetClass": "SI063"
+            },
+            "Pre External LE MOBILE": {
+              "targetClass": "SI064"
+            },
+            "Myopia": {
+              "targetClass": "SI065"
+            }
+          }
+        }
+      },
+      "eye_laterality": {
+        "@id": "schema:variable/eye_laterality",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Special Investigation advice -single",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(10)",
+        "description": "Eye on which special investigation is performed",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Study",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Study"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Study Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Study Variables"
+          }
+        ]
+      },
+      "special_investigation_date": {
+        "@id": "schema:variable/special_investigation_date",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Special Investigation advice -single",
+        "fieldType": "Datetime",
+        "sqlType": "Datetime",
+        "description": "Date and time when the investigation was performed",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Special Investigation advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Special Investigation advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Special Investigation advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Special Investigation advice Variables"
+          }
+        ]
+      },
+      "special_investigation_id": {
+        "@id": "schema:variable/special_investigation_id",
+        "@type": "schema:IdentifierVariable",
+        "dataType": "identifier",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Special Investigation advice -single",
+        "fieldType": "Alphanumeric Identifier",
+        "sqlType": "varchar(255)",
+        "description": "Scan_id ( Study id ) of the investigation performed. Typically the id of the DICOM file or image file of this investigation.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Special Investigation advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Special Investigation advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Special Investigation advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Special Investigation advice Variables"
+          }
+        ]
+      },
+      "special_investigation_notes": {
+        "@id": "schema:variable/special_investigation_notes",
+        "@type": "schema:TextVariable",
+        "dataType": "text",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Special Investigation advice -single",
+        "fieldType": "Free Text",
+        "sqlType": "varchar()",
+        "description": "Remarks or Notes about the results of the investigation. This can contain SRF volume.. There should possibly be a separate field for this.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Special Investigation advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Special Investigation advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Special Investigation advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Special Investigation advice Variables"
+          }
+        ]
+      },
+      "re_fl_investigation_method": {
+        "@id": "schema:variable/re_fl_investigation_method",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Follow-up Investigation Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "",
+        "description": "Method of investigation."
+      },
+      "le_fl_investigation_method": {
+        "@id": "schema:variable/le_fl_investigation_method",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Follow-up Investigation Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "",
+        "description": "Method of investigation"
+      },
+      "diagnosis_name": {
+        "@id": "schema:variable/diagnosis_name",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Diagnosis",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Name of the diagnosis given to the patient",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Diagnosis",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Diagnosis"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Diagnosis Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Diagnosis Variables"
+          }
+        ]
+      },
+      "diagnosis_date": {
+        "@id": "schema:variable/diagnosis_date",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Diagnosis",
+        "fieldType": "Datetime",
+        "sqlType": "Datetime",
+        "description": "Date and time of diagnosis",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Diagnosis",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Diagnosis"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Diagnosis Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Diagnosis Variables"
+          }
+        ]
+      },
+      "drug_name": {
+        "@id": "schema:variable/drug_name",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Drug Prescription",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Name of the drug prescribed",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Drug Prescription",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Drug Prescription"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Drug Prescription Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Drug Prescription Variables"
+          }
+        ]
+      },
+      "drug_duration": {
+        "@id": "schema:variable/drug_duration",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Drug Prescription",
+        "fieldType": "Temporal",
+        "sqlType": "varchar(255)",
+        "description": "Duration for which it has to be taken, in days",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Drug Prescription",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Drug Prescription"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Drug Prescription Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Drug Prescription Variables"
+          }
+        ]
+      },
+      "form_type": {
+        "@id": "schema:variable/form_type",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Drug Prescription",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Form in which the drug needs to be taken, eg tablet, syrup, capsule etc",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Drug Prescription",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Drug Prescription"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Drug Prescription Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Drug Prescription Variables"
+          }
+        ]
+      },
+      "dosage": {
+        "@id": "schema:variable/dosage",
+        "@type": "schema:TextVariable",
+        "dataType": "text",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Drug Prescription",
+        "fieldType": "Free Text",
+        "sqlType": "varchar(255)",
+        "description": "Dosage of the drug ( frequency and amount )",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Drug Prescription",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Drug Prescription"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Drug Prescription Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Drug Prescription Variables"
+          }
+        ]
+      },
+      "advice_date": {
+        "@id": "schema:variable/advice_date",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Treatment Advice",
+        "fieldType": "Datetime",
+        "sqlType": "Datetime",
+        "description": "Date of the advice",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice Variables"
+          }
+        ]
+      },
+      "refractive_correction_type": {
+        "@id": "schema:variable/refractive_correction_type",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Refractive Correction",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Refractive Correction Advised. Example (Same Gp, Lasik Counselling, Contact Lens)",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Refractive Correction",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Refractive Correction"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Refractive Correction Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Refractive Correction Variables"
+          }
+        ]
+      },
+      "glass_precription_value": {
+        "@id": "schema:variable/glass_precription_value",
+        "@type": "schema:TextVariable",
+        "dataType": "text",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "GP Advice",
+        "fieldType": "Free Text",
+        "sqlType": "varchar(255)",
+        "description": "Glass prescription advice",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "GP Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "GP Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "GP Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "GP Advice Variables"
+          }
+        ]
+      },
+      "primary_procedure": {
+        "@id": "schema:variable/primary_procedure",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Primary surgical procedure advised",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice Variables"
+          }
+        ]
+      },
+      "secondary_procedure": {
+        "@id": "schema:variable/secondary_procedure",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Secondary surgical procedure advised",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice Variables"
+          }
+        ]
+      },
+      "implant": {
+        "@id": "schema:variable/implant",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Implant advise",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice Variables"
+          }
+        ]
+      },
+      "adjunct": {
+        "@id": "schema:variable/adjunct",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "adjunct advise",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice Variables"
+          }
+        ]
+      },
+      "anesthesia": {
+        "@id": "schema:variable/anesthesia",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "Boolean",
+        "sqlType": "Boolean",
+        "description": "Whether to be done under anesthesia or not",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice Variables"
+          }
+        ]
+      },
+      "surgery_completed_date": {
+        "@id": "schema:variable/surgery_completed_date",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "Datetime",
+        "sqlType": "Datetime",
+        "description": "Date of completion of surgery",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice Variables"
+          }
+        ]
+      },
+      "surgery_done_at": {
+        "@id": "schema:variable/surgery_done_at",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Hospital where surgery was done.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Surgery Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Surgery Advice Variables"
+          }
+        ]
+      },
+      "k1dioptre": {
+        "@id": "schema:variable/k1dioptre",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "",
+        "sqlType": ""
+      },
+      "k2dioptre": {
+        "@id": "schema:variable/k2dioptre",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "",
+        "sqlType": ""
+      },
+      "k1degree": {
+        "@id": "schema:variable/k1degree",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "",
+        "sqlType": ""
+      },
+      "k2degree": {
+        "@id": "schema:variable/k2degree",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "",
+        "sqlType": ""
+      },
+      "k1mm": {
+        "@id": "schema:variable/k1mm",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "",
+        "sqlType": ""
+      },
+      "k2mm": {
+        "@id": "schema:variable/k2mm",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "",
+        "sqlType": ""
+      },
+      "axis_length": {
+        "@id": "schema:variable/axis_length",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Surgery Advice",
+        "fieldType": "",
+        "sqlType": ""
+      },
+      "procedure_type": {
+        "@id": "schema:variable/procedure_type",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Procedure Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Procedure type ( eg Injection, laser etc ) advised",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Injection": {
+              "targetClass": "PRT001"
+            },
+            "Surgery": {
+              "targetClass": "PRT002"
+            },
+            "Medication": {
+              "targetClass": "PRT003"
+            },
+            "Other": {
+              "targetClass": "PRT004"
+            }
+          }
+        }
+      },
+      "procedure_name": {
+        "@id": "schema:variable/procedure_name",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Procedure Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Exact name of the procedure advised",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice Variables"
+          }
+        ],
+        "valueMapping": {
+          "terms": {
+            "Accessible PRP": {
+              "targetClass": "PR001"
+            },
+            "BARRAGE LASER": {
+              "targetClass": "PR002"
+            },
+            "Conformer removal": {
+              "targetClass": "PR003"
+            },
+            "Custom fit prosthesis fitting": {
+              "targetClass": "PR004"
+            },
+            "Custom fit prosthesis polishing": {
+              "targetClass": "PR005"
+            },
+            "Cyst needling": {
+              "targetClass": "PR006"
+            },
+            "Facial prosthesis appointment": {
+              "targetClass": "PR007"
+            },
+            "Facial prosthesis fitting": {
+              "targetClass": "PR008"
+            },
+            "FB Removed Under Topical": {
+              "targetClass": "PR009"
+            },
+            "FDS bolster removal": {
+              "targetClass": "PR010"
+            },
+            "FIRST SITTING": {
+              "targetClass": "PR011"
+            },
+            "Focal": {
+              "targetClass": "PR012"
+            },
+            "Grid": {
+              "targetClass": "PR013"
+            },
+            "IMP": {
+              "targetClass": "PR014"
+            },
+            "Impression cytology": {
+              "targetClass": "PR015"
+            },
+            "Inj. PST": {
+              "targetClass": "PR016"
+            },
+            "Inj.Clendamycin": {
+              "targetClass": "PR017"
+            },
+            "Intra Cameral Injection - Avastin": {
+              "targetClass": "PR018"
+            },
+            "Intra Vireal Injection Methotraxate": {
+              "targetClass": "PR019"
+            },
+            "Intra Vitreal Injection - Accentrix": {
+              "targetClass": "PR020"
+            },
+            "Intra Vitreal Injection - Avastin": {
+              "targetClass": "PR021"
+            },
+            "Intra Vitreal Injection - Eylea": {
+              "targetClass": "PR022"
+            },
+            "Intra Vitreal Injection - Ganciclovir": {
+              "targetClass": "PR023"
+            },
+            "Intra Vitreal Injection - Lucentis": {
+              "targetClass": "PR024"
+            },
+            "Intra Vitreal Injection - Ozurdex": {
+              "targetClass": "PR025"
+            },
+            "Intra Vitreal Injection - Pagenax": {
+              "targetClass": "PR026"
+            },
+            "Intra Vitreal Injection - Ranieyes": {
+              "targetClass": "PR027"
+            },
+            "Intra Vitreal Injection - Razumab": {
+              "targetClass": "PR028"
+            },
+            "Intra Vitreal Injection - Tricot": {
+              "targetClass": "PR029"
+            },
+            "Intra vitreal Injection Vabysmo": {
+              "targetClass": "PR030"
+            },
+            "INTRA VITREAL RANIZUREL": {
+              "targetClass": "PR031"
+            },
+            "Intracameral Inj": {
+              "targetClass": "PR032"
+            },
+            "Intracameral Injection - Accentrix": {
+              "targetClass": "PR033"
+            },
+            "Intracameral Injection - Eylea": {
+              "targetClass": "PR034"
+            },
+            "Intracameral Injection - Lucentis": {
+              "targetClass": "PR035"
+            },
+            "Intracameral Injection - Ozurdex": {
+              "targetClass": "PR036"
+            },
+            "Intracameral Injection - Tricort": {
+              "targetClass": "PR037"
+            },
+            "IntraVit Inj": {
+              "targetClass": "PR038"
+            },
+            "Intravitreal Injection Actilyse": {
+              "targetClass": "PR039"
+            },
+            "Intravitreal Injection LRP AFLI study": {
+              "targetClass": "PR040"
+            },
+            "Intravitreal Injection Melphalan": {
+              "targetClass": "PR041"
+            },
+            "Intravitreal injection TOPOTECAN": {
+              "targetClass": "PR042"
+            },
+            "INTRAVITREAL INJECTION-OCEVA": {
+              "targetClass": "PR043"
+            },
+            "Intravitreal Methyl Prednisolone": {
+              "targetClass": "PR044"
+            },
+            "Irrigation- eye cleaning": {
+              "targetClass": "PR045"
+            },
+            "LSL": {
+              "targetClass": "PR046"
+            },
+            "Manual Epilation": {
+              "targetClass": "PR047"
+            },
+            "New Custom fit prosthesis appointment": {
+              "targetClass": "PR048"
+            },
+            "Pad and Bandage": {
+              "targetClass": "PR049"
+            },
+            "Probing": {
+              "targetClass": "PR050"
+            },
+            "PRP": {
+              "targetClass": "PR051"
+            },
+            "PRP + Focal": {
+              "targetClass": "PR052"
+            },
+            "PRP + Grid": {
+              "targetClass": "PR053"
+            },
+            "Repeat yag PI": {
+              "targetClass": "PR054"
+            },
+            "Retina Laser": {
+              "targetClass": "PR055"
+            },
+            "Saline wash": {
+              "targetClass": "PR056"
+            },
+            "Scleral Abscess": {
+              "targetClass": "PR057"
+            },
+            "Selective Laser Trabeculoplasty": {
+              "targetClass": "PR058"
+            },
+            "Socket cleaning": {
+              "targetClass": "PR059"
+            },
+            "Stent removal": {
+              "targetClass": "PR060"
+            },
+            "Stock shell prosthesis fitting": {
+              "targetClass": "PR061"
+            },
+            "Stock shell prosthesis polishing": {
+              "targetClass": "PR062"
+            },
+            "Supra Tarsal Injection": {
+              "targetClass": "PR063"
+            },
+            "Supra Tarsal Injection with Tricort": {
+              "targetClass": "PR064"
+            },
+            "Suture Removal – OP": {
+              "targetClass": "PR065"
+            },
+            "TTT": {
+              "targetClass": "PR066"
+            },
+            "Tube/ stent repositioning": {
+              "targetClass": "PR067"
+            },
+            "Wound cleaning(Betadine)": {
+              "targetClass": "PR068"
+            },
+            "YAG ANTERIOR CAPSULOTOMY-AEH": {
+              "targetClass": "PR069"
+            },
+            "YAG ANTERIOR CAPSULOTOMY-Surgery Done at Outside": {
+              "targetClass": "PR070"
+            },
+            "YAG Cap": {
+              "targetClass": "PR071"
+            },
+            "YAG CAPSULOTOMY-Surgery Done at Outside": {
+              "targetClass": "PR072"
+            },
+            "YAG ENLARGEMENT - AEH": {
+              "targetClass": "PR073"
+            },
+            "YAG ENLARGEMENT-Surgery Done at Outside": {
+              "targetClass": "PR074"
+            },
+            "YAG Hyaloidotomy": {
+              "targetClass": "PR075"
+            },
+            "Yag Laser Synechiolysis": {
+              "targetClass": "PR076"
+            },
+            "YAG MEMBRANALYSIS - AEH": {
+              "targetClass": "PR077"
+            },
+            "YAG MEMBRANOLYSIS-Surgery Done at Outside": {
+              "targetClass": "PR078"
+            },
+            "YAG Phimosis release - AEH": {
+              "targetClass": "PR079"
+            },
+            "YAG Phimosis release - Surgery done at outside": {
+              "targetClass": "PR080"
+            },
+            "YAG PI": {
+              "targetClass": "PR081"
+            },
+            "Yag PI Enlargement": {
+              "targetClass": "PR082"
+            },
+            "YAG PIGMENT DISPERSION/SWEEPING - AEH": {
+              "targetClass": "PR083"
+            },
+            "YAG PIGMENT DISPERSION/SWEEPING- Sx Done Outside": {
+              "targetClass": "PR084"
+            },
+            "YAG VITREOLYSIS - AEH": {
+              "targetClass": "PR085"
+            },
+            "YAG VITREOLYSIS-Surgery Done at Outside": {
+              "targetClass": "PR086"
+            }
+          }
+        }
+      },
+      "number_of_sittings_advice": {
+        "@id": "schema:variable/number_of_sittings_advice",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Procedure Advice",
+        "fieldType": "Numerical",
+        "sqlType": "Integer",
+        "description": "Number of sittings required.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice Variables"
+          }
+        ]
+      },
+      "completion_date": {
+        "@id": "schema:variable/completion_date",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Procedure Advice",
+        "fieldType": "Datetime",
+        "sqlType": "Datetime",
+        "description": "Date of completion of procedure.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice Variables"
+          }
+        ]
+      },
+      "sitting_num_completed": {
+        "@id": "schema:variable/sitting_num_completed",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Procedure Advice",
+        "fieldType": "Numerical",
+        "sqlType": "Integer",
+        "description": "How many sittings are done.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice Variables"
+          }
+        ]
+      },
+      "procedure_done_at": {
+        "@id": "schema:variable/procedure_done_at",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Procedure Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Hospital where procedure was done.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Procedure Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Procedure Advice Variables"
+          }
+        ]
+      },
+      "treatment_type": {
+        "@id": "schema:variable/treatment_type",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Treatment Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Treatment type. ( eg : Exercise, Patching, Lacriminal Sac Massage etc)",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice Variables"
+          }
+        ]
+      },
+      "treatment_duration": {
+        "@id": "schema:variable/treatment_duration",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Treatment Advice",
+        "fieldType": "Temporal",
+        "sqlType": "varchar(255)",
+        "description": "Duration of treatment in days, months etc.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice Variables"
+          }
+        ]
+      },
+      "treatment_completion_date": {
+        "@id": "schema:variable/treatment_completion_date",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Treatment Advice",
+        "fieldType": "Datetime",
+        "sqlType": "Datetime",
+        "description": "Date of completion of treatment",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice Variables"
+          }
+        ]
+      },
+      "treatment_done_at": {
+        "@id": "schema:variable/treatment_done_at",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Treatment Advice",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Hospital where treatment was done.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Treatment Advice Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Treatment Advice Variables"
+          }
+        ]
+      },
+      "oct_scan_id": {
+        "@id": "schema:variable/oct_scan_id",
+        "@type": "schema:IdentifierVariable",
+        "dataType": "identifier",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Study",
+        "fieldType": "Alphanumeric Identifier",
+        "sqlType": "varchar(255)",
+        "description": "Typically the Study Instance Uid of the DICOM field.  It refers to the imaging study."
+      },
+      "visit_id": {
+        "@id": "schema:variable/visit_id",
+        "@type": "schema:IdentifierVariable",
+        "dataType": "identifier",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Alphanumeric Identifier",
+        "sqlType": "varchar(255)",
+        "description": "Unique identifier for patient encounters or visits. A PE is a patient event, and it means a visit to the hospital, which can be a fresh visit, a routine followup or a visit for a procedure.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Keratoconus Ground Truth",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Keratoconus Ground Truth"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Keratoconus Ground Truth Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Keratoconus Ground Truth Variables"
+          }
+        ]
+      },
+      "scan_date": {
+        "@id": "schema:variable/scan_date",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "date",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Study",
+        "fieldType": "Datetime",
+        "sqlType": "Datetime",
+        "description": "The date of the study",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Study",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Study"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Study Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Study Variables"
+          }
+        ]
+      },
+      "device_type": {
+        "@id": "schema:variable/device_type",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Study",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "The type of OCT device. This will typically be the Manufacturer + Model",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Study",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Study"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Study Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Study Variables"
+          }
+        ]
+      },
+      "scan_protocol": {
+        "@id": "schema:variable/scan_protocol",
+        "@type": "schema:CategoricalVariable",
+        "dataType": "categorical",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Study",
+        "fieldType": "Categorical Nominal",
+        "sqlType": "varchar(255)",
+        "description": "Scan type (macula cube, raster)",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Study",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Study"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Study Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Study Variables"
+          }
+        ]
+      },
+      "signal_strength": {
+        "@id": "schema:variable/signal_strength",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Study",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Number",
+        "description": "Image quality metric",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Study",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Study"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Study Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Study Variables"
+          }
+        ]
+      },
+      "image_id": {
+        "@id": "schema:variable/image_id",
+        "@type": "schema:IdentifierVariable",
+        "dataType": "identifier",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Image",
+        "fieldType": "Alphanumeric Identifier",
+        "sqlType": "varchar(255)",
+        "description": "Typically, the Image Instance Uid of the DICOM image. Each study can have many images.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Image",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Image"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Image Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Image Variables"
+          }
+        ]
+      },
+      "number_of_frames": {
+        "@id": "schema:variable/number_of_frames",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Image",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Number",
+        "description": "Number of frames captured in this image. Each image can have many frames.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Image",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Image"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Image Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Image Variables"
+          }
+        ]
+      },
+      "frame_id": {
+        "@id": "schema:variable/frame_id",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Frame",
+        "fieldType": "Alphanumeric",
+        "sqlType": "Numeric",
+        "description": "Identification of the slice. Corresponds to the id of the actual image slice.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Frame",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Frame"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Frame Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Frame Variables"
+          }
+        ]
+      },
+      "pixel_spacing": {
+        "@id": "schema:variable/pixel_spacing",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Frame",
+        "fieldType": "Numerical Array",
+        "sqlType": "LIST[2]",
+        "description": "Dimensions of each pixel in mm/µm"
+      },
+      "inter_slice_spacing": {
+        "@id": "schema:variable/inter_slice_spacing",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Frame",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 1 mm)",
+        "description": "Distance between slices of OCT"
+      },
+      "image_position_patient": {
+        "@id": "schema:variable/image_position_patient",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Frame",
+        "fieldType": "Numerical Array",
+        "sqlType": "LIST[3]",
+        "description": "Origin Location (top-left corner coordinates) of B-Scan slice in 3D space"
+      },
+      "slice_thickness": {
+        "@id": "schema:variable/slice_thickness",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Frame",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 1 mm)",
+        "description": "Thickness of each slice",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Frame",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Frame"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Frame Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Frame Variables"
+          }
+        ]
+      },
+      "image_orientation": {
+        "@id": "schema:variable/image_orientation",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "OCT Frame",
+        "fieldType": "Numerical Array",
+        "sqlType": "LIST[6]",
+        "description": "Row and Column Direction Cosines",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Frame",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Frame"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "OCT Frame Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "OCT Frame Variables"
+          }
+        ]
+      },
+      "scan_id": {
+        "@id": "schema:variable/scan_id",
+        "@type": "schema:IdentifierVariable",
+        "dataType": "identifier",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Alphanumeric Identifier",
+        "sqlType": "varchar(255)",
+        "description": "Typically the Study Instance Uid of the DICOM field. Here, the locator for the Pentacam image files.",
+        "schemaReconstruction": [
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Keratoconus Ground Truth",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Keratoconus Ground Truth"
+          },
+          {
+            "@type": "schema:ClassNode",
+            "classLabel": "Keratoconus Ground Truth Variables",
+            "predicate": "coda:hasConceptClass",
+            "aestheticLabel": "Keratoconus Ground Truth Variables"
+          }
+        ]
+      },
+      "k1_flat_keratometry": {
+        "@id": "schema:variable/k1_flat_keratometry",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Radius/curvature of the flattest corneal meridian (anterior surface)"
+      },
+      "k2_steep_keratometry": {
+        "@id": "schema:variable/k2_steep_keratometry",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Radius/curvature of the steepest corneal meridian (anterior surface)"
+      },
+      "km_mean_keratometry": {
+        "@id": "schema:variable/km_mean_keratometry",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Average of K1 and K2"
+      },
+      "posterior_k1k2km": {
+        "@id": "schema:variable/posterior_k1k2km",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Same as above but for posterior corneal surface"
+      },
+      "central_corneal_thickness_cct": {
+        "@id": "schema:variable/central_corneal_thickness_cct",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (int)",
+        "description": "Thickness at corneal apex (center)"
+      },
+      "thinnest_corneal_thickness": {
+        "@id": "schema:variable/thinnest_corneal_thickness",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (int)",
+        "description": "Minimum corneal thickness detected across cornea"
+      },
+      "pachymetry_map": {
+        "@id": "schema:variable/pachymetry_map",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Array/Grid",
+        "sqlType": "Array/Grid",
+        "description": "Spatial corneal thickness map"
+      },
+      "anterior_chamber_depth_acd": {
+        "@id": "schema:variable/anterior_chamber_depth_acd",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Distance from corneal endothelium to lens"
+      },
+      "anterior_chamber_volume_acv": {
+        "@id": "schema:variable/anterior_chamber_volume_acv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 1dp)",
+        "description": "Total fluid-filled space volume between cornea & lens"
+      },
+      "anterior_chamber_angle_aca": {
+        "@id": "schema:variable/anterior_chamber_angle_aca",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 1dp)",
+        "description": "Angle between cornea & iris"
+      },
+      "anterior_elevation_map": {
+        "@id": "schema:variable/anterior_elevation_map",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Array/Grid",
+        "sqlType": "Array/Grid",
+        "description": "Height difference of anterior cornea vs. best-fit sphere"
+      },
+      "posterior_elevation_map": {
+        "@id": "schema:variable/posterior_elevation_map",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Array/Grid",
+        "sqlType": "Array/Grid",
+        "description": "Height difference of posterior cornea vs. best-fit sphere"
+      },
+      "corneal_volume_cv": {
+        "@id": "schema:variable/corneal_volume_cv",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Total corneal volume in defined diameter (e.g., 10 mm)"
+      },
+      "belinambrosio_deviation_badd": {
+        "@id": "schema:variable/belinambrosio_deviation_badd",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Composite ectasia index (combines curvature, pachymetry, elevation)"
+      },
+      "lens_densitometry": {
+        "@id": "schema:variable/lens_densitometry",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Optical density within defined regions of crystalline lens"
+      },
+      "isv_index_of_surface_variance": {
+        "@id": "schema:variable/isv_index_of_surface_variance",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Standard deviation of individual corneal curvature values"
+      },
+      "iva_index_of_vertical_asymmetry": {
+        "@id": "schema:variable/iva_index_of_vertical_asymmetry",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Compares superior vs inferior corneal curvature"
+      },
+      "ki_keratoconus_index": {
+        "@id": "schema:variable/ki_keratoconus_index",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Ratio between steepest radius and average curvature"
+      },
+      "cki_central_keratoconus_index": {
+        "@id": "schema:variable/cki_central_keratoconus_index",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Ratio of central vs paracentral corneal curvature"
+      },
+      "qvalue_asphericity": {
+        "@id": "schema:variable/qvalue_asphericity",
+        "@type": "schema:ContinuousVariable",
+        "dataType": "continuous",
+        "predicate": "ncit:Concept_In_Subset",
+        "class": "ncit:C25190",
+        "section": "Keratoconus Ground Truth",
+        "fieldType": "Numerical Continuous",
+        "sqlType": "Numeric (float, 2dp)",
+        "description": "Describes whether cornea is prolate or oblate"
+      }
+    }
+  },
+  "databases": {
+    "coda_db": {
+      "name": "coda_db",
+      "description": "CODA ophthalmology EMR database"
+    }
+  }
+}
