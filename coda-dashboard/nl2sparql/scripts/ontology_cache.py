@@ -48,6 +48,16 @@ QUERY_PATTERNS = {
         "relationships": ["hasInvestigation"],
         "ignore": ["laterality"]  # Only use if specifically mentioned
     },
+    "batch|batch_id|batch id|scan id": {
+        "primary_class": "Visit",
+        "attributes": ["batch_id", "visitDate"],
+        "relationships": ["hasVisit"]
+    },
+    "oct|octa|optical coherence|scan": {
+        "primary_class": "OctDetails",
+        "attributes": ["scan_id"],
+        "relationships": ["hasOctDetails"]
+    },
 }
 
 # Semantic alternatives (to reduce redundant columns)

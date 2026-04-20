@@ -61,10 +61,10 @@ But you can select these ID columns if the user explicitly asks for them or if t
 Ontology:
 PREFIX ns1: <http://clinical-example.org/ontology/>
 
-Classes: Patient, Visit, Complaint, Investigation, VitalDetails, VisionDetails, VisionItem, RefractionDetails, RefractionItem, AnteriorSegmentExam, ExamFinding, ReportedHistory, SystemicHistory, AdviceDetails, DrugPrescription, ProcedureAdvice, Diagnosis
+Classes: Patient, Visit, Complaint, Investigation, VitalDetails, VisionDetails, VisionItem, RefractionDetails, RefractionItem, AnteriorSegmentExam, ExamFinding, ReportedHistory, SystemicHistory, AdviceDetails, DrugPrescription, ProcedureAdvice, Diagnosis, OctDetails
 
 Key Relationships:
-- Patient hasVisit Visit | hasReportedHistory ReportedHistory
+- Patient hasVisit Visit | hasReportedHistory ReportedHistory | hasOctDetails OctDetails
 - Visit hasComplaint Complaint | hasInvestigation Investigation | hasVitals VitalDetails | hasVisionDetails VisionDetails | hasRefraction RefractionDetails | hasAsExam AnteriorSegmentExam | hasDiagnosis Diagnosis | hasAdvice AdviceDetails
 - VisionDetails hasVisionItem VisionItem
 - RefractionDetails hasRefractionItem RefractionItem
@@ -74,7 +74,8 @@ Key Relationships:
 
 Minimal Attribute Reference (PREFER THESE):
 - Patient: patientId, patientMrnNo
-- Visit: visitDate
+- Visit: visitDate, batch_id, purpose_of_visit
+- OctDetails: scan_id
 - Complaint: complaintName, duration, laterality
 - Investigation: investigationName, resultNumeric, resultUnit, laterality
 - VitalDetails: systolicBP, diastolicBP
