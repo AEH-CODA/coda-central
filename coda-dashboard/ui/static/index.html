@@ -605,6 +605,101 @@ function renderPreview(preview) {
   }
 }
 
+/**
+ * Decide which chart type to use for a categorical column.
+ * 
+ * Logic:
+ * - 2-4 categories: Pie chart
+ * - 5-6 categories: Doughnut chart
+ * - 7+ categories: Bar chart
+ * 
+ * Special case: If max/min ratio >= 10:1, use bar chart (data too skewed for pie)
+ */
+function decideChartType(column) {
+  if (column.dtype !== "categorical" || !column.distribution) {
+    return "bar";
+  }
+  
+  const uniqueValues = column.unique_values || 0;
+  
+  // Need at least 2 categories for pie/doughnut
+  if (uniqueValues < 2) {
+    return "bar";
+  }
+  
+  // Check if data is too skewed for pie/doughnut charts
+  const counts = column.distribution.counts || [];
+  if (counts.length > 0) {
+    const maxCount = Math.max(...counts);
+    const minCount = Math.min(...counts);
+    const ratio = minCount > 0 ? maxCount / minCount : Infinity;
+    
+    // If ratio is too large (>=10:1), use bar chart to avoid illegible slices
+    if (ratio >= 10) {
+      console.log(`Column "${column.name}" has skewed distribution (ratio: ${ratio.toFixed(1)}:1). Using bar chart.`);
+      return "bar";
+    }
+  }
+  
+  // Apply progressive categorization
+  if (uniqueValues <= 4) {
+    return "pie";
+  } else if (uniqueValues <= 6) {
+    return "doughnut";
+  } else {
+    return "bar";
+  }
+}
+
+/**
+ * Generate a palette of distinct colors for pie/doughnut charts.
+ * Cycles through predefined colors if more slices than colors.
+ */
+function generatePaletteColors(count) {
+  const colors = [
+    'rgba(255, 99, 132, 0.8)',    // Red
+    'rgba(54, 162, 235, 0.8)',    // Blue
+    'rgba(255, 206, 86, 0.8)',    // Yellow
+    'rgba(75, 192, 192, 0.8)',    // Teal
+    'rgba(153, 102, 255, 0.8)',   // Purple
+    'rgba(255, 159, 64, 0.8)',    // Orange
+    'rgba(199, 199, 199, 0.8)',   // Gray
+    'rgba(83, 102, 255, 0.8)',    // Indigo
+    'rgba(255, 102, 178, 0.8)',   // Pink
+    'rgba(102, 255, 178, 0.8)',   // Mint
+  ];
+  
+  let result = [];
+  for (let i = 0; i < count; i++) {
+    result.push(colors[i % colors.length]);
+  }
+  return result;
+}
+
+/**
+ * Generate border colors (darker version of palette colors for borders).
+ */
+function generateBorderColors(count) {
+  const borderColors = [
+    'rgba(255, 99, 132, 1)',      // Red
+    'rgba(54, 162, 235, 1)',      // Blue
+    'rgba(255, 206, 86, 1)',      // Yellow
+    'rgba(75, 192, 192, 1)',      // Teal
+    'rgba(153, 102, 255, 1)',     // Purple
+    'rgba(255, 159, 64, 1)',      // Orange
+    'rgba(199, 199, 199, 1)',     // Gray
+    'rgba(83, 102, 255, 1)',      // Indigo
+    'rgba(255, 102, 178, 1)',     // Pink
+    'rgba(102, 255, 178, 1)',     // Mint
+  ];
+  
+  let result = [];
+  for (let i = 0; i < count; i++) {
+    result.push(borderColors[i % borderColors.length]);
+  }
+  return result;
+}
+
 function renderChart(column, idx, totalRows) {
   const ctx = document.getElementById(`chart-${idx}`);
   if (!ctx) return;
@@ -637,31 +732,106 @@ function renderChart(column, idx, totalRows) {
       }
     };
   } else if (column.dtype === "categorical" && column.distribution) {
-    // Bar chart for categorical columns
-    config = {
-      type: "bar",
-      data: {
-        labels: column.distribution.categories || [],
-        datasets: [{
-          label: "Count",
-          data: column.distribution.counts || [],
-          backgroundColor: "rgba(17, 153, 142, 0.6)",
-          borderColor: "rgba(17, 153, 142, 1)",
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false }
+    // Smart chart type selection for categorical columns
+    const chartType = decideChartType(column);
+    const categories = column.distribution.categories || [];
+    const counts = column.distribution.counts || [];
+    
+    if (chartType === "pie") {
+      // Pie chart for 2-4 categories
+      config = {
+        type: "pie",
+        data: {
+          labels: categories,
+          datasets: [{
+            data: counts,
+            backgroundColor: generatePaletteColors(categories.length),
+            borderColor: generateBorderColors(categories.length),
+            borderWidth: 2
+          }]
         },
-        scales: {
-          x: { beginAtZero: true, ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 } },
-          y: { beginAtZero: true }
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'right',
+              labels: { padding: 12, font: { size: 11 } }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((context.parsed / total) * 100).toFixed(1);
+                  return `${context.label}: ${context.parsed} (${percentage}%)`;
+                }
+              }
+            }
+          }
         }
-      }
-    };
+      };
+    } else if (chartType === "doughnut") {
+      // Doughnut chart for 5-6 categories
+      config = {
+        type: "doughnut",
+        data: {
+          labels: categories,
+          datasets: [{
+            data: counts,
+            backgroundColor: generatePaletteColors(categories.length),
+            borderColor: generateBorderColors(categories.length),
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'right',
+              labels: { padding: 12, font: { size: 11 } }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((context.parsed / total) * 100).toFixed(1);
+                  return `${context.label}: ${context.parsed} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      };
+    } else {
+      // Bar chart for 7+ categories or skewed data
+      config = {
+        type: "bar",
+        data: {
+          labels: categories,
+          datasets: [{
+            label: "Count",
+            data: counts,
+            backgroundColor: "rgba(17, 153, 142, 0.6)",
+            borderColor: "rgba(17, 153, 142, 1)",
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { beginAtZero: true, ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 } },
+            y: { beginAtZero: true }
+          }
+        }
+      };
+    }
   }
 
   if (config) {
@@ -669,6 +839,7 @@ function renderChart(column, idx, totalRows) {
       const chart = new Chart(ctx, config);
       if (!window.previewCharts) window.previewCharts = [];
       window.previewCharts.push(chart);
+      console.log(`Chart created for column "${column.name}": ${config.type}`);
     } catch (e) {
       console.error("Chart rendering failed:", e);
     }

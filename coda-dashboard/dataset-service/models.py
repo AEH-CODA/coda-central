@@ -112,25 +112,28 @@ class PreviewResponse(BaseModel):
     sample_rows: List[Dict[str, Any]]
 
 
-# Access Request models
+# Access Request-related models
 
 class AccessRequestCreateRequest(BaseModel):
-    """Request to create a new data access request."""
-    reason: str  # Why user needs this data (10-500 chars)
+    """Request to create a new access request for a dataset."""
+    reason: str
     nl_query: str
     sparql_query: str
-    data_preview: Optional[Dict[str, Any]] = None  # Preview data from frontend
+    data_preview: Optional[Any] = None  # Preview data from /datasets/preview endpoint
 
 
 class AccessRequestResponse(BaseModel):
-    """Response showing access request details."""
+    """Response containing access request details."""
     id: UUID
     user_id: UUID
     reason: str
     nl_query: str
     sparql_query: str
-    data_preview: Optional[Dict[str, Any]] = None
-    status: str  # pending, approved, rejected
+    data_preview: Optional[Any] = None
+    result_file_path: Optional[str] = None
+    result_json: Optional[str] = None
+    full_results: Optional[Any] = None  # Loaded from file or JSON for frontend
+    status: str  # "pending", "approved", "rejected"
     created_at: datetime
     reviewed_by_id: Optional[UUID] = None
     reviewed_at: Optional[datetime] = None
@@ -141,11 +144,12 @@ class AccessRequestResponse(BaseModel):
 
 
 class AccessRequestListResponse(BaseModel):
-    """Response for listing access requests (for data manager view)."""
+    """Response for access request listing."""
     id: UUID
     user_id: UUID
     reason: str
     nl_query: str
+    sparql_query: str
     status: str
     created_at: datetime
     reviewed_at: Optional[datetime] = None
@@ -155,14 +159,16 @@ class AccessRequestListResponse(BaseModel):
 
 
 class AccessRequestDetailResponse(BaseModel):
-    """Response with full request details including full results (for data manager)."""
+    """Response for access request details (includes full data)."""
     id: UUID
     user_id: UUID
     reason: str
     nl_query: str
     sparql_query: str
-    data_preview: Optional[Dict[str, Any]] = None
-    full_results: Optional[Any] = None  # Full results loaded from file or DB
+    data_preview: Optional[Any] = None
+    result_file_path: Optional[str] = None
+    result_json: Optional[str] = None
+    full_results: Optional[Any] = None
     status: str
     created_at: datetime
     reviewed_by_id: Optional[UUID] = None
@@ -174,7 +180,27 @@ class AccessRequestDetailResponse(BaseModel):
 
 
 class AccessRequestApprovalRequest(BaseModel):
-    """Request to approve/reject an access request."""
+    """Request to approve or reject an access request."""
     action: str  # "approve" or "reject"
     review_reason: Optional[str] = None  # Reason for rejection
 
+
+class AccessRequestDetailResponse(BaseModel):
+    """Response containing full access request details."""
+    id: UUID
+    dataset_id: UUID
+    user_id: UUID
+    reason: str
+    requested_columns: Optional[List[str]] = None
+    status: str
+    created_at: datetime
+    updated_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+
+class AccessRequestApprovalRequest(BaseModel):
+    """Request to approve or reject an access request."""
+    status: str  # "approved" or "rejected"
+    notes: Optional[str] = None

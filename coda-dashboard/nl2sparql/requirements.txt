@@ -3,3 +3,4 @@ uvicorn
 groq
 dotenv
 logging
+requests>=2.31.0

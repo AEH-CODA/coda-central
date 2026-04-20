@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Header, Query
+from fastapi import APIRouter, Depends, HTTPException, Header, Query, Body
 from sqlalchemy.orm import Session
 from uuid import UUID
 from jose import jwt, JWTError
@@ -358,7 +358,7 @@ def create_access_request(
 @router.post("/access-requests/{request_id}/full-results")
 def store_access_request_full_results(
     request_id: str,
-    full_results: dict,
+    full_results: dict = Body(...),
     user_id: UUID = Depends(verify_token),
     db: Session = Depends(get_db)
 ):
@@ -367,7 +367,7 @@ def store_access_request_full_results(
     
     Args:
         request_id: Access request ID
-        full_results: Full query results dictionary
+        full_results: Full query results dictionary (from request body)
         user_id: Verified user ID from JWT
         db: Database session
     

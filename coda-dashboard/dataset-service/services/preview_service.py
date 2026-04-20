@@ -3,7 +3,7 @@ import re
 import httpx
 import pandas as pd
 import numpy as np
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from datetime import datetime
 
 from config import GRAPHDB_ENDPOINT, SPARQL_QUERY_TIMEOUT, PREVIEW_ROW_LIMIT
@@ -67,6 +67,34 @@ class PreviewService:
         except Exception as e:
             logger.error(f"Error executing SPARQL query: {str(e)}")
             raise Exception("Failed to execute SPARQL query")
+    
+    @staticmethod
+    def _is_aggregate_query(sparql_query: str) -> bool:
+        """
+        Detect if a SPARQL query is an aggregate query.
+        
+        Aggregate queries use functions like COUNT, SUM, AVG, MIN, MAX, GROUP_CONCAT
+        or GROUP BY / HAVING clauses.
+        
+        Args:
+            sparql_query: SPARQL query string
+            
+        Returns:
+            True if query appears to be an aggregate query, False otherwise
+        """
+        query_upper = sparql_query.upper()
+        
+        # Check for aggregate functions
+        aggregate_functions = ['COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'GROUP_CONCAT', 'SAMPLE']
+        for func in aggregate_functions:
+            if f'{func}(' in query_upper:
+                return True
+        
+        # Check for GROUP BY or HAVING clauses
+        if 'GROUP BY' in query_upper or 'HAVING' in query_upper:
+            return True
+        
+        return False
     
     @staticmethod
     def _convert_results_to_dataframe(sparql_results: Dict[str, Any]) -> pd.DataFrame:
@@ -349,6 +377,112 @@ class PreviewService:
         }
     
     @staticmethod
+    def _compute_aggregate_numeric_stats(series: pd.Series) -> Dict[str, Any]:
+        """
+        Compute statistics for numeric column in aggregate results.
+        
+        Filters out NaN/Inf values which are not JSON-serializable.
+        Single-value series will have NaN for std, which is replaced with None.
+        
+        Args:
+            series: Pandas Series with numeric values
+            
+        Returns:
+            Dict with mean, min, max, std (or None for invalid values)
+        """
+        numeric_series = pd.to_numeric(series, errors="coerce")
+        
+        stats = {}
+        
+        # Compute mean
+        mean_val = numeric_series.mean()
+        stats["mean"] = float(mean_val) if pd.notna(mean_val) and np.isfinite(mean_val) else None
+        
+        # Compute min
+        min_val = numeric_series.min()
+        stats["min"] = float(min_val) if pd.notna(min_val) and np.isfinite(min_val) else None
+        
+        # Compute max
+        max_val = numeric_series.max()
+        stats["max"] = float(max_val) if pd.notna(max_val) and np.isfinite(max_val) else None
+        
+        # Compute std (may be NaN for single-value series)
+        std_val = numeric_series.std()
+        stats["std"] = float(std_val) if pd.notna(std_val) and np.isfinite(std_val) else None
+        
+        return stats
+    
+    @staticmethod
+    def _compute_aggregate_metadata(sparql_results: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Compute simplified metadata for aggregate query results.
+        
+        Aggregate queries return summary data (e.g., COUNT, SUM) rather than detail rows.
+        This method returns basic metadata without attempting to compute distributions.
+        
+        Args:
+            sparql_results: Results from GraphDB SPARQL endpoint
+            
+        Returns:
+            Dict with dataset_summary, columns metadata (no distributions), and sample_rows
+        """
+        df = PreviewService._convert_results_to_dataframe(sparql_results)
+        
+        if df.empty:
+            return {
+                "dataset_summary": {"row_count": 0, "column_count": 0},
+                "patient_insights": None,
+                "columns": [],
+                "sample_rows": [],
+            }
+        
+        row_count = len(df)
+        column_count = len(df.columns)
+        
+        # For aggregate queries, return simplified column metadata (no distributions)
+        columns_metadata = []
+        for col_name in df.columns:
+            series = df[col_name]
+            dtype = PreviewService._detect_column_type(series)
+            
+            col_meta = {
+                "name": col_name,
+                "dtype": dtype,
+                "is_patient_id": False,  # Aggregate results don't have patient IDs
+                "missing_percentage": 0.0,
+                "unique_values": int(series.nunique()),
+            }
+            
+            # Add basic stats but no distributions for aggregate results
+            if dtype == "numeric":
+                # Use special stats computation that filters out NaN/Inf
+                col_meta.update(PreviewService._compute_aggregate_numeric_stats(series))
+            elif dtype == "categorical":
+                col_meta["unique_values"] = int(series.nunique())
+            
+            columns_metadata.append(col_meta)
+        
+        # Sample rows
+        sample_rows = (
+            df.head(5)
+            .astype(object)
+            .where(pd.notna(df.head(5)), None)
+            .to_dict(orient="records")
+        )
+        
+        logger.info(f"Aggregate query metadata computed: {row_count} rows, {column_count} columns")
+        
+        return {
+            "dataset_summary": {
+                "row_count": row_count,
+                "column_count": column_count,
+            },
+            "patient_insights": None,
+            "columns": columns_metadata,
+            "sample_rows": sample_rows,
+        }
+    
+    @staticmethod
     def compute_metadata(sparql_results: Dict[str, Any]) -> Dict[str, Any]:
         """
         Compute dataset metadata from SPARQL results with enhanced Kaggle-style insights.
@@ -444,6 +578,7 @@ class PreviewService:
         Generate a complete preview for a SPARQL query.
         
         Orchestrates query execution and metadata computation.
+        Automatically detects aggregate queries and handles them appropriately.
         
         Args:
             sparql_query: SPARQL query string
@@ -458,11 +593,18 @@ class PreviewService:
             Exception: For other errors
         """
         try:
+            # Check if this is an aggregate query
+            is_aggregate = PreviewService._is_aggregate_query(sparql_query)
+            logger.debug(f"Query is aggregate: {is_aggregate}")
+            
             # Execute query
             results = PreviewService.execute_sparql_query(sparql_query, timeout)
             
-            # Compute metadata
-            metadata = PreviewService.compute_metadata(results)
+            # Compute metadata based on query type
+            if is_aggregate:
+                metadata = PreviewService._compute_aggregate_metadata(results)
+            else:
+                metadata = PreviewService.compute_metadata(results)
             
             logger.info(f"Preview generated: {metadata['dataset_summary']['row_count']} rows, "
                        f"{metadata['dataset_summary']['column_count']} columns")
