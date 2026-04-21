@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Patient JSON</title>
+</head>
+<body>
+  <h2>Insert Patient Data to GraphDB</h2>
+  <form action="/insert_patient_data" enctype="multipart/form-data" method="post">
+    <input type="file" name="file" accept=".json" required>
+    <button type="submit">Upload & Insert</button>
+  </form>
+</body>
+</html>
