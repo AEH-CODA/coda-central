@@ -10,7 +10,6 @@ from db import AccessRequest, Dataset
 from config import DATA_DIRECTORY
 from models import AccessRequestDetailResponse
 
-
 class AccessRequestService:
     """Business logic for access request operations."""
     
@@ -18,11 +17,15 @@ class AccessRequestService:
     def create_access_request(
         db: Session,
         user_id: UUID,
+        user_name: str,
+        project_name: str,
         reason: str,
         nl_query: str,
         sparql_query: str,
         data_preview: Optional[Any] = None,
         full_results: Optional[Any] = None,
+        supporting_doc_file: Optional[Any] = None,
+        supporting_doc_filename: Optional[str] = None,
     ) -> AccessRequest:
         """
         Create a new data access request.
@@ -31,11 +34,15 @@ class AccessRequestService:
         Args:
             db: Database session
             user_id: User requesting access
+            user_name: Requester's display name from JWT token
+            project_name: Project requesting access
             reason: User's reason for needing data
             nl_query: Natural language query
             sparql_query: SPARQL query
             data_preview: Preview data (optional, from frontend)
             full_results: Full query results to store
+            supporting_doc_file: Optional file object for PDF document
+            supporting_doc_filename: Original filename of the PDF
         
         Returns:
             AccessRequest model instance
@@ -62,15 +69,34 @@ class AccessRequestService:
             else:
                 result_json = results_json
         
+        # Store supporting document if provided
+        supporting_doc_path = None
+        if supporting_doc_file and supporting_doc_filename:
+            timestamp = datetime.utcnow().timestamp()
+            # Create filename from timestamp and original filename (sanitized)
+            sanitized_filename = "".join(c for c in supporting_doc_filename if c.isalnum() or c in ('-', '_', '.'))
+            filename = f"{int(timestamp)}_{sanitized_filename}"
+            supporting_doc_path = f"access_requests/{user_id}/{filename}"
+            filepath = os.path.join(DATA_DIRECTORY, supporting_doc_path)
+            
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+            # Save the file
+            with open(filepath, "wb") as f:
+                f.write(supporting_doc_file.read())
+        
         # Create access request record
         request = AccessRequest(
             user_id=user_id,
+            user_name=user_name,
+            project_name=project_name,
             reason=reason,
             nl_query=nl_query,
             sparql_query=sparql_query,
             data_preview=preview_json,
             result_file_path=result_file_path,
             result_json=result_json,
+            supporting_doc_path=supporting_doc_path,
+            supporting_doc_filename=supporting_doc_filename,
             status="pending"
         )
         
@@ -184,11 +210,15 @@ class AccessRequestService:
         return AccessRequestDetailResponse(
             id=request.id,
             user_id=request.user_id,
+            user_name=request.user_name,
+            project_name=request.project_name,
             reason=request.reason,
             nl_query=request.nl_query,
             sparql_query=request.sparql_query,
             data_preview=data_preview,
             full_results=full_results,
+            supporting_doc_path=request.supporting_doc_path,
+            supporting_doc_filename=request.supporting_doc_filename,
             status=request.status,
             created_at=request.created_at,
             reviewed_by_id=request.reviewed_by_id,

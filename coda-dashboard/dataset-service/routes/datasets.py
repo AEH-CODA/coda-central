@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Header, Query, Body
+from fastapi import APIRouter, Depends, HTTPException, Header, Query, Body, Form, UploadFile, File
 from sqlalchemy.orm import Session
 from uuid import UUID
 from jose import jwt, JWTError
@@ -73,6 +73,44 @@ def extract_user_role(authorization: str = Header(...)) -> tuple:
             raise HTTPException(status_code=401, detail="Invalid token: missing sub claim")
         
         return UUID(user_id), role
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidSignatureError:
+        raise HTTPException(status_code=401, detail="Invalid token signature")
+    except jwt.DecodeError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    except (JWTError, ValueError) as e:
+        raise HTTPException(status_code=401, detail=f"Token validation failed: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Token validation error")
+
+
+def extract_user_info(authorization: str = Header(...)) -> tuple:
+    """
+    Extract user_id, role, and user_name from JWT token.
+    
+    Returns:
+        Tuple of (user_id, role, user_name)
+    """
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token format",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+    
+    token = authorization.split(" ")[1]
+    
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get("sub")
+        role = payload.get("role", "user")  # Default to "user" if role not in token
+        user_name = payload.get("name", "Unknown User")  # Get user_name from JWT
+        
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token: missing sub claim")
+        
+        return UUID(user_id), role, user_name
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.InvalidSignatureError:
@@ -307,15 +345,25 @@ def delete_dataset(
 
 @router.post("/access-requests/create")
 def create_access_request(
-    req: AccessRequestCreateRequest,
+    project_name: str = Form(...),
+    reason: str = Form(...),
+    nl_query: str = Form(...),
+    sparql_query: str = Form(...),
+    data_preview: str = Form(None),  # JSON string from form
+    supporting_document: UploadFile = File(None),  # Optional PDF file
     authorization: str = Header(...),
     db: Session = Depends(get_db)
 ):
     """
-    Create a new data access request.
+    Create a new data access request with optional PDF support document.
     
     Args:
-        req: Access request details (reason, nl_query, sparql_query, data_preview, full results)
+        project_name: Project requesting access
+        reason: Reason for access request
+        nl_query: Natural language query
+        sparql_query: SPARQL query
+        data_preview: JSON string of preview data
+        supporting_document: Optional PDF file upload
         authorization: Bearer token
         db: Database session
     
@@ -323,24 +371,69 @@ def create_access_request(
         Access request ID and status
     """
     try:
-        # Extract user_id and role from token
-        user_id, role = extract_user_role(authorization)
+        import json
+        
+        # Extract user_id, role, and user_name from token
+        user_id, role, user_name = extract_user_info(authorization)
+        
+        # Validate project name
+        if not project_name or len(project_name.strip()) < 2 or len(project_name.strip()) > 255:
+            raise HTTPException(
+                status_code=400,
+                detail="Project name must be between 2 and 255 characters"
+            )
         
         # Validate reason length
-        if not req.reason or len(req.reason) < 10 or len(req.reason) > 500:
+        if not reason or len(reason) < 10 or len(reason) > 500:
             raise HTTPException(
                 status_code=400,
                 detail="Reason must be between 10 and 500 characters"
             )
         
+        # Parse data_preview if provided
+        preview_data = None
+        if data_preview:
+            try:
+                preview_data = json.loads(data_preview)
+            except json.JSONDecodeError:
+                raise HTTPException(status_code=400, detail="Invalid preview data format")
+        
+        # Validate supporting document if provided
+        supporting_doc_file = None
+        supporting_doc_filename = None
+        if supporting_document and supporting_document.filename:
+            # Validate file extension
+            if not supporting_document.filename.lower().endswith('.pdf'):
+                raise HTTPException(
+                    status_code=400,
+                    detail="Supporting document must be a PDF file"
+                )
+            
+            # Check file size (max 10MB)
+            content = supporting_document.file.read()
+            if len(content) > 10 * 1024 * 1024:  # 10MB
+                raise HTTPException(
+                    status_code=400,
+                    detail="PDF file size must not exceed 10MB"
+                )
+            
+            # Reset file pointer for service to read
+            supporting_document.file.seek(0)
+            supporting_doc_file = supporting_document.file
+            supporting_doc_filename = supporting_document.filename
+        
         access_request = AccessRequestService.create_access_request(
             db=db,
             user_id=user_id,
-            reason=req.reason,
-            nl_query=req.nl_query,
-            sparql_query=req.sparql_query,
-            data_preview=req.data_preview,
-            full_results=None  # Will be populated by frontend after query execution
+            user_name=user_name,
+            project_name=project_name.strip(),
+            reason=reason,
+            nl_query=nl_query,
+            sparql_query=sparql_query,
+            data_preview=preview_data,
+            full_results=None,  # Will be populated by frontend after query execution
+            supporting_doc_file=supporting_doc_file,
+            supporting_doc_filename=supporting_doc_filename
         )
         
         return {

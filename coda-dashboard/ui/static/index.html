@@ -5,6 +5,18 @@
   <link rel="stylesheet" href="styles/common.css">
   <link rel="stylesheet" href="styles/index.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <style>
+    .scan-id-link {
+      color: #2563eb;
+      cursor: pointer;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+    .scan-id-link:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
 
@@ -159,8 +171,22 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="accessReason">Why do you need this data? *</label>
-          <textarea id="accessReason" name="accessReason" required placeholder="Please explain your reason for requesting access to this data (10-500 characters)" style="min-height: 100px; resize: vertical;"></textarea>
+          <label for="projectName">Project Name *</label>
+          <input type="text" id="projectName" name="projectName" required placeholder="Enter the name of your project (2-255 characters)" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          <div style="font-size: 12px; color: #999; margin-top: 4px;">
+            <span id="projectNameCharCount">0</span>/255 characters
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="supportingDocument">Supporting Document (PDF)</label>
+          <input type="file" id="supportingDocument" name="supportingDocument" accept=".pdf" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+          <div style="font-size: 12px; color: #999; margin-top: 4px;">
+            Optional: Upload a PDF file (max 10MB) to support your request
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="accessReason">Reason for Access *</label>
+          <textarea id="accessReason" name="accessReason" required placeholder="Please explain your reason for requesting access to this data (10-500 characters)" style="width: 100%; min-height: 100px; resize: vertical; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"></textarea>
           <div style="font-size: 12px; color: #999; margin-top: 4px;">
             <span id="reasonCharCount">0</span>/500 characters
           </div>
@@ -176,6 +202,27 @@
 </main>
 
 <script>
+
+// Helper function to create scan_id link
+function createScanIdLink(scanId) {
+  const link = document.createElement('a');
+  link.className = 'scan-id-link';
+  link.href = `https://coda.innowave.asia/viewer?StudyInstanceUIDs=${encodeURIComponent(scanId)}`;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = scanId;
+  link.onclick = (e) => {
+    // Allow normal link behavior
+    return true;
+  };
+  return link;
+}
+
+// Helper function to check if column name is scan_id
+function isScanIdColumn(columnName) {
+  const lowerName = String(columnName).toLowerCase();
+  return lowerName === 'scan_id' || lowerName === 'scanid' || lowerName === 'scaninstanceuid' || lowerName === 'studyinstanceuids';
+}
 
 // Handle token from OAuth callback
 const params = new URLSearchParams(window.location.search);
@@ -593,7 +640,13 @@ function renderPreview(preview) {
     preview.columns.forEach(col => {
       const td = document.createElement("td");
       const value = row[col.name];
-      td.textContent = value !== null && value !== undefined ? value : "-";
+      
+      // Check if this is a scan_id column
+      if (isScanIdColumn(col.name) && value !== null && value !== undefined) {
+        td.appendChild(createScanIdLink(String(value)));
+      } else {
+        td.textContent = value !== null && value !== undefined ? value : "-";
+      }
       tr.appendChild(td);
     });
     sampleTable.appendChild(tr);
@@ -881,7 +934,14 @@ function renderTable(sparqlResults) {
     const tr = document.createElement("tr");
     columns.forEach(col => {
       const td = document.createElement("td");
-      td.textContent = row[col]?.value || "";
+      const value = row[col]?.value || "";
+      
+      // Check if this is a scan_id column
+      if (isScanIdColumn(col) && value) {
+        td.appendChild(createScanIdLink(String(value)));
+      } else {
+        td.textContent = value;
+      }
       tr.appendChild(td);
     });
     table.appendChild(tr);
@@ -909,14 +969,22 @@ function closeRequestAccessDialog() {
   document.getElementById('requestAccessModal').style.display = 'none';
   document.getElementById('requestAccessForm').reset();
   document.getElementById('reasonCharCount').textContent = '0';
+  document.getElementById('projectNameCharCount').textContent = '0';
 }
 
-// Character counter for access reason
+// Character counters for form fields
 document.addEventListener('DOMContentLoaded', function() {
   const reasonText = document.getElementById('accessReason');
   if (reasonText) {
     reasonText.addEventListener('input', function() {
       document.getElementById('reasonCharCount').textContent = this.value.length;
+    });
+  }
+  
+  const projectName = document.getElementById('projectName');
+  if (projectName) {
+    projectName.addEventListener('input', function() {
+      document.getElementById('projectNameCharCount').textContent = this.value.length;
     });
   }
 });
@@ -928,13 +996,34 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
       
+      const projectName = document.getElementById('projectName').value.trim();
       const reason = document.getElementById('accessReason').value;
+      const supportingDocument = document.getElementById('supportingDocument').files[0];
       const token = localStorage.getItem('token');
+      
+      // Validate project name
+      if (!projectName || projectName.length < 2 || projectName.length > 255) {
+        alert('Please provide a project name between 2 and 255 characters');
+        return;
+      }
       
       // Validate reason
       if (reason.length < 10 || reason.length > 500) {
         alert('Please provide a reason between 10 and 500 characters');
         return;
+      }
+      
+      // Validate PDF if provided
+      if (supportingDocument) {
+        if (!supportingDocument.name.toLowerCase().endsWith('.pdf')) {
+          alert('Supporting document must be a PDF file');
+          return;
+        }
+        
+        if (supportingDocument.size > 10 * 1024 * 1024) {  // 10MB
+          alert('PDF file size must not exceed 10MB');
+          return;
+        }
       }
       
       if (!currentQueryData) {
@@ -943,21 +1032,33 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       try {
-        // First, create the access request
+        // Create FormData for multipart/form-data submission
+        const formData = new FormData();
+        formData.append('project_name', projectName);
+        formData.append('reason', reason);
+        formData.append('nl_query', currentQueryData.nl_query);
+        formData.append('sparql_query', currentQueryData.sparql);
+        
+        // Add preview data as JSON string
+        if (currentQueryData.preview_data) {
+          formData.append('data_preview', JSON.stringify(currentQueryData.preview_data));
+        }
+        
+        // Add supporting document if provided
+        if (supportingDocument) {
+          formData.append('supporting_document', supportingDocument);
+        }
+        
+        // First, create the access request with multipart form data
         const createResponse = await fetch(
           'http://' + window.location.hostname + ':8000/datasets/access-requests/create',
           {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
               'Authorization': 'Bearer ' + token
+              // Don't set Content-Type: multipart/form-data - let the browser set it with boundary
             },
-            body: JSON.stringify({
-              reason: reason,
-              nl_query: currentQueryData.nl_query,
-              sparql_query: currentQueryData.sparql,
-              data_preview: currentQueryData.preview_data || null
-            })
+            body: formData
           }
         );
         

@@ -180,6 +180,16 @@
     .preview-table tr:hover {
       background-color: #f9fafb;
     }
+    .scan-id-link {
+      color: #2563eb;
+      cursor: pointer;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+    .scan-id-link:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -382,6 +392,27 @@
 </div>
 
 <script>
+
+// Helper function to create scan_id link
+function createScanIdLink(scanId) {
+  const link = document.createElement('a');
+  link.className = 'scan-id-link';
+  link.href = `https://coda.innowave.asia/viewer?StudyInstanceUIDs=${encodeURIComponent(scanId)}`;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = scanId;
+  link.onclick = (e) => {
+    // Allow normal link behavior
+    return true;
+  };
+  return link;
+}
+
+// Helper function to check if column name is scan_id
+function isScanIdColumn(columnName) {
+  const lowerName = String(columnName).toLowerCase();
+  return lowerName === 'scan_id' || lowerName === 'scanid' || lowerName === 'scaninstanceuid' || lowerName === 'studyinstanceuids';
+}
 
 // Handle token from OAuth callback
 const params = new URLSearchParams(window.location.search);
@@ -778,7 +809,13 @@ function renderPreviewTable(preview) {
         preview.columns.forEach(col => {
           const td = document.createElement('td');
           const value = row[col.name];
-          td.textContent = value !== null && value !== undefined ? String(value).substring(0, 100) : '-';
+          
+          // Check if this is a scan_id column
+          if (isScanIdColumn(col.name) && value !== null && value !== undefined) {
+            td.appendChild(createScanIdLink(String(value)));
+          } else {
+            td.textContent = value !== null && value !== undefined ? String(value).substring(0, 100) : '-';
+          }
           tr.appendChild(td);
         });
         table.appendChild(tr);
@@ -822,7 +859,14 @@ function renderFullResultsTable(results) {
     const tr = document.createElement('tr');
     columns.forEach(col => {
       const td = document.createElement('td');
-      td.textContent = row[col]?.value ? String(row[col].value).substring(0, 100) : '-';
+      const value = row[col]?.value ? String(row[col].value) : '-';
+      
+      // Check if this is a scan_id column
+      if (isScanIdColumn(col) && value !== '-') {
+        td.appendChild(createScanIdLink(value));
+      } else {
+        td.textContent = value.length > 100 ? value.substring(0, 100) : value;
+      }
       tr.appendChild(td);
     });
     table.appendChild(tr);

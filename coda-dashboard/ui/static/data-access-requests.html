@@ -4,6 +4,18 @@
   <title>Data Access Requests - CODA</title>
   <link rel="stylesheet" href="styles/common.css">
   <link rel="stylesheet" href="styles/data-access-requests.css">
+  <style>
+    .scan-id-link {
+      color: #2563eb;
+      cursor: pointer;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+    .scan-id-link:hover {
+      color: #1d4ed8;
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
 
@@ -88,7 +100,7 @@
       <h3>Requester Information</h3>
       <div class="info-grid">
         <div class="info-item">
-          <span class="label">User ID</span>
+          <span class="label">Requester Name</span>
           <span id="detailUserId" class="value"></span>
         </div>
         <div class="info-item">
@@ -98,10 +110,30 @@
       </div>
     </div>
 
+    <!-- Project Name -->
+    <div class="detail-section">
+      <h3>Project Information</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Project Name</span>
+          <span id="detailProjectName" class="value"></span>
+        </div>
+      </div>
+    </div>
+
     <!-- Reason -->
     <div class="detail-section">
       <h3>Request Reason</h3>
       <div id="detailReason" class="reason-box"></div>
+    </div>
+
+    <!-- Supporting Document -->
+    <div id="supportingDocSection" class="detail-section" style="display: none;">
+      <h3>Supporting Document</h3>
+      <p>
+        <strong>Attached Document:</strong> 
+        <span id="supportingDocLink" style="color: #2563eb; cursor: pointer; text-decoration: underline;"></span>
+      </p>
     </div>
 
     <!-- Query Information -->
@@ -200,6 +232,27 @@
 </div>
 
 <script>
+
+// Helper function to create scan_id link
+function createScanIdLink(scanId) {
+  const link = document.createElement('a');
+  link.className = 'scan-id-link';
+  link.href = `https://coda.innowave.asia/viewer?StudyInstanceUIDs=${encodeURIComponent(scanId)}`;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = scanId;
+  link.onclick = (e) => {
+    // Allow normal link behavior
+    return true;
+  };
+  return link;
+}
+
+// Helper function to check if column name is scan_id
+function isScanIdColumn(columnName) {
+  const lowerName = String(columnName).toLowerCase();
+  return lowerName === 'scan_id' || lowerName === 'scanid' || lowerName === 'scaninstanceuid' || lowerName === 'studyinstanceuids';
+}
 
 // Check if authenticated and is data-manager
 const params = new URLSearchParams(window.location.search);
@@ -343,10 +396,13 @@ function renderRequestsList(requests) {
       ? request.nl_query.substring(0, 100) + '...' 
       : request.nl_query;
     
+    // Format: Project Name | User Name | Date
+    const headingText = `${request.project_name} | ${request.user_name} | ${createdDate}`;
+    
     requestCard.innerHTML = `
       <div class="request-card-header">
         <div class="request-info">
-          <h3 class="requester-name">User: ${request.user_id.substring(0, 8)}</h3>
+          <h3 class="requester-name">${headingText}</h3>
           <p class="request-query">${nl_query}</p>
         </div>
         <div class="request-status">
@@ -394,18 +450,39 @@ async function viewRequestDetail(requestId) {
 }
 
 function renderRequestDetail(request) {
-  // Header
-  document.getElementById('detailRequesterName').textContent = `Request from User ${request.user_id.substring(0, 8)}`;
+  // Header - show Project Name | User Name | Date
+  const headerText = `${request.project_name} | ${request.user_name}`;
+  document.getElementById('detailRequesterName').textContent = headerText;
   document.getElementById('detailStatus').textContent = request.status.toUpperCase();
   document.getElementById('detailStatus').className = `status-badge status-${request.status}`;
   document.getElementById('detailDate').textContent = new Date(request.created_at).toLocaleString();
   
-  // Requester Info
-  document.getElementById('detailUserId').textContent = request.user_id;
+  // Requester Info - show User Name instead of just User ID
+  document.getElementById('detailUserId').textContent = request.user_name;
   document.getElementById('detailRequestedAt').textContent = new Date(request.created_at).toLocaleString();
+  
+  // Project Name
+  const projectNameElement = document.getElementById('detailProjectName');
+  if (projectNameElement) {
+    projectNameElement.textContent = request.project_name;
+  }
   
   // Reason
   document.getElementById('detailReason').textContent = request.reason;
+  
+  // Supporting Document
+  const supportingDocSection = document.getElementById('supportingDocSection');
+  const supportingDocLink = document.getElementById('supportingDocLink');
+  if (request.supporting_doc_path && request.supporting_doc_filename) {
+    supportingDocSection.style.display = 'block';
+    supportingDocLink.textContent = request.supporting_doc_filename;
+    // Note: You may want to add a download endpoint later
+    supportingDocLink.style.color = '#2563eb';
+    supportingDocLink.style.cursor = 'pointer';
+    supportingDocLink.style.textDecoration = 'underline';
+  } else if (supportingDocSection) {
+    supportingDocSection.style.display = 'none';
+  }
   
   // Queries
   document.getElementById('detailNLQuery').textContent = request.nl_query;
@@ -465,7 +542,14 @@ function renderPreviewTable(preview) {
     const tr = document.createElement('tr');
     columns.forEach(col => {
       const td = document.createElement('td');
-      td.textContent = row[col] !== null && row[col] !== undefined ? row[col] : '';
+      const value = row[col];
+      
+      // Check if this is a scan_id column
+      if (isScanIdColumn(col) && value !== null && value !== undefined) {
+        td.appendChild(createScanIdLink(String(value)));
+      } else {
+        td.textContent = value !== null && value !== undefined ? value : '';
+      }
       tr.appendChild(td);
     });
     table.appendChild(tr);
@@ -525,7 +609,13 @@ function renderFullResultsTable(fullResults) {
       const td = document.createElement('td');
       const val = row[col];
       const displayVal = val !== null && val !== undefined ? String(val) : '';
-      td.textContent = displayVal.length > 50 ? displayVal.substring(0, 50) + '...' : displayVal;
+      
+      // Check if this is a scan_id column
+      if (isScanIdColumn(col) && displayVal) {
+        td.appendChild(createScanIdLink(displayVal));
+      } else {
+        td.textContent = displayVal.length > 50 ? displayVal.substring(0, 50) + '...' : displayVal;
+      }
       tr.appendChild(td);
     });
     table.appendChild(tr);
@@ -590,9 +680,13 @@ function showRejectionForm() {
 }
 
 function hideRejectionForm() {
-  document.getElementById('rejectionFormSection').style.display = 'none';
-  document.getElementById('reviewActions').style.display = 'block';
-  document.getElementById('rejectionForm').reset();
+  const rejectionForm = document.getElementById('rejectionFormSection');
+  const reviewActions = document.getElementById('reviewActions');
+  const form = document.getElementById('rejectionForm');
+  
+  if (rejectionForm) rejectionForm.style.display = 'none';
+  if (reviewActions) reviewActions.style.display = 'block';
+  if (form) form.reset();
 }
 
 async function submitRejection(event) {

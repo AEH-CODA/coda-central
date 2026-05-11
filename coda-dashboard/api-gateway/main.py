@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Header, Request
+from fastapi import FastAPI, HTTPException, Depends, Header, Request, UploadFile
 from pydantic import BaseModel
 import requests
 from fastapi.middleware.cors import CORSMiddleware
@@ -413,7 +413,7 @@ async def proxy_preview_dataset(request: Request):
 
 @app.post("/datasets/access-requests/create")
 async def proxy_create_access_request(request: Request):
-    """Proxy POST /datasets/access-requests/create to dataset-service"""
+    """Proxy POST /datasets/access-requests/create to dataset-service (multipart/form-data)"""
     try:
         auth_header = request.headers.get("authorization")
         if not auth_header:
@@ -423,11 +423,26 @@ async def proxy_create_access_request(request: Request):
                 "action": "Please sign out and sign in again to continue."
             })
         
-        body = await request.json()
+        # Read multipart form data
+        form_data = await request.form()
+        
+        # Prepare form data for proxying
+        files = {}
+        data = {}
+        
+        for key, value in form_data.items():
+            if isinstance(value, UploadFile):
+                # Handle file upload
+                content = await value.read()
+                files[key] = (value.filename, content, value.content_type)
+            else:
+                # Handle regular form fields
+                data[key] = value
         
         response = requests.post(
             f"{DATASET_SERVICE_URL}/datasets/access-requests/create",
-            json=body,
+            data=data,
+            files=files if files else None,
             headers={"Authorization": auth_header},
             timeout=int(DOCKER_API_TIMEOUT)
         )

@@ -116,6 +116,7 @@ class PreviewResponse(BaseModel):
 
 class AccessRequestCreateRequest(BaseModel):
     """Request to create a new access request for a dataset."""
+    project_name: str  # Project requesting access
     reason: str
     nl_query: str
     sparql_query: str
@@ -126,6 +127,8 @@ class AccessRequestResponse(BaseModel):
     """Response containing access request details."""
     id: UUID
     user_id: UUID
+    user_name: str
+    project_name: str
     reason: str
     nl_query: str
     sparql_query: str
@@ -133,6 +136,8 @@ class AccessRequestResponse(BaseModel):
     result_file_path: Optional[str] = None
     result_json: Optional[str] = None
     full_results: Optional[Any] = None  # Loaded from file or JSON for frontend
+    supporting_doc_path: Optional[str] = None
+    supporting_doc_filename: Optional[str] = None
     status: str  # "pending", "approved", "rejected"
     created_at: datetime
     reviewed_by_id: Optional[UUID] = None
@@ -147,6 +152,8 @@ class AccessRequestListResponse(BaseModel):
     """Response for access request listing."""
     id: UUID
     user_id: UUID
+    user_name: str
+    project_name: str
     reason: str
     nl_query: str
     sparql_query: str
@@ -162,6 +169,8 @@ class AccessRequestDetailResponse(BaseModel):
     """Response for access request details (includes full data)."""
     id: UUID
     user_id: UUID
+    user_name: str
+    project_name: str
     reason: str
     nl_query: str
     sparql_query: str
@@ -169,6 +178,8 @@ class AccessRequestDetailResponse(BaseModel):
     result_file_path: Optional[str] = None
     result_json: Optional[str] = None
     full_results: Optional[Any] = None
+    supporting_doc_path: Optional[str] = None
+    supporting_doc_filename: Optional[str] = None
     status: str
     created_at: datetime
     reviewed_by_id: Optional[UUID] = None
@@ -183,24 +194,3 @@ class AccessRequestApprovalRequest(BaseModel):
     """Request to approve or reject an access request."""
     action: str  # "approve" or "reject"
     review_reason: Optional[str] = None  # Reason for rejection
-
-
-class AccessRequestDetailResponse(BaseModel):
-    """Response containing full access request details."""
-    id: UUID
-    dataset_id: UUID
-    user_id: UUID
-    reason: str
-    requested_columns: Optional[List[str]] = None
-    status: str
-    created_at: datetime
-    updated_at: datetime
-    
-    class Config:
-        from_attributes = True
-
-
-class AccessRequestApprovalRequest(BaseModel):
-    """Request to approve or reject an access request."""
-    status: str  # "approved" or "rejected"
-    notes: Optional[str] = None

@@ -36,12 +36,16 @@ class AccessRequest(Base):
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), nullable=False, index=True)  # User requesting access
+    user_name = Column(String(255), nullable=False)  # Requester's display name from JWT token
+    project_name = Column(String(255), nullable=False)  # Project requesting access
     reason = Column(Text, nullable=False)  # Why they need this data
     nl_query = Column(Text, nullable=False)  # Original natural language query
     sparql_query = Column(Text, nullable=False)  # SPARQL query executed
     data_preview = Column(Text, nullable=True)  # JSON string of preview data
     result_file_path = Column(String(1024), nullable=True)  # Path to full results if large
     result_json = Column(Text, nullable=True)  # JSON string of full results if small
+    supporting_doc_path = Column(String(1024), nullable=True)  # Path to supporting PDF file
+    supporting_doc_filename = Column(String(255), nullable=True)  # Original filename of uploaded PDF
     status = Column(String(20), nullable=False, default="pending", index=True)  # pending, approved, rejected
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
     reviewed_by_id = Column(UUID(as_uuid=True), nullable=True, index=True)  # Data manager who reviewed
