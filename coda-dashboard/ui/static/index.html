@@ -2,18 +2,21 @@
 <html>
 <head>
   <title>CODA Data Discovery UI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/common.css">
   <link rel="stylesheet" href="styles/index.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
   <style>
     .scan-id-link {
-      color: #2563eb;
+      color: var(--color-accent-light);
       cursor: pointer;
       text-decoration: underline;
       font-weight: 500;
     }
     .scan-id-link:hover {
-      color: #1d4ed8;
+      color: var(--color-accent-contrast);
       text-decoration: underline;
     }
   </style>
@@ -22,27 +25,36 @@
 
 <aside class="sidebar">
   <div class="sidebar-header">
-    <h1>CODA</h1>
-    <p>Data Discovery Platform</p>
+    <div class="brand-mark">C</div>
+    <div>
+      <h1>CODA</h1>
+      <p>Data Discovery</p>
+    </div>
   </div>
 
+  <div class="nav-section-label">Workspace</div>
   <nav class="nav-buttons">
     <button class="nav-btn active" onclick="setActiveNav(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       Query Data
     </button>
     <button class="nav-btn" onclick="navigateToSavedDatasets()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
       My Data Requests
     </button>
     <button class="nav-btn" onclick="setActiveNav(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/></svg>
       Model Workspace
     </button>
     <button class="nav-btn" id="dataAccessRequestsBtn" onclick="navigateToAccessRequests()" style="display: none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
       Data Access Requests
     </button>
   </nav>
 
   <div class="sidebar-footer">
     <button class="signout-btn" onclick="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Sign Out
     </button>
   </div>
@@ -50,14 +62,18 @@
 
 <main class="main-content">
   <div class="content-header">
-    <h2>QUERY DATA</h2>
+    <h2>Query Data</h2>
     <p>Discover insights with natural language queries</p>
   </div>
 
   <div class="query-section">
     <div class="query-input-group">
       <input id="query" type="text" placeholder="Enter natural language query (e.g., 'Show me all patients with diabetes')">
-      <button class="submit-btn" onclick="submitQuery()">Search</button>
+      <svg class="query-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <button class="submit-btn" onclick="submitQuery()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        Search
+      </button>
     </div>
   </div>
 
@@ -70,11 +86,11 @@
     </div>
 
     <!-- Dataset Preview Section (inline) -->
-    <div id="previewInfoMessage" style="display: none; margin-bottom: 20px; padding: 15px; background-color: #e3f2fd; border-left: 4px solid #2196F3; border-radius: 4px; color: #1565c0;">
+    <div id="previewInfoMessage" style="display: none; margin-bottom: 20px; padding: 15px; background-color: var(--color-accent-soft); border-left: 4px solid var(--color-accent); border-radius: var(--radius-sm); color: var(--color-text);">
       <strong style="font-weight: 600;">Preview Only:</strong> This is a preview of the data you queried. To access the full dataset, click "Request Access" below. Your request will be reviewed by the Data Manager.
     </div>
 
-    <div id="previewSection" style="display: none; margin-bottom: 30px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; background-color: #fafafa;">
+    <div id="previewSection" style="display: none; margin-bottom: 30px; border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 22px; background-color: var(--color-surface);">
       <div id="previewLoading" class="loading" style="display: none;">
         <p>Loading preview...</p>
       </div>
@@ -84,11 +100,13 @@
         <div class="preview-section">
           <h3>Dataset Summary</h3>
           <div class="summary-stats">
-            <div class="stat-card">
+            <div class="stat-card stat-teal">
+              <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="10" x2="9" y2="20"/></svg></div>
               <span class="stat-label">Row Count</span>
               <span class="stat-value" id="rowCount">-</span>
             </div>
-            <div class="stat-card">
+            <div class="stat-card stat-amber">
+              <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/><line x1="15" y1="4" x2="15" y2="20"/></svg></div>
               <span class="stat-label">Column Count</span>
               <span class="stat-value" id="columnCount">-</span>
             </div>
@@ -99,21 +117,24 @@
         <div class="preview-section" id="patientInsightsSection" style="display: none;">
           <h3>Patient Coverage</h3>
           <div class="patient-stats">
-            <div class="stat-card patient-stat">
+            <div class="stat-card patient-stat stat-violet">
+              <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
               <span class="stat-label">Unique Patients</span>
               <span class="stat-value" id="uniquePatients">-</span>
             </div>
-            <div class="stat-card patient-stat">
+            <div class="stat-card patient-stat stat-rose">
+              <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
               <span class="stat-label">Returning Patients</span>
               <span class="stat-value" id="returningPatients">-</span>
             </div>
-            <div class="stat-card patient-stat">
+            <div class="stat-card patient-stat stat-sky">
+              <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div>
               <span class="stat-label">Return Rate</span>
               <span class="stat-value" id="returnRate">-</span>
             </div>
           </div>
-          <div id="patientAppearanceContainer" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px solid #efefef;">
-            <p style="margin: 0 0 8px 0; font-size: 12px; color: #999;">Visits per Patient</p>
+          <div id="patientAppearanceContainer" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--color-border);">
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: var(--color-text-muted);">Visits per Patient</p>
             <div style="display: flex; justify-content: flex-start; overflow-x: auto;">
               <canvas id="patientAppearanceChart" style="max-height: 100px; max-width: 100%;"></canvas>
             </div>
@@ -159,35 +180,35 @@
       <h2>Request Data Access</h2>
       <form id="requestAccessForm">
         <div class="form-group">
-          <label style="font-weight: 600; margin-bottom: 8px; display: block;">Query Preview</label>
-          <div style="padding: 12px; background-color: #f5f5f5; border-radius: 4px; margin-bottom: 15px; max-height: 100px; overflow-y: auto; word-break: break-word;">
-            <p id="requestAccessQueryPreview" style="margin: 0; font-size: 14px; color: #333;"></p>
+          <label>Query Preview</label>
+          <div style="padding: 12px; background-color: var(--color-surface-alt); border-radius: var(--radius-sm); margin-bottom: 15px; max-height: 100px; overflow-y: auto; word-break: break-word;">
+            <p id="requestAccessQueryPreview" style="margin: 0; font-size: 14px; color: var(--color-text);"></p>
           </div>
         </div>
         <div class="form-group">
-          <label style="font-weight: 600; margin-bottom: 8px; display: block;">Dataset Summary</label>
-          <div style="padding: 12px; background-color: #f5f5f5; border-radius: 4px; margin-bottom: 15px;">
-            <p style="margin: 0 0 4px 0; font-size: 13px; color: #666;"><strong>Rows:</strong> <span id="requestAccessRowCount">-</span> | <strong>Columns:</strong> <span id="requestAccessColCount">-</span></p>
+          <label>Dataset Summary</label>
+          <div style="padding: 12px; background-color: var(--color-surface-alt); border-radius: var(--radius-sm); margin-bottom: 15px;">
+            <p style="margin: 0 0 4px 0; font-size: 13px; color: var(--color-text-secondary);"><strong>Rows:</strong> <span id="requestAccessRowCount">-</span> | <strong>Columns:</strong> <span id="requestAccessColCount">-</span></p>
           </div>
         </div>
         <div class="form-group">
           <label for="projectName">Project Name *</label>
-          <input type="text" id="projectName" name="projectName" required placeholder="Enter the name of your project (2-255 characters)" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-          <div style="font-size: 12px; color: #999; margin-top: 4px;">
+          <input type="text" id="projectName" name="projectName" required placeholder="Enter the name of your project (2-255 characters)">
+          <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px;">
             <span id="projectNameCharCount">0</span>/255 characters
           </div>
         </div>
         <div class="form-group">
           <label for="supportingDocument">Supporting Document (PDF)</label>
-          <input type="file" id="supportingDocument" name="supportingDocument" accept=".pdf" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-          <div style="font-size: 12px; color: #999; margin-top: 4px;">
+          <input type="file" id="supportingDocument" name="supportingDocument" accept=".pdf">
+          <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px;">
             Optional: Upload a PDF file (max 10MB) to support your request
           </div>
         </div>
         <div class="form-group">
           <label for="accessReason">Reason for Access *</label>
-          <textarea id="accessReason" name="accessReason" required placeholder="Please explain your reason for requesting access to this data (10-500 characters)" style="width: 100%; min-height: 100px; resize: vertical; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;"></textarea>
-          <div style="font-size: 12px; color: #999; margin-top: 4px;">
+          <textarea id="accessReason" name="accessReason" required placeholder="Please explain your reason for requesting access to this data (10-500 characters)"></textarea>
+          <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px;">
             <span id="reasonCharCount">0</span>/500 characters
           </div>
         </div>
@@ -202,6 +223,12 @@
 </main>
 
 <script>
+
+// Chart.js dark-theme defaults (tick/legend text and gridlines were tuned for a light background)
+if (window.Chart) {
+  Chart.defaults.color = '#a7a8b3';
+  Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.08)';
+}
 
 // Helper function to create scan_id link
 function createScanIdLink(scanId) {
@@ -222,6 +249,17 @@ function createScanIdLink(scanId) {
 function isScanIdColumn(columnName) {
   const lowerName = String(columnName).toLowerCase();
   return lowerName === 'scan_id' || lowerName === 'scanid' || lowerName === 'scaninstanceuid' || lowerName === 'studyinstanceuids';
+}
+
+// Small dtype icon shown in each Column Information card header
+function columnTypeIcon(dtype) {
+  if (dtype === "numeric") {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="11"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="19" y1="20" x2="19" y2="15"/></svg>';
+  }
+  if (dtype === "datetime") {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+  }
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h7"/></svg>';
 }
 
 // Handle token from OAuth callback
@@ -480,9 +518,9 @@ function renderPreview(preview) {
           labels: distData.labels,
           datasets: [{
             data: distData.counts,
-            backgroundColor: '#2563eb',
+            backgroundColor: '#8b5cf6',
             borderWidth: 0,
-            borderRadius: 2
+            borderRadius: 4
           }]
         },
         options: {
@@ -508,7 +546,7 @@ function renderPreview(preview) {
             y: {
               beginAtZero: true,
               ticks: { stepSize: 1, font: { size: 10 } },
-              grid: { color: '#f3f3f3', drawBorder: false },
+              grid: { color: 'rgba(255, 255, 255, 0.06)', drawBorder: false },
               title: {
                 display: true,
                 text: ['Number of', 'Patients'],
@@ -546,11 +584,11 @@ function renderPreview(preview) {
     if (col.is_patient_id) {
       return;
     }
-    
+
     const colDiv = document.createElement("div");
-    colDiv.className = "column-info";
-    
-    let statsHtml = `<strong>Type:</strong> <span class="type-badge">${col.dtype}</span>`;
+    colDiv.className = `column-info type-${col.dtype}`;
+
+    let statsHtml = `<strong>Type:</strong> <span class="type-badge type-badge-${col.dtype}">${col.dtype}</span>`;
     statsHtml += `<br><strong>Unique:</strong> ${col.unique_values}`;
     
     if (col.missing_percentage > 0) {
@@ -587,8 +625,9 @@ function renderPreview(preview) {
         Object.entries(col.top_values).forEach(([value, count]) => {
           const percentage = col.unique_values > 0 ? ((count / preview.dataset_summary.row_count) * 100).toFixed(1) : 0;
           statsHtml += `<div class="value-bar">
+            <div class="value-bar-fill" style="width: ${percentage}%"></div>
             <span class="value-label">${value}</span>
-            <span class="value-count">${count} (${percentage}%)</span>
+            <span class="value-count">${count} <span class="value-pct">${percentage}%</span></span>
           </div>`;
         });
         statsHtml += `</div>`;
@@ -601,6 +640,7 @@ function renderPreview(preview) {
 
     colDiv.innerHTML = `
       <div class="column-header">
+        <div class="column-type-icon">${columnTypeIcon(col.dtype)}</div>
         <span class="column-name">${col.name}</span>
       </div>
       <div class="column-stats">${statsHtml}</div>
@@ -710,16 +750,16 @@ function decideChartType(column) {
  */
 function generatePaletteColors(count) {
   const colors = [
-    'rgba(255, 99, 132, 0.8)',    // Red
-    'rgba(54, 162, 235, 0.8)',    // Blue
-    'rgba(255, 206, 86, 0.8)',    // Yellow
-    'rgba(75, 192, 192, 0.8)',    // Teal
-    'rgba(153, 102, 255, 0.8)',   // Purple
-    'rgba(255, 159, 64, 0.8)',    // Orange
-    'rgba(199, 199, 199, 0.8)',   // Gray
-    'rgba(83, 102, 255, 0.8)',    // Indigo
-    'rgba(255, 102, 178, 0.8)',   // Pink
-    'rgba(102, 255, 178, 0.8)',   // Mint
+    'rgba(20, 184, 166, 0.85)',   // Teal
+    'rgba(245, 158, 11, 0.85)',   // Amber
+    'rgba(139, 92, 246, 0.85)',   // Violet
+    'rgba(244, 63, 94, 0.85)',    // Rose
+    'rgba(14, 165, 233, 0.85)',   // Sky
+    'rgba(132, 204, 22, 0.85)',   // Lime
+    'rgba(217, 70, 239, 0.85)',   // Fuchsia
+    'rgba(100, 116, 139, 0.85)',  // Slate
+    'rgba(251, 146, 60, 0.85)',   // Orange
+    'rgba(6, 182, 212, 0.85)',    // Cyan
   ];
   
   let result = [];
@@ -734,16 +774,16 @@ function generatePaletteColors(count) {
  */
 function generateBorderColors(count) {
   const borderColors = [
-    'rgba(255, 99, 132, 1)',      // Red
-    'rgba(54, 162, 235, 1)',      // Blue
-    'rgba(255, 206, 86, 1)',      // Yellow
-    'rgba(75, 192, 192, 1)',      // Teal
-    'rgba(153, 102, 255, 1)',     // Purple
-    'rgba(255, 159, 64, 1)',      // Orange
-    'rgba(199, 199, 199, 1)',     // Gray
-    'rgba(83, 102, 255, 1)',      // Indigo
-    'rgba(255, 102, 178, 1)',     // Pink
-    'rgba(102, 255, 178, 1)',     // Mint
+    'rgba(15, 118, 110, 1)',      // Teal
+    'rgba(180, 116, 6, 1)',       // Amber
+    'rgba(109, 62, 214, 1)',      // Violet
+    'rgba(190, 18, 60, 1)',       // Rose
+    'rgba(3, 105, 161, 1)',       // Sky
+    'rgba(77, 124, 15, 1)',       // Lime
+    'rgba(162, 28, 175, 1)',      // Fuchsia
+    'rgba(51, 65, 85, 1)',        // Slate
+    'rgba(194, 65, 12, 1)',       // Orange
+    'rgba(14, 116, 144, 1)',      // Cyan
   ];
   
   let result = [];
@@ -768,9 +808,10 @@ function renderChart(column, idx, totalRows) {
         datasets: [{
           label: "Frequency",
           data: column.distribution.counts || [],
-          backgroundColor: "rgba(102, 126, 234, 0.6)",
-          borderColor: "rgba(102, 126, 234, 1)",
-          borderWidth: 1
+          backgroundColor: "rgba(139, 92, 246, 0.55)",
+          borderColor: "rgba(167, 139, 250, 1)",
+          borderWidth: 1,
+          borderRadius: 3
         }]
       },
       options: {
@@ -867,9 +908,10 @@ function renderChart(column, idx, totalRows) {
           datasets: [{
             label: "Count",
             data: counts,
-            backgroundColor: "rgba(17, 153, 142, 0.6)",
-            borderColor: "rgba(17, 153, 142, 1)",
-            borderWidth: 1
+            backgroundColor: "rgba(139, 92, 246, 0.6)",
+            borderColor: "rgba(109, 62, 214, 1)",
+            borderWidth: 1,
+            borderRadius: 3
           }]
         },
         options: {

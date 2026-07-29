@@ -2,17 +2,20 @@
 <html>
 <head>
   <title>Data Access Requests - CODA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/common.css">
   <link rel="stylesheet" href="styles/data-access-requests.css">
   <style>
     .scan-id-link {
-      color: #2563eb;
+      color: var(--color-accent-dark);
       cursor: pointer;
       text-decoration: underline;
       font-weight: 500;
     }
     .scan-id-link:hover {
-      color: #1d4ed8;
+      color: var(--color-accent-darker);
       text-decoration: underline;
     }
   </style>
@@ -21,24 +24,31 @@
 
 <aside class="sidebar">
   <div class="sidebar-header">
-    <h1>CODA</h1>
-    <p>Data Discovery Platform</p>
+    <div class="brand-mark">C</div>
+    <div>
+      <h1>CODA</h1>
+      <p>Data Discovery</p>
+    </div>
   </div>
 
   <nav class="nav-buttons">
     <button class="nav-btn" onclick="navigateToQuery()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       Query Data
     </button>
     <button class="nav-btn" onclick="navigateToSavedDatasets()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
       Saved Datasets
     </button>
     <button class="nav-btn active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
       Data Access Requests
     </button>
   </nav>
 
   <div class="sidebar-footer">
     <button class="signout-btn" onclick="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Sign Out
     </button>
   </div>
@@ -46,7 +56,7 @@
 
 <main class="main-content">
   <div class="content-header">
-    <h2>DATA ACCESS REQUESTS</h2>
+    <h2>Data Access Requests</h2>
     <p>Review and manage user requests for data access</p>
   </div>
 
@@ -132,7 +142,7 @@
       <h3>Supporting Document</h3>
       <p>
         <strong>Attached Document:</strong> 
-        <span id="supportingDocLink" style="color: #2563eb; cursor: pointer; text-decoration: underline;"></span>
+        <span id="supportingDocLink" style="color: var(--color-accent-dark); cursor: pointer; text-decoration: underline;"></span>
       </p>
     </div>
 
@@ -161,7 +171,7 @@
     <div class="detail-section">
       <h3>Full Dataset Results</h3>
       <div class="results-info">
-        <p id="detailResultsInfo" style="color: #666; margin: 0; font-size: 13px;"></p>
+        <p id="detailResultsInfo" style="color: var(--color-text-secondary); margin: 0; font-size: 13px;"></p>
       </div>
       <div class="results-table-container">
         <table id="detailFullResultsTable" class="data-table"></table>
@@ -222,8 +232,8 @@
 <div id="approvalConfirmModal" class="modal" style="display: none;">
   <div class="modal-content" style="max-width: 400px;">
     <h2>Confirm Approval</h2>
-    <p id="approvalConfirmMessage" style="color: #666; margin: 20px 0;"></p>
-    <p style="color: #999; font-size: 13px; margin: 15px 0;">This will grant the user access to the dataset and send them a notification.</p>
+    <p id="approvalConfirmMessage" style="color: var(--color-text-secondary); margin: 20px 0;"></p>
+    <p style="color: var(--color-text-muted); font-size: 13px; margin: 15px 0;">This will grant the user access to the dataset and send them a notification.</p>
     <div class="form-actions">
       <button class="btn-approve" onclick="submitApproval()">Approve</button>
       <button class="btn-secondary" onclick="closeApprovalConfirm()">Cancel</button>
@@ -302,7 +312,7 @@ let currentRequestDetail = null;
 window.addEventListener('DOMContentLoaded', async function() {
   const isDataManager = await checkDataManagerRole();
   if (!isDataManager) {
-    document.getElementById('contentHeader').innerHTML = '<p style="color: #d32f2f;">You do not have permission to view this page.</p>';
+    document.getElementById('contentHeader').innerHTML = '<p style="color: var(--color-danger);">You do not have permission to view this page.</p>';
     return;
   }
   
@@ -477,7 +487,7 @@ function renderRequestDetail(request) {
     supportingDocSection.style.display = 'block';
     supportingDocLink.textContent = request.supporting_doc_filename;
     // Note: You may want to add a download endpoint later
-    supportingDocLink.style.color = '#2563eb';
+    supportingDocLink.style.color = '#0f766e';
     supportingDocLink.style.cursor = 'pointer';
     supportingDocLink.style.textDecoration = 'underline';
   } else if (supportingDocSection) {
