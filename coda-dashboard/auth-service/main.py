@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import FRONTEND_ORIGINS
 from db import init_db
 from routes.auth import router as auth_router
+from routes.users import router as users_router
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -29,6 +30,7 @@ def startup():
 
 # Include routers
 app.include_router(auth_router)
+app.include_router(users_router)
 
 # Health check endpoint
 @app.get("/health")

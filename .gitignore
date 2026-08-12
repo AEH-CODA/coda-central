@@ -4,6 +4,9 @@
 .env.*
 **/.env.*
 
+*/.claude/
+*/references/
+
 # ---- Docker ----
 *.log
 docker-compose.override.yml

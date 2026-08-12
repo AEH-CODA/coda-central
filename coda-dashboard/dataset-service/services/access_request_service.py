@@ -113,7 +113,7 @@ class AccessRequestService:
         limit: int = 20
     ) -> List[AccessRequest]:
         """
-        Get all pending access requests (for data managers).
+        Get all pending access requests (for admins).
         
         Args:
             db: Database session
@@ -255,27 +255,27 @@ class AccessRequestService:
     def approve_request(
         db: Session,
         request_id: UUID,
-        data_manager_id: UUID
+        admin_id: UUID
     ) -> Optional[AccessRequest]:
         """
         Approve an access request and create corresponding dataset.
-        
+
         Args:
             db: Database session
             request_id: Request ID to approve
-            data_manager_id: UUID of approving data manager
-        
+            admin_id: UUID of approving admin
+
         Returns:
             Updated AccessRequest, or None if not found
         """
         request = AccessRequestService.get_request_by_id(db, request_id)
-        
+
         if not request:
             return None
-        
+
         # Update request status
         request.status = "approved"
-        request.reviewed_by_id = data_manager_id
+        request.reviewed_by_id = admin_id
         request.reviewed_at = datetime.utcnow()
         
         # Create dataset record for the user
@@ -313,7 +313,7 @@ class AccessRequestService:
             nl_query=request.nl_query,
             sparql_query=request.sparql_query,
             name=f"Approved Request - {request.created_at.strftime('%Y-%m-%d %H:%M')}",
-            description=f"Approved by data manager on {datetime.utcnow().strftime('%Y-%m-%d')}. Reason: {request.reason}",
+            description=f"Approved by admin on {datetime.utcnow().strftime('%Y-%m-%d')}. Reason: {request.reason}",
             result_file_path=dataset_result_file_path,
             result_json=dataset_result_json,
         )
@@ -328,28 +328,28 @@ class AccessRequestService:
     def reject_request(
         db: Session,
         request_id: UUID,
-        data_manager_id: UUID,
+        admin_id: UUID,
         reason: Optional[str] = None
     ) -> Optional[AccessRequest]:
         """
         Reject an access request.
-        
+
         Args:
             db: Database session
             request_id: Request ID to reject
-            data_manager_id: UUID of rejecting data manager
+            admin_id: UUID of rejecting admin
             reason: Optional reason for rejection
-        
+
         Returns:
             Updated AccessRequest, or None if not found
         """
         request = AccessRequestService.get_request_by_id(db, request_id)
-        
+
         if not request:
             return None
-        
+
         request.status = "rejected"
-        request.reviewed_by_id = data_manager_id
+        request.reviewed_by_id = admin_id
         request.reviewed_at = datetime.utcnow()
         request.review_reason = reason
         

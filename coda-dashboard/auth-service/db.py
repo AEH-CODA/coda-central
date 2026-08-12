@@ -36,6 +36,21 @@ def init_db():
                 );
             """)
 
+            cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS name TEXT;")
+
+            # Audit trail for role changes made from the Role Management page —
+            # who was changed, from/to what role, and which admin did it.
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS role_changes (
+                    id UUID PRIMARY KEY,
+                    user_id UUID NOT NULL REFERENCES users(id),
+                    old_role TEXT NOT NULL,
+                    new_role TEXT NOT NULL,
+                    changed_by_id UUID NOT NULL REFERENCES users(id),
+                    changed_at TIMESTAMPTZ DEFAULT NOW()
+                );
+            """)
+
             conn.commit()
             cur.close()
             conn.close()

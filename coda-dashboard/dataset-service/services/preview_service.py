@@ -202,6 +202,36 @@ class PreviewService:
         
         return patient_id_columns
     
+    # Non-patient ID columns that should still be treated as identifiers
+    # (mirrors SCAN_ID_COLUMN_NAMES in ui/src/lib/scanId.js)
+    _SCAN_ID_COLUMN_NAMES = {'scan_id', 'scanid', 'scaninstanceuid', 'studyinstanceuids'}
+
+    @staticmethod
+    def _get_identifier_columns(df: pd.DataFrame, patient_id_columns: set) -> set:
+        """
+        Detect columns that are identifiers and shouldn't get a full
+        distribution chart - just the top 5 most frequent values.
+
+        Includes patient ID columns plus other ID-style columns such as
+        MRN numbers (e.g. patientMrnNo) and scan IDs (e.g. scan_id), which
+        are high-cardinality and not meaningful to chart.
+
+        Args:
+            df: Pandas DataFrame
+            patient_id_columns: Already-detected patient ID columns
+
+        Returns:
+            Set of column names that are identifier-like
+        """
+        identifier_columns = set(patient_id_columns)
+
+        for col in df.columns:
+            col_lower = col.lower()
+            if 'mrn' in col_lower or col_lower in PreviewService._SCAN_ID_COLUMN_NAMES:
+                identifier_columns.add(col)
+
+        return identifier_columns
+
     @staticmethod
     def _detect_patient_id_column(df: pd.DataFrame) -> Optional[str]:
         """
@@ -413,16 +443,18 @@ class PreviewService:
         return stats
     
     @staticmethod
-    def _compute_aggregate_metadata(sparql_results: Dict[str, Any]) -> Dict[str, Any]:
+    def _compute_aggregate_metadata(sparql_results: Dict[str, Any], full_sample: bool = False) -> Dict[str, Any]:
         """
         Compute simplified metadata for aggregate query results.
-        
+
         Aggregate queries return summary data (e.g., COUNT, SUM) rather than detail rows.
         This method returns basic metadata without attempting to compute distributions.
-        
+
         Args:
             sparql_results: Results from GraphDB SPARQL endpoint
-            
+            full_sample: If True, return every fetched row instead of just the first 5
+                (used for roles like "doctor" that are not limited to a 5-row preview)
+
         Returns:
             Dict with dataset_summary, columns metadata (no distributions), and sample_rows
         """
@@ -462,14 +494,16 @@ class PreviewService:
             
             columns_metadata.append(col_meta)
         
-        # Sample rows
+        # Sample rows — full_sample roles (e.g. doctor) get every fetched row,
+        # everyone else gets the standard 5-row preview
+        sample_df = df if full_sample else df.head(5)
         sample_rows = (
-            df.head(5)
+            sample_df
             .astype(object)
-            .where(pd.notna(df.head(5)), None)
+            .where(pd.notna(sample_df), None)
             .to_dict(orient="records")
         )
-        
+
         logger.info(f"Aggregate query metadata computed: {row_count} rows, {column_count} columns")
         
         return {
@@ -483,13 +517,15 @@ class PreviewService:
         }
     
     @staticmethod
-    def compute_metadata(sparql_results: Dict[str, Any]) -> Dict[str, Any]:
+    def compute_metadata(sparql_results: Dict[str, Any], full_sample: bool = False) -> Dict[str, Any]:
         """
         Compute dataset metadata from SPARQL results with enhanced Kaggle-style insights.
-        
+
         Args:
             sparql_results: Results from GraphDB SPARQL endpoint
-            
+            full_sample: If True, return every fetched row instead of just the first 5
+                (used for roles like "doctor" that are not limited to a 5-row preview)
+
         Returns:
             Dict with dataset_summary, patient_insights (if applicable), columns metadata, and sample_rows
         """
@@ -510,33 +546,42 @@ class PreviewService:
         
         # Detect all patient ID columns
         patient_id_columns = PreviewService._get_all_patient_id_columns(df)
-        
+
+        # Detect all identifier-like columns (patient IDs plus MRN-style columns),
+        # which get top-5 frequent values instead of a full distribution chart
+        identifier_columns = PreviewService._get_identifier_columns(df, patient_id_columns)
+
         # Compute patient insights using the first patient ID column (if exists)
         patient_insights = None
         if patient_id_columns:
             patient_id_col = next(iter(patient_id_columns))
             patient_insights = PreviewService._compute_patient_insights(df, patient_id_col)
-        
+
         # Column-level metadata
         columns_metadata = []
         for col_name in df.columns:
             series = df[col_name]
-            
-            # Check if this is a patient ID column
+
+            # Check if this is a patient ID / identifier column
             is_patient_id = col_name in patient_id_columns
-            
+            is_identifier = col_name in identifier_columns
+
             col_meta = {
                 "name": col_name,
-                "dtype": "identifier" if is_patient_id else PreviewService._detect_column_type(series),
+                "dtype": "identifier" if is_identifier else PreviewService._detect_column_type(series),
                 "is_patient_id": is_patient_id,
-                "missing_percentage": 0.0,  # Patient ID should not have nulls
+                "missing_percentage": 0.0,
                 "unique_values": int(series.nunique()),
             }
-            
-            # Skip distribution stats for patient ID columns
-            if is_patient_id:
-                # Only include basic info for patient ID columns
-                logger.debug(f"Skipping distribution stats for patient ID column: {col_name}")
+
+            if is_identifier:
+                # Identifiers are high-cardinality; skip the full distribution
+                # chart and only surface the top 5 most frequent values
+                missing_count = series.isna().sum()
+                col_meta["missing_percentage"] = float((missing_count / len(series)) * 100) if len(series) > 0 else 0.0
+                value_counts = series.value_counts().head(5)
+                col_meta["top_values"] = {str(k): int(v) for k, v in value_counts.items()}
+                logger.debug(f"Computed top-5 values only for identifier column: {col_name}")
             else:
                 # Compute missing percentage for non-ID columns
                 missing_count = series.isna().sum()
@@ -554,14 +599,16 @@ class PreviewService:
             
             columns_metadata.append(col_meta)
         
-        # Sample rows (first 5)
+        # Sample rows — full_sample roles (e.g. doctor) get every fetched row,
+        # everyone else gets the standard first-5-rows preview
+        sample_df = df if full_sample else df.head(5)
         sample_rows = (
-            df.head(5)
+            sample_df
             .astype(object)
-            .where(pd.notna(df.head(5)), None)
+            .where(pd.notna(sample_df), None)
             .to_dict(orient="records")
         )
-        
+
         return {
             "dataset_summary": {
                 "row_count": row_count,
@@ -573,20 +620,23 @@ class PreviewService:
         }
     
     @staticmethod
-    def generate_preview(sparql_query: str, timeout: int = SPARQL_QUERY_TIMEOUT) -> Dict[str, Any]:
+    def generate_preview(sparql_query: str, timeout: int = SPARQL_QUERY_TIMEOUT, full_sample: bool = False) -> Dict[str, Any]:
         """
         Generate a complete preview for a SPARQL query.
-        
+
         Orchestrates query execution and metadata computation.
         Automatically detects aggregate queries and handles them appropriately.
-        
+
         Args:
             sparql_query: SPARQL query string
             timeout: Query timeout in seconds
-            
+            full_sample: If True, sample_rows contains every fetched row instead
+                of being capped at 5 (used for roles, e.g. "doctor", that are
+                entitled to the full dataset rather than a 5-row preview)
+
         Returns:
             Dict with preview metadata (dataset_summary, columns, sample_rows)
-            
+
         Raises:
             ValueError: For invalid queries
             TimeoutError: For timeout
@@ -596,15 +646,15 @@ class PreviewService:
             # Check if this is an aggregate query
             is_aggregate = PreviewService._is_aggregate_query(sparql_query)
             logger.debug(f"Query is aggregate: {is_aggregate}")
-            
+
             # Execute query
             results = PreviewService.execute_sparql_query(sparql_query, timeout)
-            
+
             # Compute metadata based on query type
             if is_aggregate:
-                metadata = PreviewService._compute_aggregate_metadata(results)
+                metadata = PreviewService._compute_aggregate_metadata(results, full_sample=full_sample)
             else:
-                metadata = PreviewService.compute_metadata(results)
+                metadata = PreviewService.compute_metadata(results, full_sample=full_sample)
             
             logger.info(f"Preview generated: {metadata['dataset_summary']['row_count']} rows, "
                        f"{metadata['dataset_summary']['column_count']} columns")

@@ -94,3 +94,150 @@ def get_or_create_user(email: str, google_id: str, name: str = None) -> tuple:
             cur.close()
         if db:
             db.close()
+
+
+def list_users() -> list:
+    """
+    List all users for the Role Management page.
+
+    Returns:
+        List of dicts: id, email, name, role, created_at
+
+    Raises:
+        Exception: If database operation fails
+    """
+    db = None
+    cur = None
+
+    try:
+        db = get_db_connection()
+        cur = db.cursor()
+
+        cur.execute("SELECT id, email, name, role, created_at FROM users ORDER BY email")
+        rows = cur.fetchall()
+
+        return [
+            {"id": row[0], "email": row[1], "name": row[2], "role": row[3], "created_at": row[4]}
+            for row in rows
+        ]
+    except Exception as e:
+        logger.error(f"Failed to list users: {str(e)}")
+        raise Exception(f"Failed to list users: {str(e)}")
+    finally:
+        if cur:
+            cur.close()
+        if db:
+            db.close()
+
+
+def update_user_role(user_id: str, new_role: str, changed_by_id: str) -> dict:
+    """
+    Update a user's role and record the change for audit purposes.
+
+    Args:
+        user_id: UUID (string) of the user whose role is changing
+        new_role: New role to assign
+        changed_by_id: UUID (string) of the admin performing the change
+
+    Returns:
+        Dict with user_id, old_role, new_role — or None if the user doesn't exist
+
+    Raises:
+        Exception: If database operation fails
+    """
+    db = None
+    cur = None
+
+    try:
+        db = get_db_connection()
+        cur = db.cursor()
+
+        cur.execute("SELECT role FROM users WHERE id=%s FOR UPDATE", (user_id,))
+        row = cur.fetchone()
+
+        if not row:
+            db.rollback()
+            return None
+
+        old_role = row[0]
+
+        cur.execute("UPDATE users SET role=%s WHERE id=%s", (new_role, user_id))
+
+        if old_role != new_role:
+            cur.execute(
+                """
+                INSERT INTO role_changes (id, user_id, old_role, new_role, changed_by_id)
+                VALUES (%s, %s, %s, %s, %s)
+                """,
+                (str(uuid.uuid4()), user_id, old_role, new_role, changed_by_id)
+            )
+
+        db.commit()
+        logger.info(f"Role changed for user {user_id}: {old_role} -> {new_role} by {changed_by_id}")
+        return {"user_id": user_id, "old_role": old_role, "new_role": new_role}
+    except Exception as e:
+        logger.error(f"Failed to update role for user {user_id}: {str(e)}")
+        if db:
+            db.rollback()
+        raise Exception(f"Failed to update user role: {str(e)}")
+    finally:
+        if cur:
+            cur.close()
+        if db:
+            db.close()
+
+
+def list_role_changes(skip: int = 0, limit: int = 50) -> list:
+    """
+    List role-change audit records, most recent first.
+
+    Args:
+        skip: Pagination offset
+        limit: Max records to return
+
+    Returns:
+        List of dicts: id, old_role, new_role, changed_at, user_email, changed_by_email
+
+    Raises:
+        Exception: If database operation fails
+    """
+    db = None
+    cur = None
+
+    try:
+        db = get_db_connection()
+        cur = db.cursor()
+
+        cur.execute(
+            """
+            SELECT rc.id, rc.old_role, rc.new_role, rc.changed_at,
+                   u.email AS user_email, a.email AS changed_by_email
+            FROM role_changes rc
+            JOIN users u ON rc.user_id = u.id
+            JOIN users a ON rc.changed_by_id = a.id
+            ORDER BY rc.changed_at DESC
+            OFFSET %s LIMIT %s
+            """,
+            (skip, limit)
+        )
+        rows = cur.fetchall()
+
+        return [
+            {
+                "id": row[0],
+                "old_role": row[1],
+                "new_role": row[2],
+                "changed_at": row[3],
+                "user_email": row[4],
+                "changed_by_email": row[5],
+            }
+            for row in rows
+        ]
+    except Exception as e:
+        logger.error(f"Failed to list role changes: {str(e)}")
+        raise Exception(f"Failed to list role changes: {str(e)}")
+    finally:
+        if cur:
+            cur.close()
+        if db:
+            db.close()

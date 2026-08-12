@@ -31,7 +31,7 @@ class Dataset(Base):
 
 
 class AccessRequest(Base):
-    """Data access request from user to data manager."""
+    """Data access request from user to admin."""
     __tablename__ = "access_requests"
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -48,8 +48,8 @@ class AccessRequest(Base):
     supporting_doc_filename = Column(String(255), nullable=True)  # Original filename of uploaded PDF
     status = Column(String(20), nullable=False, default="pending", index=True)  # pending, approved, rejected
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
-    reviewed_by_id = Column(UUID(as_uuid=True), nullable=True, index=True)  # Data manager who reviewed
-    reviewed_at = Column(DateTime, nullable=True)  # When data manager took action
+    reviewed_by_id = Column(UUID(as_uuid=True), nullable=True, index=True)  # Admin who reviewed
+    reviewed_at = Column(DateTime, nullable=True)  # When admin took action
     review_reason = Column(Text, nullable=True)  # Reason for rejection (optional)
 
 def get_db():

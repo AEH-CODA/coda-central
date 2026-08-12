@@ -158,6 +158,85 @@ def proxy_auth_callback(request: Request, code: str, state: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Auth service error: {str(e)}")
 
+# ============================================================================
+# ROLE MANAGEMENT PROXY ENDPOINTS (admin only, enforced by auth-service)
+# ============================================================================
+
+@app.get("/users")
+async def proxy_get_users(request: Request):
+    """Proxy GET /users to auth-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+
+        response = requests.get(
+            f"{AUTH_SERVICE_URL}/users",
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list users: {str(e)}")
+
+@app.put("/users/{user_id}/role")
+async def proxy_update_user_role(user_id: str, request: Request):
+    """Proxy PUT /users/{user_id}/role to auth-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+
+        body = await request.json()
+
+        response = requests.put(
+            f"{AUTH_SERVICE_URL}/users/{user_id}/role",
+            json=body,
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update user role: {str(e)}")
+
+@app.get("/role-changes")
+async def proxy_get_role_changes(request: Request, skip: int = 0, limit: int = 50):
+    """Proxy GET /role-changes to auth-service"""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+
+        response = requests.get(
+            f"{AUTH_SERVICE_URL}/role-changes?skip={skip}&limit={limit}",
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list role changes: {str(e)}")
+
 @app.post("/query")
 def handle_query(req: QueryRequest, user=Depends(verify_token)):
     """
@@ -423,27 +502,19 @@ async def proxy_create_access_request(request: Request):
                 "action": "Please sign out and sign in again to continue."
             })
         
-        # Read multipart form data
-        form_data = await request.form()
+        # Forward the raw request body to preserve multipart encoding exactly
+        body = await request.body()
         
-        # Prepare form data for proxying
-        files = {}
-        data = {}
-        
-        for key, value in form_data.items():
-            if isinstance(value, UploadFile):
-                # Handle file upload
-                content = await value.read()
-                files[key] = (value.filename, content, value.content_type)
-            else:
-                # Handle regular form fields
-                data[key] = value
+        # Forward headers, including the original Content-Type for multipart boundary
+        headers = {}
+        if "content-type" in request.headers:
+            headers["content-type"] = request.headers["content-type"]
+        headers["Authorization"] = auth_header
         
         response = requests.post(
             f"{DATASET_SERVICE_URL}/datasets/access-requests/create",
-            data=data,
-            files=files if files else None,
-            headers={"Authorization": auth_header},
+            data=body,
+            headers=headers,
             timeout=int(DOCKER_API_TIMEOUT)
         )
         

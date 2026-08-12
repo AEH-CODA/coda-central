@@ -17,6 +17,11 @@ from services.access_request_service import AccessRequestService
 
 router = APIRouter(prefix="/datasets", tags=["datasets"])
 
+# Roles allowed to review/approve/reject access requests. "admin" additionally
+# gets the Role Management page; "data-manager" keeps its original,
+# request-review-only privileges.
+REQUEST_MANAGER_ROLES = ("admin", "data-manager")
+
 def verify_token(authorization: str = Header(...)) -> UUID:
     """
     Verify JWT token and extract user_id.
@@ -161,25 +166,29 @@ def save_dataset(
 @router.post("/preview")
 def preview_dataset(
     req: PreviewRequest,
-    user_id: UUID = Depends(verify_token)
+    user_role: tuple = Depends(extract_user_role)
 ) -> PreviewResponse:
     """
     Generate a dataset preview (metadata only) for a SPARQL query.
-    
+
     Args:
         req: Preview request containing SPARQL query
-        user_id: Verified user ID from JWT (for audit/logging)
-    
+        user_role: Verified (user_id, role) tuple from JWT
+
     Returns:
-        Dataset preview with metadata: dataset_summary, column stats, and sample rows
+        Dataset preview with metadata: dataset_summary, column stats, and sample rows.
+        Doctors (and admins/data managers) receive every fetched row in sample_rows
+        rather than being capped at 5, since they aren't subject to the request-access workflow.
     """
+    user_id, role = user_role
     try:
         # Generate preview metadata
         preview_data = PreviewService.generate_preview(
-            req.sparql_query, 
-            timeout=SPARQL_QUERY_TIMEOUT
+            req.sparql_query,
+            timeout=SPARQL_QUERY_TIMEOUT,
+            full_sample=role in ("doctor", "admin", "data-manager"),
         )
-        
+
         return PreviewResponse(**preview_data)
         
     except ValueError as e:
@@ -375,7 +384,13 @@ def create_access_request(
         
         # Extract user_id, role, and user_name from token
         user_id, role, user_name = extract_user_info(authorization)
-        
+
+        if role == "doctor":
+            raise HTTPException(
+                status_code=403,
+                detail="Doctors already have full dataset access and do not need to request it"
+            )
+
         # Validate project name
         if not project_name or len(project_name.strip()) < 2 or len(project_name.strip()) > 255:
             raise HTTPException(
@@ -521,22 +536,22 @@ def get_pending_requests(
     db: Session = Depends(get_db)
 ):
     """
-    Get all pending access requests (data manager only).
-    
+    Get all pending access requests (admin or data-manager only).
+
     Args:
         skip: Pagination offset
         limit: Pagination limit
         authorization: Bearer token
         db: Database session
-    
+
     Returns:
         List of pending access requests
     """
     try:
         user_id, role = extract_user_role(authorization)
-        
-        if role != "data-manager":
-            raise HTTPException(status_code=403, detail="Only data managers can view pending requests")
+
+        if role not in REQUEST_MANAGER_ROLES:
+            raise HTTPException(status_code=403, detail="Only admins or data managers can view pending requests")
         
         requests = AccessRequestService.get_pending_requests(db, skip, limit)
         total = AccessRequestService.get_pending_requests_count(db)
@@ -563,22 +578,22 @@ def get_all_requests(
     db: Session = Depends(get_db)
 ):
     """
-    Get all access requests (data manager only) - pending, approved, and rejected.
-    
+    Get all access requests (admin or data-manager only) - pending, approved, and rejected.
+
     Args:
         skip: Pagination offset
         limit: Pagination limit
         authorization: Bearer token
         db: Database session
-    
+
     Returns:
         List of all access requests
     """
     try:
         user_id, role = extract_user_role(authorization)
-        
-        if role != "data-manager":
-            raise HTTPException(status_code=403, detail="Only data managers can view requests")
+
+        if role not in REQUEST_MANAGER_ROLES:
+            raise HTTPException(status_code=403, detail="Only admins or data managers can view requests")
         
         requests = AccessRequestService.get_all_requests(db, skip, limit)
         total = db.query(db.func.count()).from_statement(
@@ -657,13 +672,13 @@ def get_request_detail(
     try:
         user_id, role = extract_user_role(authorization)
         
-        # Only data managers and the requester can view details
+        # Only admins/data managers and the requester can view details
         access_request = AccessRequestService.get_request_by_id(db, request_uuid)
-        
+
         if not access_request:
             raise HTTPException(status_code=404, detail="Access request not found")
-        
-        if role != "data-manager" and access_request.user_id != user_id:
+
+        if role not in REQUEST_MANAGER_ROLES and access_request.user_id != user_id:
             raise HTTPException(status_code=403, detail="Not authorized to view this request")
         
         request_detail = AccessRequestService.get_request_detail(db, request_uuid)
@@ -682,14 +697,14 @@ def approve_access_request(
     db: Session = Depends(get_db)
 ):
     """
-    Approve an access request (data manager only).
+    Approve an access request (admin or data-manager only).
     Creates a new dataset for the user.
-    
+
     Args:
         request_id: Access request ID to approve
         authorization: Bearer token
         db: Database session
-    
+
     Returns:
         Success message with created dataset ID
     """
@@ -697,12 +712,12 @@ def approve_access_request(
         request_uuid = UUID(request_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid request ID format")
-    
+
     try:
         user_id, role = extract_user_role(authorization)
-        
-        if role != "data-manager":
-            raise HTTPException(status_code=403, detail="Only data managers can approve requests")
+
+        if role not in REQUEST_MANAGER_ROLES:
+            raise HTTPException(status_code=403, detail="Only admins or data managers can approve requests")
         
         access_request = AccessRequestService.approve_request(db, request_uuid, user_id)
         
@@ -729,14 +744,14 @@ def reject_access_request(
     db: Session = Depends(get_db)
 ):
     """
-    Reject an access request (data manager only).
-    
+    Reject an access request (admin or data-manager only).
+
     Args:
         request_id: Access request ID to reject
         req: Rejection details (action, optional review_reason)
         authorization: Bearer token
         db: Database session
-    
+
     Returns:
         Success message
     """
@@ -744,12 +759,12 @@ def reject_access_request(
         request_uuid = UUID(request_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid request ID format")
-    
+
     try:
         user_id, role = extract_user_role(authorization)
-        
-        if role != "data-manager":
-            raise HTTPException(status_code=403, detail="Only data managers can reject requests")
+
+        if role not in REQUEST_MANAGER_ROLES:
+            raise HTTPException(status_code=403, detail="Only admins or data managers can reject requests")
         
         if req.action != "reject":
             raise HTTPException(status_code=400, detail="Invalid action for this endpoint")
