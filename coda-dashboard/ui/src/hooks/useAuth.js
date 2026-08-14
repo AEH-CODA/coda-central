@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
-import { getToken, setToken, clearToken, decodeRole, decodeUserId } from '@/lib/auth'
+import { getToken, setToken, clearToken, decodeRole, decodeUserId, decodeName } from '@/lib/auth'
 
 function subscribe(callback) {
   window.addEventListener('storage', callback)
@@ -15,6 +15,7 @@ export function useAuth() {
   const token = useSyncExternalStore(subscribe, getToken)
   const role = useMemo(() => (token ? decodeRole(token) : null), [token])
   const userId = useMemo(() => (token ? decodeUserId(token) : null), [token])
+  const userName = useMemo(() => (token ? decodeName(token) : null), [token])
 
   const login = useCallback((newToken) => {
     setToken(newToken)
@@ -30,6 +31,7 @@ export function useAuth() {
     token,
     role,
     userId,
+    userName,
     isAuthenticated: Boolean(token),
     isAdmin: role === 'admin',
     isDataManager: role === 'data-manager',
@@ -37,6 +39,11 @@ export function useAuth() {
     // admins additionally get the Role Management page.
     canManageRequests: role === 'admin' || role === 'data-manager',
     isDoctor: role === 'doctor',
+    // Doctors, admins, and data managers see the full dataset directly
+    // (paginated, downloadable) instead of a 5-row preview, and have no
+    // access-request workflow of their own — mirrors FULL_ACCESS_ROLES
+    // in dataset-service/routes/datasets.py.
+    hasFullDatasetAccess: role === 'doctor' || role === 'admin' || role === 'data-manager',
     login,
     logout,
   }

@@ -1,8 +1,9 @@
 import { getToken } from './auth'
 
-// Same runtime-hostname pattern the original static app used, so the API
-// gateway is reachable the same way in dev and in the container.
-export const API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`
+// Same-origin: Nginx (ui/nginx.conf) reverse-proxies API paths to the
+// gateway, so the browser never needs to know the gateway's port. This also
+// keeps the OAuth redirect_uri host/proto correct behind any reverse proxy.
+export const API_BASE_URL = `${window.location.protocol}//${window.location.host}`
 
 export class AuthError extends Error {
   constructor(message) {

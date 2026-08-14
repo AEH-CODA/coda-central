@@ -1,6 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
-import { RequireAuth, RequireAdmin, RequireRequestManager, RequireNotDoctor } from '@/components/layout/RequireAuth'
+import {
+  RequireAuth,
+  RequireAdmin,
+  RequireRequestManager,
+  RequireNotFullDatasetAccess,
+} from '@/components/layout/RequireAuth'
 import { LoginPage } from '@/pages/LoginPage'
 import { QueryDataPage } from '@/pages/QueryDataPage'
 import { MyDataRequestsPage } from '@/pages/MyDataRequestsPage'
@@ -18,7 +23,7 @@ export const router = createBrowserRouter([
         children: [
           { path: '/', element: <QueryDataPage /> },
           {
-            element: <RequireNotDoctor />,
+            element: <RequireNotFullDatasetAccess />,
             children: [{ path: '/requests', element: <MyDataRequestsPage /> }],
           },
           { path: '/model-workspace', element: <ModelWorkspacePage /> },

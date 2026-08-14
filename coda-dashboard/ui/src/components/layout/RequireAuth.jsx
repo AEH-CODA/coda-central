@@ -35,12 +35,13 @@ export function RequireRequestManager() {
   return <Outlet />
 }
 
-// Doctors have full dataset access and no request-access workflow, so the
-// requests pages aren't relevant to them — same treatment as RequireAdmin.
-export function RequireNotDoctor() {
-  const { isDoctor } = useAuth()
+// Doctors, admins, and data managers have full dataset access and no
+// access-request workflow of their own, so the "My Data Requests" page isn't
+// relevant to them.
+export function RequireNotFullDatasetAccess() {
+  const { hasFullDatasetAccess } = useAuth()
 
-  if (isDoctor) {
+  if (hasFullDatasetAccess) {
     return <Navigate to="/" replace />
   }
 

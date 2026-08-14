@@ -14,7 +14,7 @@ const STORAGE_QUERY_DATA = 'currentQueryData'
 const STORAGE_LAST_QUERY = 'lastQuery'
 
 export function QueryDataPage() {
-  const { logout, isDoctor } = useAuth()
+  const { logout, hasFullDatasetAccess } = useAuth()
   const navigate = useNavigate()
 
   const [query, setQuery] = useState('')
@@ -140,10 +140,10 @@ export function QueryDataPage() {
         <section>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">Results</h2>
-            {!isDoctor && <Button onClick={() => setModalOpen(true)}>Request Access</Button>}
+            {!hasFullDatasetAccess && <Button onClick={() => setModalOpen(true)}>Request Access</Button>}
           </div>
 
-          {!isDoctor && (
+          {!hasFullDatasetAccess && (
             <div className="mb-6 rounded-md border-l-4 border-accent bg-accent/10 p-3 text-sm text-foreground">
               <strong className="font-semibold">Preview Only:</strong> This is a preview of the data you queried. To
               access the full dataset, click "Request Access" above. Your request will be reviewed by an
@@ -154,12 +154,14 @@ export function QueryDataPage() {
           {previewState === 'loading' && <LoadingState label="Loading preview…" />}
           {previewState === 'error' && <ErrorBanner message={previewError} />}
           {previewState === 'success' && queryData.preview_data && (
-            <DatasetPreview preview={queryData.preview_data} isDoctor={isDoctor} queryData={queryData} />
+            <DatasetPreview preview={queryData.preview_data} hasFullDatasetAccess={hasFullDatasetAccess} queryData={queryData} />
           )}
         </section>
       )}
 
-      {!isDoctor && <RequestAccessModal open={modalOpen} onClose={() => setModalOpen(false)} queryData={queryData} />}
+      {!hasFullDatasetAccess && (
+        <RequestAccessModal open={modalOpen} onClose={() => setModalOpen(false)} queryData={queryData} />
+      )}
     </div>
   )
 }

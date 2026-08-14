@@ -32,6 +32,16 @@ export function decodeUserId(token) {
   }
 }
 
+export function decodeName(token) {
+  try {
+    const payload = token.split('.')[1]
+    if (!payload) return null
+    return JSON.parse(atob(payload)).name || null
+  } catch {
+    return null
+  }
+}
+
 /**
  * Captures ?token= from the OAuth redirect and strips it from the URL.
  * Must run synchronously before the app renders — route guards decide

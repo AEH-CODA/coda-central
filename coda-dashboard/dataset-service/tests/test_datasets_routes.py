@@ -1,9 +1,11 @@
 """Role-based access tests for the dataset-service routes.
 
-Covers the new "doctor" role: full (uncapped) preview sample rows, and
-exclusion from the access-request workflow and request-management endpoints
-(which "admin" and "data-manager" both have access to) — mirroring the
-existing coverage implied for "user", "admin", and "data-manager".
+Covers FULL_ACCESS_ROLES ("doctor", "admin", "data-manager"): full (uncapped)
+preview sample rows, and exclusion from the access-request workflow — they
+see the whole dataset directly instead of a 5-row preview, so there's nothing
+for them to request. Also covers the request-management endpoints (reviewing
+*other* users' requests), which "admin" and "data-manager" both have access
+to but "doctor" does not.
 
 Route functions are called directly (bypassing the ASGI/TestClient threadpool)
 since FastAPI dispatches sync route handlers to a worker thread, and the
@@ -107,8 +109,9 @@ class TestPreviewSampleRowsByRole:
         assert len(response.sample_rows) == 15
 
 
-class TestAccessRequestWorkflowExcludesDoctors:
-    def test_doctor_cannot_create_access_request(self, db):
+class TestAccessRequestWorkflowExcludesFullAccessRoles:
+    @pytest.mark.parametrize("role", ["doctor", "admin", "data-manager"])
+    def test_full_access_role_cannot_create_access_request(self, db, role):
         with pytest.raises(HTTPException) as exc_info:
             create_access_request(
                 project_name="Test Project",
@@ -117,7 +120,7 @@ class TestAccessRequestWorkflowExcludesDoctors:
                 sparql_query="SELECT * WHERE { ?s ?p ?o }",
                 data_preview=None,
                 supporting_document=None,
-                authorization=bearer("doctor"),
+                authorization=bearer(role),
                 db=db,
             )
         assert exc_info.value.status_code == 403

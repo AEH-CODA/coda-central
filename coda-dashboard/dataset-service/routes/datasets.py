@@ -22,6 +22,11 @@ router = APIRouter(prefix="/datasets", tags=["datasets"])
 # request-review-only privileges.
 REQUEST_MANAGER_ROLES = ("admin", "data-manager")
 
+# Roles that see the full dataset directly (paginated, downloadable) instead
+# of a 5-row preview, and therefore have no access-request workflow of their
+# own to go through.
+FULL_ACCESS_ROLES = ("doctor", "admin", "data-manager")
+
 def verify_token(authorization: str = Header(...)) -> UUID:
     """
     Verify JWT token and extract user_id.
@@ -177,8 +182,9 @@ def preview_dataset(
 
     Returns:
         Dataset preview with metadata: dataset_summary, column stats, and sample rows.
-        Doctors (and admins/data managers) receive every fetched row in sample_rows
-        rather than being capped at 5, since they aren't subject to the request-access workflow.
+        Doctors, admins, and data managers (FULL_ACCESS_ROLES) receive every
+        fetched row in sample_rows rather than being capped at 5, since they
+        aren't subject to the request-access workflow.
     """
     user_id, role = user_role
     try:
@@ -186,7 +192,7 @@ def preview_dataset(
         preview_data = PreviewService.generate_preview(
             req.sparql_query,
             timeout=SPARQL_QUERY_TIMEOUT,
-            full_sample=role in ("doctor", "admin", "data-manager"),
+            full_sample=role in FULL_ACCESS_ROLES,
         )
 
         return PreviewResponse(**preview_data)
@@ -385,10 +391,10 @@ def create_access_request(
         # Extract user_id, role, and user_name from token
         user_id, role, user_name = extract_user_info(authorization)
 
-        if role == "doctor":
+        if role in FULL_ACCESS_ROLES:
             raise HTTPException(
                 status_code=403,
-                detail="Doctors already have full dataset access and do not need to request it"
+                detail="This role already has full dataset access and does not need to request it"
             )
 
         # Validate project name

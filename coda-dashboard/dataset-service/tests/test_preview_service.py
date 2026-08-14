@@ -1,8 +1,8 @@
 """Tests for role-driven sample-row behavior in PreviewService.
 
 Users get a 5-row preview and must submit an access request for the rest;
-doctors (and admins/data managers) get every fetched row via the `full_sample` flag,
-since they aren't subject to that request-access workflow.
+doctors, admins, and data managers get every fetched row via the `full_sample`
+flag, since they aren't subject to that workflow.
 """
 from services.preview_service import PreviewService
 
