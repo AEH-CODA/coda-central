@@ -2,19 +2,23 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
+import re
+import json
 import logging
 from groq import Groq
-from scripts.postprocessing import strip_sparql, header_footer
-from scripts.ontology_cache import analyze_query_intent, get_primary_classes
+from scripts.runtime.postprocessing import strip_sparql, header_footer
+from scripts.runtime.rag_retriever import retriever
+from scripts.embedding_config import ONTOLOGY_BLOCK_PATH, KNOWN_SCHEMA_PATH
 
-app = FastAPI(title="NL to SPARQL Service - Smart Column Selection")
+app = FastAPI(title="NL to SPARQL Service - RAG-assisted")
 
 load_dotenv()
 
 # Configuration
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GRAPHDB_URL = os.getenv("GRAPHDB_URL")
-GRAPHDB_REPO = os.getenv("GRAPHDB_REPO")
+# Note: GRAPHDB_URL / GRAPHDB_REPO are intentionally not read here -- this service never calls
+# GraphDB itself. They're read by the offline dev tools in scripts/generate_ontology_snapshot.py,
+# run by hand to regenerate ontology_block.txt / known_schema.json when the schema changes.
 
 if not GROQ_API_KEY:
     raise RuntimeError("GROQ_API_KEY not set")
@@ -24,68 +28,57 @@ groq_client = Groq(api_key=GROQ_API_KEY)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# ----------------------------------------------------------------------------
+# Static, one-time-generated schema artifacts (see scripts/generate_ontology_snapshot.py).
+# Loaded once at import time. The running service never queries GraphDB itself; rerun that
+# script by hand and commit its output whenever the GraphDB schema changes materially.
+# ----------------------------------------------------------------------------
+with open(ONTOLOGY_BLOCK_PATH) as f:
+    ONTOLOGY_BLOCK = f.read()
+
+with open(KNOWN_SCHEMA_PATH) as f:
+    _known_schema = json.load(f)
+    KNOWN_TOKENS = set(_known_schema["classes"]) | set(_known_schema["predicates"])
+
+GOTCHAS_BLOCK = """Known data quirks -- apply these when relevant:
+- Refraction fields (reSphere, reCylinder, reAxis, rePHVA, leSphere, leCylinder, leAxis, lePHVA) and
+  number_of_sittings_advice / sitting_num_completed are stored as xsd:string even though they look
+  numeric. Cast with xsd:decimal(?x) or xsd:integer(?x) before any numeric comparison.
+- age is free text like "65 Years 4 Months 17 Days", not a number. For age-range questions, extract
+  the leading integer, e.g. BIND(xsd:integer(REPLACE(?age, "^(\\\\d+)\\\\s+Years?.*$", "$1")) AS ?ageYears).
+- Only visitDate is a real xsd:date. Every advice-item date (drug_advice_date, procedure_advice_date,
+  surgery_advice_date, treatment_advice_date, refractive_advice_date) is an unreliable xsd:string,
+  often empty -- do not attempt to xsd:date-cast or numerically compare these.
+- Boolean-like fields are inconsistently cased across classes (e.g. "true" vs "True") -- match with
+  LCASE(?x) = "true" rather than an exact string match when checking a boolean-like field.
+- Diagnosis, ExamFinding, VisionItem, and RefractionItem are all independent 1-to-many children of
+  Visit. Joining more than one of them directly in a flat SELECT multiplies rows (cartesian product).
+  When a query needs two or more of them together, use a GROUP_CONCAT subselect per child instead.
+- Prefer human-readable columns over raw IDs (e.g. diagnosisName over diagnosis, visitDate over visit)
+  unless the user explicitly asks for the identifier or it's the only way to answer the question.
+"""
+
 class NLQuery(BaseModel):
     query: str
 
-def build_smart_prompt(nl_query: str) -> str:
-    """Build contextual prompt using ontology intelligence"""
-    
-    # Analyze the query to understand intent
-    query_analysis = analyze_query_intent(nl_query)
-    primary_classes = get_primary_classes(nl_query)
-    ignore_columns = query_analysis["should_ignore_columns"]
-    
-    logger.info(f"Query Analysis - Primary classes: {primary_classes}, Ignore: {ignore_columns}")
-    
-    # Build a minimal, focused prompt
+def _format_examples_block(examples: list[dict]) -> str:
+    parts = ["Examples (real, verified queries against this exact schema -- follow their join and filter patterns; do not copy literal values unless they match the user's query):\n"]
+    for ex in examples:
+        parts.append(f"NL: {ex['nl_query']}\nSPARQL:\n{ex['sparql']}\n")
+    return "\n".join(parts)
+
+def build_smart_prompt(nl_query: str, retrieved_examples: list[dict]) -> str:
+    """Build the translation prompt from the static schema snapshot + retrieved few-shot examples."""
+
+    examples_block = _format_examples_block(retrieved_examples)
+
     prompt = f"""You are a SPARQL expert. Generate minimal, efficient SELECT queries ONLY.
 
-IMPORTANT - Query Understanding:
-- User asked about: {', '.join(primary_classes)}
-- Ignore these redundant columns: {', '.join(ignore_columns) if ignore_columns else 'none'}
-- Only select columns that directly answer the question
-- Use shortest path through relationships
+{ONTOLOGY_BLOCK}
 
-Replace ID columns with readable data:
-- Don't select 'complaint' (raw ID) unless explicitly specified. Instead select 'complaintName' (the actual complaint text)
-- Don't select 'visit' (raw ID) unless explicitly specified. Instead select 'visitDate' (when the visit happened)
-- Don't select 'investigation' (raw ID) unless explicitly specified. Instead select 'investigationName' (test name)
-- Don't select 'vitalDetails' (raw ID) unless explicitly specified. Instead select 'systolicBP' or 'diastolicBP' (actual vital signs)
-- Don't select 'visionDetails' (raw ID) unless explicitly specified. Instead select 'visionType' or 'leftEyeValue' (vision data)
-- Don't select 'refraction' (raw ID) unless explicitly specified. Instead select 'reSphere', 'reCylinder', etc. (refraction data)
-- Don't select 'exam' or 'examId' (raw ID) unless explicitly specified. Instead select 'partName' or 'findingValue' (exam findings)
-- Don't select 'advice' (raw ID) unless explicitly specified. Instead select 'drug_name' (medication) or 'procedure_name' (procedure)
-- Don't select 'diagnosis' (raw ID) unless explicitly specified. Instead select 'diagnosisName' (diagnosis text)
-But you can select these ID columns if the user explicitly asks for them or if they are the only way to answer the question.
+{GOTCHAS_BLOCK}
 
-Ontology:
-PREFIX ns1: <http://clinical-example.org/ontology/>
-
-Classes: Patient, Visit, Complaint, Investigation, VitalDetails, VisionDetails, VisionItem, RefractionDetails, RefractionItem, AnteriorSegmentExam, ExamFinding, ReportedHistory, SystemicHistory, AdviceDetails, DrugPrescription, ProcedureAdvice, Diagnosis, OctDetails
-
-Key Relationships:
-- Patient hasVisit Visit | hasReportedHistory ReportedHistory | hasOctDetails OctDetails
-- Visit hasComplaint Complaint | hasInvestigation Investigation | hasVitals VitalDetails | hasVisionDetails VisionDetails | hasRefraction RefractionDetails | hasAsExam AnteriorSegmentExam | hasDiagnosis Diagnosis | hasAdvice AdviceDetails
-- VisionDetails hasVisionItem VisionItem
-- RefractionDetails hasRefractionItem RefractionItem
-- AnteriorSegmentExam hasFinding ExamFinding
-- AdviceDetails hasAdviceItem DrugPrescription | hasAdviceItem ProcedureAdvice
-- ReportedHistory hasSystemicHistory SystemicHistory
-
-Minimal Attribute Reference (PREFER THESE):
-- Patient: patientId, patientMrnNo
-- Visit: visitDate, batch_id, purpose_of_visit
-- OctDetails: scan_id
-- Complaint: complaintName, duration, laterality
-- Investigation: investigationName, resultNumeric, resultUnit, laterality
-- VitalDetails: systolicBP, diastolicBP
-- VisionItem: visionType, leftEyeValue, rightEyeValue, chartType
-- RefractionItem: reSphere, reCylinder, reAxis, leSphere, leCylinder, leAxis
-- ExamFinding: partName, findingValue, laterality
-- SystemicHistory: conditionCode, duration, diabetesControl, otherAllergies, hasPrescription
-- Diagnosis: diagnosisName, laterality
-- DrugPrescription: drug_name, dosage, form_type, drug_duration, drug_advice_date
-- ProcedureAdvice: procedure_name, procedure_type, procedure_laterality, procedure_done_at, procedure_completion_date, number_of_sittings_advice
+{examples_block}
 
 User Query: {nl_query}
 
@@ -93,43 +86,105 @@ Return ONLY a valid SPARQL SELECT query. No explanations."""
 
     return prompt
 
+def _extract_ns1_tokens(sparql_query: str) -> set[str]:
+    """Extract every ns1:XXX local name referenced in the query (class or predicate position)."""
+    return set(re.findall(r"ns1:(\w+)", sparql_query))
+
+def _find_unknown_tokens(sparql_query: str) -> list[str]:
+    used = _extract_ns1_tokens(sparql_query)
+    unknown = sorted(used - KNOWN_TOKENS)
+    return unknown
+
+def _call_groq(prompt: str, extra_system_note: str = "") -> str:
+    system_content = (
+        "You are a SPARQL expert generating minimal, efficient queries against the given ontology. "
+        "Only use classes and predicates that appear in the Ontology/Attribute Reference sections -- "
+        "never invent or guess a predicate name. Prefer readable display columns "
+        "(e.g. diagnosisName, visitDate, systolicBP, drug_name) over raw ID columns unless the user "
+        "explicitly asks for the identifier."
+    )
+    if extra_system_note:
+        system_content += " " + extra_system_note
+
+    response = groq_client.chat.completions.create(
+        model="openai/gpt-oss-120b",
+        messages=[
+            {"role": "system", "content": system_content},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.0
+    )
+    return response.choices[0].message.content.strip()
+
+def _clean_and_validate_shape(raw_text: str) -> dict:
+    """Strip formatting and do the cheap structural checks. Returns either
+    {"ok": True, "sparql": ...} or {"ok": False, "status": "ERROR", "reason": ...}."""
+    sparql_query = strip_sparql(raw_text)
+
+    if sparql_query.startswith("{"):
+        return {"ok": False, "status": "ERROR", "reason": sparql_query}
+
+    if "SELECT" not in sparql_query.upper():
+        return {"ok": False, "status": "ERROR", "reason": "Model did not return a SELECT query"}
+
+    return {"ok": True, "sparql": header_footer(sparql_query)}
+
 @app.post("/translate")
 def translate(nl: NLQuery):
     nl_query = nl.query
-    
+
     try:
-        # Build smart prompt
-        prompt = build_smart_prompt(nl_query)
-        
         logger.info(f"Processing: {nl_query}")
-        
-        # Call Groq
-        response = groq_client.chat.completions.create(
-            model="openai/gpt-oss-120b",
-            messages=[
-                {"role": "system", "content": "You are a SPARQL expert generating minimal, efficient queries. Donot select ID-only columns (like 'complaint', 'visit', 'vitalDetails', 'advice', 'diagnosis'), unless specified. Use readable display columns instead (like 'complaintName', 'visitDate', 'systolicBP', 'drug_name', 'diagnosisName'). Include relevant relationships for medications, procedures, diagnoses when queried."},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.0
-        )
-        
-        sparql_query = response.choices[0].message.content.strip()
-        logger.info(f"Generated SPARQL: {sparql_query}")
-        
-        # Post-process
-        sparql_query = strip_sparql(sparql_query)
-        
-        # Validate
-        if sparql_query.startswith("{"):
-            return {"status": "ERROR", "reason": sparql_query}
-        
-        if "SELECT" not in sparql_query.upper():
-            return {"status": "ERROR", "reason": "Model did not return a SELECT query"}
-        
-        sparql_query = header_footer(sparql_query)
-        
+
+        retrieved_examples = retriever.retrieve(nl_query, k=5)
+        logger.info(f"Retrieved examples: {[e['nl_query'] for e in retrieved_examples]}")
+
+        prompt = build_smart_prompt(nl_query, retrieved_examples)
+
+        raw = _call_groq(prompt)
+        logger.info(f"Generated SPARQL (attempt 1): {raw}")
+
+        shape_check = _clean_and_validate_shape(raw)
+        if not shape_check["ok"]:
+            return {"status": shape_check["status"], "reason": shape_check["reason"]}
+        sparql_query = shape_check["sparql"]
+
+        unknown_tokens = _find_unknown_tokens(sparql_query)
+
+        if unknown_tokens:
+            logger.warning(f"Unknown schema tokens in attempt 1: {unknown_tokens}")
+            correction_note = (
+                f"Your previous answer used undefined predicate/class name(s): "
+                f"{', '.join(unknown_tokens)}. These do not exist in this ontology -- do not use them. "
+                f"Re-read the Ontology and Attribute Reference sections and only use names listed there."
+            )
+            raw_retry = _call_groq(prompt, extra_system_note=correction_note)
+            logger.info(f"Generated SPARQL (attempt 2, corrective retry): {raw_retry}")
+
+            retry_shape_check = _clean_and_validate_shape(raw_retry)
+            if retry_shape_check["ok"]:
+                retry_unknown_tokens = _find_unknown_tokens(retry_shape_check["sparql"])
+                if not retry_unknown_tokens:
+                    return {"sparql": retry_shape_check["sparql"], "status": "SUCCESS"}
+                # Retry still has unknown tokens -- surface a warning rather than silently
+                # returning a query that will execute and quietly yield zero/wrong rows.
+                return {
+                    "sparql": retry_shape_check["sparql"],
+                    "status": "WARNING",
+                    "unknown_tokens": retry_unknown_tokens,
+                    "reason": "Generated SPARQL references predicate/class names not found in the schema; results may be empty or incorrect.",
+                }
+            # Retry didn't even produce a valid SELECT shape -- fall back to the first attempt,
+            # flagged, rather than discarding it entirely.
+            return {
+                "sparql": sparql_query,
+                "status": "WARNING",
+                "unknown_tokens": unknown_tokens,
+                "reason": "Generated SPARQL references predicate/class names not found in the schema; results may be empty or incorrect.",
+            }
+
         return {"sparql": sparql_query, "status": "SUCCESS"}
-        
+
     except Exception as e:
         logger.error(f"Error: {e}")
         return {"status": "ERROR", "reason": str(e)}

@@ -4,3 +4,6 @@ groq
 dotenv
 logging
 requests>=2.31.0
+fastembed
+pandas
+numpy
