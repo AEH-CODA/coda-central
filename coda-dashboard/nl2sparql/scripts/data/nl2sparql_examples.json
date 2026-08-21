@@ -1,0 +1,252 @@
+[
+  {
+    "category": "patient_lookup",
+    "nl_query": "List all patients with their patient ID, MRN number, age, and gender",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?patientMrnNo ?age ?gender WHERE {\n  ?patient a ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:patientMrnNo ?patientMrnNo ;\n           ns1:age ?age ;\n           ns1:gender ?gender .\n}\nLIMIT 20"
+  },
+  {
+    "category": "patient_lookup",
+    "nl_query": "How many patients are there in total?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT (COUNT(DISTINCT ?patient) as ?patientCount) WHERE {\n  ?patient a ns1:Patient .\n}"
+  },
+  {
+    "category": "patient_lookup",
+    "nl_query": "Show all female patients",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?age WHERE {\n  ?patient a ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:gender \"F\" ;\n           ns1:age ?age .\n}\nLIMIT 20"
+  },
+  {
+    "category": "patient_lookup",
+    "nl_query": "How many male patients and how many female patients are there?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?gender (COUNT(?patient) as ?count) WHERE {\n  ?patient a ns1:Patient ;\n           ns1:gender ?gender .\n}\nGROUP BY ?gender"
+  },
+  {
+    "category": "patient_lookup",
+    "nl_query": "Find patients whose age in years is over 60",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?age WHERE {\n  ?patient a ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:age ?age .\n  BIND(xsd:integer(REPLACE(?age, \"^(\\\\d+)\\\\s+Years?.*$\", \"$1\")) AS ?ageYears)\n  FILTER(?ageYears > 60)\n}\nLIMIT 20"
+  },
+  {
+    "category": "visit_lookup",
+    "nl_query": "List all visits for patient CODA-PT-B1383581 with their visit dates",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?visit ?visitDate WHERE {\n  ?patient a ns1:Patient ;\n           ns1:patientId \"CODA-PT-B1383581\" ;\n           ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate .\n}\nORDER BY ?visitDate"
+  },
+  {
+    "category": "visit_lookup",
+    "nl_query": "Show visits that happened between 2025-06-01 and 2025-06-30",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?visitDate WHERE {\n  ?patient a ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate .\n  FILTER(?visitDate >= \"2025-06-01\"^^xsd:date && ?visitDate <= \"2025-06-30\"^^xsd:date)\n}\nORDER BY ?visitDate\nLIMIT 20"
+  },
+  {
+    "category": "visit_lookup",
+    "nl_query": "What are the distinct purposes of visit recorded in the system?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?purpose (COUNT(*) as ?count) WHERE {\n  ?visit a ns1:Visit ;\n         ns1:purpose_of_visit ?purpose .\n}\nGROUP BY ?purpose\nORDER BY DESC(?count)"
+  },
+  {
+    "category": "visit_lookup",
+    "nl_query": "Show the 10 most recent visits with patient ID and visit date",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?visitDate WHERE {\n  ?patient a ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate .\n}\nORDER BY DESC(?visitDate)\nLIMIT 10"
+  },
+  {
+    "category": "vitals",
+    "nl_query": "Show blood pressure readings for all visits",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?visitDate ?systolicBP ?diastolicBP WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate ; ns1:hasVitals ?vitals .\n  ?vitals ns1:systolicBP ?systolicBP ; ns1:diastolicBP ?diastolicBP .\n}\nLIMIT 20"
+  },
+  {
+    "category": "vitals",
+    "nl_query": "Find visits where systolic blood pressure was above 140",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?visitDate ?systolicBP WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate ; ns1:hasVitals ?vitals .\n  ?vitals ns1:systolicBP ?systolicBP .\n  FILTER(?systolicBP > 140)\n}\nORDER BY DESC(?systolicBP)\nLIMIT 20"
+  },
+  {
+    "category": "vitals",
+    "nl_query": "What is the average systolic blood pressure across all recorded vitals?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT (AVG(?systolicBP) as ?avgSystolic) WHERE {\n  ?vitals a ns1:VitalDetails ;\n          ns1:systolicBP ?systolicBP .\n}"
+  },
+  {
+    "category": "diagnosis",
+    "nl_query": "List patients diagnosed with diabetic macular edema",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT DISTINCT ?patientId ?visitDate ?laterality WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate ; ns1:hasDiagnosis ?diagnosis .\n  ?diagnosis ns1:diagnosisName \"Diabetic macular edema\" ;\n             ns1:laterality ?laterality .\n}\nLIMIT 20"
+  },
+  {
+    "category": "diagnosis",
+    "nl_query": "What are the most common diagnoses across all visits?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?diagnosisName (COUNT(*) as ?count) WHERE {\n  ?diagnosis a ns1:Diagnosis ;\n             ns1:diagnosisName ?diagnosisName .\n}\nGROUP BY ?diagnosisName\nORDER BY DESC(?count)\nLIMIT 10"
+  },
+  {
+    "category": "diagnosis",
+    "nl_query": "How many patients have a diagnosis affecting both eyes?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT (COUNT(DISTINCT ?patient) as ?patientCount) WHERE {\n  ?patient a ns1:Patient ; ns1:hasVisit ?visit .\n  ?visit ns1:hasDiagnosis ?diagnosis .\n  ?diagnosis ns1:laterality \"BE\" .\n}"
+  },
+  {
+    "category": "diagnosis",
+    "nl_query": "Show all diagnoses recorded during patient CODA-PT-B1383581's visits",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?visitDate ?diagnosisName ?laterality WHERE {\n  ?patient a ns1:Patient ; ns1:patientId \"CODA-PT-B1383581\" ; ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate ; ns1:hasDiagnosis ?diagnosis .\n  ?diagnosis ns1:diagnosisName ?diagnosisName ; ns1:laterality ?laterality .\n}"
+  },
+  {
+    "category": "diagnosis",
+    "nl_query": "For each visit, list the visit date, all diagnoses and all exam finding part names without duplicating rows",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?visitDate ?diagnoses ?examParts WHERE {\n  ?visit a ns1:Visit ; ns1:visitDate ?visitDate .\n  {\n    SELECT ?visit (GROUP_CONCAT(DISTINCT ?diagnosisName; separator=\", \") as ?diagnoses) WHERE {\n      ?visit ns1:hasDiagnosis ?diagnosis .\n      ?diagnosis ns1:diagnosisName ?diagnosisName .\n    } GROUP BY ?visit\n  }\n  {\n    SELECT ?visit (GROUP_CONCAT(DISTINCT ?partName; separator=\", \") as ?examParts) WHERE {\n      ?visit ns1:hasAsExam ?exam .\n      ?exam ns1:hasFinding ?finding .\n      ?finding ns1:partName ?partName .\n    } GROUP BY ?visit\n  }\n}\nLIMIT 10"
+  },
+  {
+    "category": "investigation",
+    "nl_query": "Show IOP (intraocular pressure) readings above 20 mm of Hg",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?visitDate ?resultNumeric ?laterality WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate ; ns1:hasInvestigation ?inv .\n  ?inv ns1:investigationName \"IOP\" ; ns1:resultNumeric ?resultNumeric ; ns1:laterality ?laterality .\n  FILTER(?resultNumeric > 20)\n}\nORDER BY DESC(?resultNumeric)\nLIMIT 20"
+  },
+  {
+    "category": "investigation",
+    "nl_query": "What investigation types are recorded and how often?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?investigationName (COUNT(*) as ?count) WHERE {\n  ?inv a ns1:Investigation ; ns1:investigationName ?investigationName .\n}\nGROUP BY ?investigationName\nORDER BY DESC(?count)"
+  },
+  {
+    "category": "vision",
+    "nl_query": "Show unaided vision (UCVA) values for both eyes",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?leftEyeValue ?rightEyeValue WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:hasVisionDetails ?vd .\n  ?vd ns1:hasVisionItem ?item .\n  ?item ns1:visionType \"UCVA With PH\" ; ns1:leftEyeValue ?leftEyeValue ; ns1:rightEyeValue ?rightEyeValue .\n}\nLIMIT 20"
+  },
+  {
+    "category": "refraction",
+    "nl_query": "Find right eye refraction records where the sphere power is greater than 1.0",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?reSphere ?reCylinder ?reAxis WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:hasRefraction ?rd .\n  ?rd ns1:hasRefractionItem ?item .\n  ?item ns1:reSphere ?reSphere ; ns1:reCylinder ?reCylinder ; ns1:reAxis ?reAxis .\n  FILTER(xsd:decimal(?reSphere) > 1.0)\n}\nLIMIT 20"
+  },
+  {
+    "category": "exam_finding",
+    "nl_query": "Show all abnormal (not Normal) findings recorded for the cornea",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?visitDate ?findingValue ?laterality WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate ; ns1:hasAsExam ?exam .\n  ?exam ns1:hasFinding ?finding .\n  ?finding ns1:partName \"Cornea\" ; ns1:findingValue ?findingValue ; ns1:laterality ?laterality .\n  FILTER(?findingValue != \"Normal\")\n}\nLIMIT 20"
+  },
+  {
+    "category": "systemic_history",
+    "nl_query": "List patients with diabetes recorded in their systemic history",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT DISTINCT ?patientId ?duration WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasReportedHistory ?rh .\n  ?rh ns1:hasSystemicHistory ?sh .\n  ?sh ns1:conditionCode \"Diabetes\" ; ns1:duration ?duration .\n}\nLIMIT 20"
+  },
+  {
+    "category": "systemic_history",
+    "nl_query": "How many patients have both diabetes and hypertension recorded?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT (COUNT(DISTINCT ?patient) as ?count) WHERE {\n  ?patient a ns1:Patient ; ns1:hasReportedHistory ?rh .\n  ?rh ns1:hasSystemicHistory ?sh1 .\n  ?sh1 ns1:conditionCode \"Diabetes\" .\n  ?rh ns1:hasSystemicHistory ?sh2 .\n  ?sh2 ns1:conditionCode \"Hypertension\" .\n}"
+  },
+  {
+    "category": "drug_prescription",
+    "nl_query": "Show all prescribed drugs with dosage for patient CODA-PT-B1383581",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?drug_name ?dosage ?form_type WHERE {\n  ?patient a ns1:Patient ; ns1:patientId \"CODA-PT-B1383581\" ; ns1:hasVisit ?visit .\n  ?visit ns1:hasAdvice ?advice .\n  ?advice ns1:hasAdviceItem ?item .\n  ?item a ns1:DrugPrescription ;\n        ns1:drug_name ?drug_name ; ns1:dosage ?dosage ; ns1:form_type ?form_type .\n}"
+  },
+  {
+    "category": "drug_prescription",
+    "nl_query": "What are the most commonly prescribed drugs?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?drug_name (COUNT(*) as ?count) WHERE {\n  ?item a ns1:DrugPrescription ; ns1:drug_name ?drug_name .\n}\nGROUP BY ?drug_name\nORDER BY DESC(?count)\nLIMIT 10"
+  },
+  {
+    "category": "procedure_advice",
+    "nl_query": "List patients advised to undergo PRP (retina laser) procedure",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT DISTINCT ?patientId ?number_of_sittings_advice WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:hasAdvice ?advice .\n  ?advice ns1:hasAdviceItem ?item .\n  ?item a ns1:ProcedureAdvice ;\n        ns1:procedure_name \"PRP\" ;\n        ns1:number_of_sittings_advice ?number_of_sittings_advice .\n}\nLIMIT 20"
+  },
+  {
+    "category": "procedure_advice",
+    "nl_query": "Find procedure advice where more than 2 sittings were advised",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?procedure_name ?number_of_sittings_advice WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:hasAdvice ?advice .\n  ?advice ns1:hasAdviceItem ?item .\n  ?item a ns1:ProcedureAdvice ;\n        ns1:procedure_name ?procedure_name ;\n        ns1:number_of_sittings_advice ?number_of_sittings_advice .\n  FILTER(xsd:integer(?number_of_sittings_advice) > 2)\n}\nLIMIT 20"
+  },
+  {
+    "category": "general_advice",
+    "nl_query": "Which patients were advised new glasses (spectacle prescription)?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT DISTINCT ?patientId ?visitDate WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate ; ns1:hasAdvice ?advice .\n  ?advice ns1:hasAdviceItem ?item .\n  ?item a ns1:GeneralAdvice ;\n        ns1:glass_precription_value ?glassValue .\n  FILTER(LCASE(?glassValue) = \"true\")\n}\nLIMIT 20"
+  },
+  {
+    "category": "treatment_advice",
+    "nl_query": "List all treatment advice types recorded and their laterality",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?treatment_type ?treatment_laterality WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:hasAdvice ?advice .\n  ?advice ns1:hasAdviceItem ?item .\n  ?item a ns1:TreatmentAdvice ;\n        ns1:treatment_type ?treatment_type ;\n        ns1:treatment_laterality ?treatment_laterality .\n}"
+  },
+  {
+    "category": "refraction_correction",
+    "nl_query": "Show patients advised a refractive correction and what type",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?refractive_correction_type ?refractive_laterality WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:hasAdvice ?advice .\n  ?advice ns1:hasAdviceItem ?item .\n  ?item a ns1:RefractionCorrection ;\n        ns1:refractive_correction_type ?refractive_correction_type ;\n        ns1:refractive_laterality ?refractive_laterality .\n}"
+  },
+  {
+    "category": "surgery_advice",
+    "nl_query": "Which patients were advised cataract surgery and what implant was planned?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?primary_procedure ?implant WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:hasAdvice ?advice .\n  ?advice ns1:hasAdviceItem ?item .\n  ?item a ns1:SurgeryAdvice ;\n        ns1:primary_procedure ?primary_procedure ;\n        ns1:implant ?implant .\n}"
+  },
+  {
+    "category": "oct",
+    "nl_query": "List OCT scan IDs recorded for patient CODA-PT-B1383581",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?scan_id ?visit_id WHERE {\n  ?patient a ns1:Patient ; ns1:patientId \"CODA-PT-B1383581\" ; ns1:hasVisit ?visit .\n  ?visit ns1:hasOctDetails ?oct .\n  ?oct ns1:scan_id ?scan_id ; ns1:visit_id ?visit_id .\n}"
+  },
+  {
+    "category": "multi_hop",
+    "nl_query": "For patients diagnosed with proliferative diabetic retinopathy, show their blood pressure readings",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT DISTINCT ?patientId ?systolicBP ?diastolicBP WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n  ?visit ns1:hasDiagnosis ?diagnosis ; ns1:hasVitals ?vitals .\n  ?diagnosis ns1:diagnosisName \"PDR - proliferative diabetic retinopathy\" .\n  ?vitals ns1:systolicBP ?systolicBP ; ns1:diastolicBP ?diastolicBP .\n}\nLIMIT 20"
+  },
+  {
+    "category": "multi_hop",
+    "nl_query": "Show patient age, diagnosis, and prescribed drug together for each visit",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?age ?diagnosisName ?drug_name WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:age ?age ; ns1:hasVisit ?visit .\n  ?visit ns1:hasDiagnosis ?diagnosis ; ns1:hasAdvice ?advice .\n  ?diagnosis ns1:diagnosisName ?diagnosisName .\n  ?advice ns1:hasAdviceItem ?item .\n  ?item a ns1:DrugPrescription ; ns1:drug_name ?drug_name .\n}\nLIMIT 20"
+  },
+  {
+    "category": "aggregation",
+    "nl_query": "Count the number of visits per patient, showing only patients with more than 1 visit",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId (COUNT(?visit) as ?visitCount) WHERE {\n  ?patient a ns1:Patient ; ns1:patientId ?patientId ; ns1:hasVisit ?visit .\n}\nGROUP BY ?patientId\nHAVING (COUNT(?visit) > 1)\nORDER BY DESC(?visitCount)\nLIMIT 20"
+  },
+  {
+    "category": "aggregation",
+    "nl_query": "What is the breakdown of visits by laterality for exam findings on the Lens?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?laterality (COUNT(*) as ?count) WHERE {\n  ?finding a ns1:ExamFinding ;\n           ns1:partName \"Lens\" ;\n           ns1:laterality ?laterality .\n}\nGROUP BY ?laterality"
+  },
+  {
+    "category": "cohort_filter",
+    "nl_query": "Get all visits of patients who had at least one visit with purpose of visit 'Intra Vit Injection' (IVI)",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n\nSELECT DISTINCT \n  ?patient \n  ?patientId \n  ?visit \n  ?visitDate \n  ?purpose_of_visit\n  ?procedure_name\n  ?procedure_type\nWHERE {\n  ?patient rdf:type ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:hasVisit ?injectionVisit .\n\n  ?injectionVisit ns1:purpose_of_visit \"Intra Vit Injection\" .\n\n  ?patient ns1:hasVisit ?visit .\n  OPTIONAL { ?visit ns1:visitDate ?visitDate . }\n  OPTIONAL { ?visit ns1:purpose_of_visit ?purpose_of_visit . }\n\n  OPTIONAL {\n    ?visit ns1:hasAdvice ?advice .\n    ?advice ns1:hasAdviceItem ?procAdvice .\n    ?procAdvice rdf:type ns1:ProcedureAdvice .\n    OPTIONAL { ?procAdvice ns1:procedure_name ?procedure_name . }\n    OPTIONAL { ?procAdvice ns1:procedure_type ?procedure_type . }\n  }\n}\nORDER BY ?patient ?visit"
+  },
+  {
+    "category": "text_search",
+    "nl_query": "Find all patients and visits where the procedure name or procedure type is like 'inj' (injection-related procedures)",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nSELECT DISTINCT\n  ?patient ?patientId ?visit ?visitDate\n  ?procedureItem ?procedure_name ?procedure_type\nWHERE {\n  ?patient rdf:type ns1:Patient ;\n           ns1:hasVisit ?visit .\n  OPTIONAL { ?patient ns1:patientId ?patientId . }\n  OPTIONAL { ?visit ns1:visitDate ?visitDate . }\n\n  ?visit ns1:hasAdvice ?advice .\n  ?advice ns1:hasAdviceItem ?procedureItem .\n  ?procedureItem rdf:type ns1:ProcedureAdvice .\n\n  OPTIONAL { ?procedureItem ns1:procedure_name ?procedure_name . }\n  OPTIONAL { ?procedureItem ns1:procedure_type ?procedure_type . }\n\n  FILTER (\n    REGEX(LCASE(COALESCE(STR(?procedure_name), \"\")), \"inj\") ||\n    REGEX(LCASE(COALESCE(STR(?procedure_type), \"\")), \"inj\")\n  )\n}\nORDER BY ?patient ?visit"
+  },
+  {
+    "category": "aggregation",
+    "nl_query": "Find patients who had the same injection procedure done on more than one distinct completion date",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\n\nSELECT\n  ?patient\n  ?patientId\n  ?procedure_name\n  (COUNT(DISTINCT ?procedure_completion_date) AS ?distinctCompletionDates)\n  (GROUP_CONCAT(DISTINCT STR(?procedure_completion_date); separator=\" | \") AS ?completionDates)\nWHERE {\n  ?patient a ns1:Patient ;\n           ns1:hasVisit ?visit .\n  OPTIONAL { ?patient ns1:patientId ?patientId . }\n\n  ?visit ns1:hasAdvice ?advice .\n  ?advice ns1:hasAdviceItem ?procAdvice .\n\n  ?procAdvice a ns1:ProcedureAdvice ;\n              ns1:procedure_name ?procedure_name ;\n              ns1:procedure_completion_date ?procedure_completion_date .\n\n  OPTIONAL { ?procAdvice ns1:procedure_type ?procedure_type . }\n\n  FILTER(\n    REGEX(LCASE(STR(?procedure_name)), \"inj\") ||\n    (BOUND(?procedure_type) && REGEX(LCASE(STR(?procedure_type)), \"inj\"))\n  )\n\n  FILTER(STRLEN(STR(?procedure_completion_date)) > 0)\n}\nGROUP BY ?patient ?patientId ?procedure_name\nHAVING (COUNT(DISTINCT ?procedure_completion_date) > 1)\nORDER BY ?patient ?procedure_name"
+  },
+  {
+    "category": "aggregation",
+    "nl_query": "Find the distribution of diagnoses in the database (number of distinct patients per diagnosis)",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n\nSELECT ?diagnosisName (COUNT(DISTINCT ?patient) AS ?patientCount)\nWHERE {\n  ?patient rdf:type ns1:Patient ;\n           ns1:hasVisit ?visit .\n\n  ?visit ns1:hasDiagnosis ?diag .\n  ?diag rdf:type ns1:Diagnosis ;\n        ns1:diagnosisName ?diagnosisName .\n}\nGROUP BY ?diagnosisName\nORDER BY DESC(?patientCount) ?diagnosisName"
+  },
+  {
+    "category": "general_advice",
+    "nl_query": "Of patients diagnosed with presbyopia, how many were advised glasses (GP / spectacle prescription)?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT (COUNT(DISTINCT ?patient) AS ?patientCount)\nWHERE {\n  ?patient rdf:type ns1:Patient ;\n           ns1:hasVisit ?visit .\n\n  ?visit ns1:hasDiagnosis ?diag ;\n         ns1:hasAdvice ?advice .\n\n  ?diag ns1:diagnosisName ?diagName .\n  FILTER(LCASE(STR(?diagName)) = \"presbyopia\")\n\n  ?advice ns1:hasAdviceItem ?gpAdvice .\n  ?gpAdvice rdf:type ns1:GeneralAdvice ;\n            ns1:glass_precription_value ?glassPrescValue .\n\n  FILTER(?glassPrescValue = \"True\" || ?glassPrescValue = true)\n}"
+  },
+  {
+    "category": "drug_prescription",
+    "nl_query": "For patients with a diagnosis of glaucoma, what medicines were prescribed? Show patient, visit, and full drug details",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n\nSELECT DISTINCT\n  ?patient ?patientId ?visit ?visitDate\n  ?drug ?drug_name ?dosage ?drug_duration ?form_type ?drug_advice_date\nWHERE {\n  ?patient rdf:type ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:hasVisit ?visit .\n\n  OPTIONAL { ?visit ns1:visitDate ?visitDate . }\n\n  ?visit ns1:hasDiagnosis ?diag ;\n         ns1:hasAdvice ?advice .\n\n  ?diag ns1:diagnosisName ?diagnosisName .\n    FILTER(CONTAINS(LCASE(STR(?diagnosisName)) , \"glaucoma\"))\n\n  ?advice ns1:hasAdviceItem ?drug .\n  ?drug rdf:type ns1:DrugPrescription .\n\n  OPTIONAL { ?drug ns1:drug_name ?drug_name . }\n  OPTIONAL { ?drug ns1:dosage ?dosage . }\n  OPTIONAL { ?drug ns1:drug_duration ?drug_duration . }\n  OPTIONAL { ?drug ns1:form_type ?form_type . }\n  OPTIONAL { ?drug ns1:drug_advice_date ?drug_advice_date . }\n}\nORDER BY ?patientId"
+  },
+  {
+    "category": "drug_prescription",
+    "nl_query": "Get all distinct drug names prescribed for patients with glaucoma",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n\nSELECT DISTINCT ?drug_name\nWHERE {\n  ?patient rdf:type ns1:Patient ;\n           ns1:hasVisit ?visit .\n\n  ?visit ns1:hasDiagnosis ?diag ;\n         ns1:hasAdvice ?advice .\n\n  ?diag ns1:diagnosisName ?diagnosisName .\n    FILTER(CONTAINS(LCASE(STR(?diagnosisName)) , \"glaucoma\"))\n\n  ?advice ns1:hasAdviceItem ?drug .\n  ?drug rdf:type ns1:DrugPrescription ;\n        ns1:drug_name ?drug_name .\n\n  FILTER(STRLEN(STR(?drug_name)) > 0)\n}\nORDER BY ?drug_name"
+  },
+  {
+    "category": "oct",
+    "nl_query": "How many OCT scans have been recorded in total?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\n\nSELECT (COUNT(?oct) AS ?octScanCount)\nWHERE {\n  ?oct a ns1:OctDetails .\n}"
+  },
+  {
+    "category": "oct",
+    "nl_query": "List patient ID, visit date, and OCT scan ID for visits that had an OCT scan, ordered by visit date",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\n\nSELECT ?patientId ?visitDate ?scan_id\nWHERE {\n  ?patient a ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate ;\n         ns1:hasOctDetails ?oct .\n  ?oct ns1:scan_id ?scan_id .\n}\nORDER BY ?visitDate\nLIMIT 20"
+  },
+  {
+    "category": "oct",
+    "nl_query": "For visits that included an OCT scan, show the scan ID together with any diagnoses recorded during that same visit",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\n\nSELECT DISTINCT ?patientId ?visitDate ?scan_id ?diagnosisName\nWHERE {\n  ?patient a ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate ;\n         ns1:hasOctDetails ?oct ;\n         ns1:hasDiagnosis ?diag .\n  ?oct ns1:scan_id ?scan_id .\n  ?diag ns1:diagnosisName ?diagnosisName .\n}\nORDER BY ?patientId\nLIMIT 30"
+  },
+  {
+    "category": "oct",
+    "nl_query": "Which patients have had more than one OCT scan, and how many scans does each of them have?",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\n\nSELECT ?patientId (COUNT(DISTINCT ?oct) AS ?octScanCount)\nWHERE {\n  ?patient a ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:hasVisit ?visit .\n  ?visit ns1:hasOctDetails ?oct .\n}\nGROUP BY ?patientId\nHAVING (COUNT(DISTINCT ?oct) > 1)\nORDER BY DESC(?octScanCount)"
+  },
+  {
+    "category": "oct",
+    "nl_query": "For patients diagnosed with any form of retinopathy, find their OCT scan IDs and the visit dates the scans were taken on",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\n\nSELECT DISTINCT ?patientId ?visitDate ?scan_id\nWHERE {\n  ?patient a ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:hasVisit ?visit .\n  ?visit ns1:hasDiagnosis ?diag ;\n         ns1:hasOctDetails ?oct .\n  ?diag ns1:diagnosisName ?diagnosisName .\n  FILTER(CONTAINS(LCASE(STR(?diagnosisName)), \"retinopathy\"))\n  ?oct ns1:scan_id ?scan_id ;\n       ns1:visit_id ?visit_id .\n  OPTIONAL { ?visit ns1:visitDate ?visitDate . }\n}\nORDER BY ?patientId\nLIMIT 30"
+  },
+  {
+    "category": "oct",
+    "nl_query": "Show all patients, their diagnoses and OCT scans, for people who scanned in September 2025",
+    "sparql": "PREFIX ns1: <http://clinical-example.org/ontology/>\nPREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n\nSELECT ?patientId ?visitDate ?scan_id ?diagnoses\nWHERE {\n  ?patient a ns1:Patient ;\n           ns1:patientId ?patientId ;\n           ns1:hasVisit ?visit .\n  ?visit ns1:visitDate ?visitDate ;\n         ns1:hasOctDetails ?oct .\n  ?oct ns1:scan_id ?scan_id .\n  FILTER(?visitDate >= \"2025-09-01\"^^xsd:date && ?visitDate <= \"2025-09-30\"^^xsd:date)\n  {\n    SELECT ?visit (GROUP_CONCAT(DISTINCT ?diagnosisName; separator=\", \") AS ?diagnoses) WHERE {\n      ?visit ns1:hasDiagnosis ?diag .\n      ?diag ns1:diagnosisName ?diagnosisName .\n    } GROUP BY ?visit\n  }\n}\nORDER BY ?patientId"
+  }
+]

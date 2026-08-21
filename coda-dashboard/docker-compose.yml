@@ -1,0 +1,83 @@
+version: "5.0.1"
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      - nl2sparql
+      - graphdb
+      - auth-service
+      - user-db
+      - dataset-service
+    env_file:
+      - ./api-gateway/.env
+
+  nl2sparql:
+    build: ./nl2sparql
+    env_file:
+    - ./nl2sparql/.env
+
+  ui:
+    build: ./ui
+    ports:
+      - "5000:80"
+  
+  graphdb:
+    image: ontotext/graphdb:10.6.1
+    container_name: graphdb
+    ports:
+      - "7200:7200"
+    volumes:
+      - graphdb-data:/opt/graphdb/home
+  
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "7000:7000"
+    env_file:
+      - ./auth-service/.env
+
+  user-db:
+    image: postgres:16
+    container_name: user-db
+    restart: always
+    environment:
+      POSTGRES_DB: user-db
+      POSTGRES_USER: coda
+      POSTGRES_PASSWORD: coda-pass
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  dataset-db:
+    image: postgres:16
+    container_name: dataset-db
+    restart: always
+    environment:
+      POSTGRES_DB: dataset-db
+      POSTGRES_USER: coda
+      POSTGRES_PASSWORD: coda-pass
+    volumes:
+      - dataset_db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  dataset-service:
+    build: ./dataset-service
+    ports:
+      - "8001:8001"
+    depends_on:
+      - dataset-db
+    env_file:
+      - ./dataset-service/.env
+    volumes:
+      - dataset_data:/app/data
+
+volumes:
+  graphdb-data:
+  user_db_data:
+  dataset_db_data:
+  dataset_data:

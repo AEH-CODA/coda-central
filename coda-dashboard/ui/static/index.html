@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CODA Data Discovery UI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/common.css">
+  <link rel="stylesheet" href="styles/index.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <style>
+    .scan-id-link {
+      color: var(--color-accent-light);
+      cursor: pointer;
+      text-decoration: underline;
+      font-weight: 500;
+    }
+    .scan-id-link:hover {
+      color: var(--color-accent-contrast);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="brand-mark">C</div>
+    <div>
+      <h1>CODA</h1>
+      <p>Data Discovery</p>
+    </div>
+  </div>
+
+  <div class="nav-section-label">Workspace</div>
+  <nav class="nav-buttons">
+    <button class="nav-btn active" onclick="setActiveNav(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Query Data
+    </button>
+    <button class="nav-btn" onclick="navigateToSavedDatasets()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+      My Data Requests
+    </button>
+    <button class="nav-btn" onclick="setActiveNav(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/></svg>
+      Model Workspace
+    </button>
+    <button class="nav-btn" id="dataAccessRequestsBtn" onclick="navigateToAccessRequests()" style="display: none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+      Data Access Requests
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="signout-btn" onclick="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </button>
+  </div>
+</aside>
+
+<main class="main-content">
+  <div class="content-header">
+    <h2>Query Data</h2>
+    <p>Discover insights with natural language queries</p>
+  </div>
+
+  <div class="query-section">
+    <div class="query-input-group">
+      <input id="query" type="text" placeholder="Enter natural language query (e.g., 'Show me all patients with diabetes')">
+      <svg class="query-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <button class="submit-btn" onclick="submitQuery()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        Search
+      </button>
+    </div>
+  </div>
+
+  <div class="results-section">
+    <h3>Results</h3>
+    <div class="results-controls">
+      <button class="request-access-btn" id="requestAccessBtn" onclick="showRequestAccessDialog()" style="display: none;">
+        Request Access
+      </button>
+    </div>
+
+    <!-- Dataset Preview Section (inline) -->
+    <div id="previewInfoMessage" style="display: none; margin-bottom: 20px; padding: 15px; background-color: var(--color-accent-soft); border-left: 4px solid var(--color-accent); border-radius: var(--radius-sm); color: var(--color-text);">
+      <strong style="font-weight: 600;">Preview Only:</strong> This is a preview of the data you queried. To access the full dataset, click "Request Access" below. Your request will be reviewed by the Data Manager.
+    </div>
+
+    <div id="previewSection" style="display: none; margin-bottom: 30px; border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 22px; background-color: var(--color-surface);">
+      <div id="previewLoading" class="loading" style="display: none;">
+        <p>Loading preview...</p>
+      </div>
+      
+      <div id="previewContent" style="display: none;">
+        <!-- Dataset Summary -->
+        <div class="preview-section">
+          <h3>Dataset Summary</h3>
+          <div class="summary-stats">
+            <div class="stat-card stat-teal">
+              <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="10" x2="9" y2="20"/></svg></div>
+              <span class="stat-label">Row Count</span>
+              <span class="stat-value" id="rowCount">-</span>
+            </div>
+            <div class="stat-card stat-amber">
+              <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/><line x1="15" y1="4" x2="15" y2="20"/></svg></div>
+              <span class="stat-label">Column Count</span>
+              <span class="stat-value" id="columnCount">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Patient Insights (conditional) -->
+        <div class="preview-section" id="patientInsightsSection" style="display: none;">
+          <h3>Patient Coverage</h3>
+          <div class="patient-stats">
+            <div class="stat-card patient-stat stat-violet">
+              <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <span class="stat-label">Unique Patients</span>
+              <span class="stat-value" id="uniquePatients">-</span>
+            </div>
+            <div class="stat-card patient-stat stat-rose">
+              <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+              <span class="stat-label">Returning Patients</span>
+              <span class="stat-value" id="returningPatients">-</span>
+            </div>
+            <div class="stat-card patient-stat stat-sky">
+              <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div>
+              <span class="stat-label">Return Rate</span>
+              <span class="stat-value" id="returnRate">-</span>
+            </div>
+          </div>
+          <div id="patientAppearanceContainer" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--color-border);">
+            <p style="margin: 0 0 8px 0; font-size: 12px; color: var(--color-text-muted);">Visits per Patient</p>
+            <div style="display: flex; justify-content: flex-start; overflow-x: auto;">
+              <canvas id="patientAppearanceChart" style="max-height: 100px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column Metadata -->
+        <div class="preview-section">
+          <h3>Column Information</h3>
+          <div id="columnsContainer" class="columns-container"></div>
+        </div>
+
+        <!-- Sample Rows -->
+        <div class="preview-section">
+          <h3>Sample Data (First 5 Rows)</h3>
+          <div class="sample-rows-container">
+            <table id="sampleRowsTable" class="sample-rows-table"></table>
+          </div>
+        </div>
+      </div>
+
+      <div id="previewError" class="error-message" style="display: none;"></div>
+    </div>
+
+    <!-- Full Query Results Hidden for Preview-Only Workflow -->
+    <!-- Full data is only shown after access is approved -->
+    <!--
+    <h4 style="margin-top: 30px; margin-bottom: 15px;">Full Query Results</h4>
+    <div class="results-table-container">
+      <table id="resultsTable"></table>
+    </div>
+
+    <div class="debug-section">
+      <h4>Raw API Response</h4>
+      <pre id="result"></pre>
+    </div>
+    -->
+
+  <!-- Request Access Modal -->
+  <div id="requestAccessModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeRequestAccessDialog()">&times;</span>
+      <h2>Request Data Access</h2>
+      <form id="requestAccessForm">
+        <div class="form-group">
+          <label>Query Preview</label>
+          <div style="padding: 12px; background-color: var(--color-surface-alt); border-radius: var(--radius-sm); margin-bottom: 15px; max-height: 100px; overflow-y: auto; word-break: break-word;">
+            <p id="requestAccessQueryPreview" style="margin: 0; font-size: 14px; color: var(--color-text);"></p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Dataset Summary</label>
+          <div style="padding: 12px; background-color: var(--color-surface-alt); border-radius: var(--radius-sm); margin-bottom: 15px;">
+            <p style="margin: 0 0 4px 0; font-size: 13px; color: var(--color-text-secondary);"><strong>Rows:</strong> <span id="requestAccessRowCount">-</span> | <strong>Columns:</strong> <span id="requestAccessColCount">-</span></p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="projectName">Project Name *</label>
+          <input type="text" id="projectName" name="projectName" required placeholder="Enter the name of your project (2-255 characters)">
+          <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px;">
+            <span id="projectNameCharCount">0</span>/255 characters
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="supportingDocument">Supporting Document (PDF)</label>
+          <input type="file" id="supportingDocument" name="supportingDocument" accept=".pdf">
+          <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px;">
+            Optional: Upload a PDF file (max 10MB) to support your request
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="accessReason">Reason for Access *</label>
+          <textarea id="accessReason" name="accessReason" required placeholder="Please explain your reason for requesting access to this data (10-500 characters)"></textarea>
+          <div style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px;">
+            <span id="reasonCharCount">0</span>/500 characters
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">Send Request</button>
+          <button type="button" class="btn-secondary" onclick="closeRequestAccessDialog()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</main>
+
+<script>
+
+// Chart.js dark-theme defaults (tick/legend text and gridlines were tuned for a light background)
+if (window.Chart) {
+  Chart.defaults.color = '#a7a8b3';
+  Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.08)';
+}
+
+// Helper function to create scan_id link
+function createScanIdLink(scanId) {
+  const link = document.createElement('a');
+  link.className = 'scan-id-link';
+  link.href = `https://coda.innowave.asia/viewer?StudyInstanceUIDs=${encodeURIComponent(scanId)}`;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+  link.textContent = scanId;
+  link.onclick = (e) => {
+    // Allow normal link behavior
+    return true;
+  };
+  return link;
+}
+
+// Helper function to check if column name is scan_id
+function isScanIdColumn(columnName) {
+  const lowerName = String(columnName).toLowerCase();
+  return lowerName === 'scan_id' || lowerName === 'scanid' || lowerName === 'scaninstanceuid' || lowerName === 'studyinstanceuids';
+}
+
+// Small dtype icon shown in each Column Information card header
+function columnTypeIcon(dtype) {
+  if (dtype === "numeric") {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="20" x2="5" y2="11"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="19" y1="20" x2="19" y2="15"/></svg>';
+  }
+  if (dtype === "datetime") {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+  }
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h7"/></svg>';
+}
+
+// Handle token from OAuth callback
+const params = new URLSearchParams(window.location.search);
+const token = params.get('token');
+if (token) {
+  localStorage.setItem('token', token);
+  window.history.replaceState({}, document.title, "/");
+}
+
+// Check if authenticated
+if (!localStorage.getItem("token")) {
+  window.location.href = "/login.html";
+}
+
+// Store current query results for saving as dataset
+let currentQueryData = null;
+
+// Restore previous query results from localStorage if available
+window.addEventListener('DOMContentLoaded', function() {
+  checkUserRole();
+  
+  const savedQueryData = localStorage.getItem('currentQueryData');
+  if (savedQueryData) {
+    try {
+      currentQueryData = JSON.parse(savedQueryData);
+      // Restore the query text
+      const savedQuery = localStorage.getItem('lastQuery');
+      if (savedQuery) {
+        document.getElementById('query').value = savedQuery;
+      }
+      // Restore results display
+      document.getElementById('result').textContent = JSON.stringify(currentQueryData, null, 2);
+      renderTable(currentQueryData.results);
+      // Show request access button
+      if (!currentQueryData.error) {
+        document.getElementById('requestAccessBtn').style.display = 'block';
+      }
+    } catch (e) {
+      console.log('Could not restore previous query data');
+    }
+  }
+});
+
+// Simple 401 handler - alert and logout
+function handleAuthError(response) {
+  if (response.status === 401) {
+    response.json().then(err => {
+      alert((err.action || "Session expired. Please sign out and sign in again."));
+    }).catch(() => {
+      alert("Session expired. Please sign out and sign in again.");
+    });
+    logout();
+    return true;
+  }
+  return false;
+}
+
+function setActiveNav(button) {
+  // Remove active class from all buttons
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  // Add active class to clicked button
+  button.classList.add('active');
+}
+
+function navigateToSavedDatasets() {
+  window.location.href = "/saved-datasets.html";
+}
+
+function navigateToAccessRequests() {
+  window.location.href = "/data-access-requests.html";
+}
+
+// Check user role and show data access requests button if data-manager
+function checkUserRole() {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    // Decode JWT to get role (simple base64 decode, not validation)
+    const parts = token.split('.');
+    if (parts.length === 3) {
+      const payload = JSON.parse(atob(parts[1]));
+      const role = payload.role || 'user';
+      
+      if (role === 'data-manager') {
+        document.getElementById('dataAccessRequestsBtn').style.display = 'block';
+      }
+    }
+  } catch (e) {
+    console.log('Could not decode token to check role:', e);
+  }
+}
+
+async function submitQuery() {
+  const query = document.getElementById("query").value;
+
+  if (!query.trim()) {
+    alert("Please enter a query");
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    alert("You are not logged in");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "http://" + window.location.hostname + ":8000/query",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({ query })
+      }
+    );
+
+    // Check for 401 auth error
+    if (handleAuthError(response)) return;
+
+    const data = await response.json();
+    currentQueryData = data;  // Store for later saving
+    
+    // Persist to localStorage for session recovery
+    localStorage.setItem('currentQueryData', JSON.stringify(data));
+    localStorage.setItem('lastQuery', query);
+    
+    // Note: Raw result not shown - users only see preview (result element is commented out)
+    // document.getElementById("result").textContent =
+    //   JSON.stringify(data, null, 2);
+
+    renderTable(data.results);
+    
+    // Show request access button and automatically show preview if query was successful
+    if (!data.error) {
+      document.getElementById("requestAccessBtn").style.display = "block";
+      // Automatically load and show preview
+      await loadAndShowPreview();
+    }
+  } catch (error) {
+    console.error("Query submission error:", error);
+    document.getElementById("requestAccessBtn").style.display = "none";
+    document.getElementById("previewSection").style.display = "none";
+    document.getElementById("previewInfoMessage").style.display = "none";
+  }
+}
+
+async function loadAndShowPreview() {
+  if (!currentQueryData || !currentQueryData.sparql) {
+    console.log("Preview error: No query data or sparql", currentQueryData);
+    return;
+  }
+
+  console.log("Starting preview load with sparql:", currentQueryData.sparql.substring(0, 100));
+  document.getElementById("previewInfoMessage").style.display = "block";
+  document.getElementById("previewSection").style.display = "block";
+  document.getElementById("previewLoading").style.display = "block";
+  document.getElementById("previewContent").style.display = "none";
+  document.getElementById("previewError").style.display = "none";
+
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(
+      "http://" + window.location.hostname + ":8000/datasets/preview",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          sparql_query: currentQueryData.sparql
+        })
+      }
+    );
+
+    console.log("Preview response status:", response.status);
+    document.getElementById("previewLoading").style.display = "none";
+
+    // Check for 401 auth error
+    if (handleAuthError(response)) return;
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Preview API error:", response.status, errorText);
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+
+    const preview = await response.json();
+    console.log("Preview data received:", preview);
+    
+    // Store preview data in currentQueryData for access request
+    currentQueryData.preview_data = preview;
+    console.log("Preview data stored in currentQueryData");
+    
+    renderPreview(preview);
+    console.log("Preview rendered successfully");
+    document.getElementById("previewContent").style.display = "block";
+
+  } catch (error) {
+    console.error("Preview loading error:", error);
+    document.getElementById("previewLoading").style.display = "none";
+    document.getElementById("previewError").style.display = "block";
+    document.getElementById("previewError").textContent = "Error loading preview: " + error.message;
+  }
+}
+
+async function showPreviewModal() {
+  // Legacy function - now just calls the inline preview
+  await loadAndShowPreview();
+}
+
+function renderPreview(preview) {
+  try {
+    console.log("renderPreview called with:", preview);
+    // Initialize chart storage for cleanup
+    window.previewCharts = window.previewCharts || [];
+    window.previewCharts.forEach(chart => chart.destroy());
+    window.previewCharts = [];
+
+  // Render dataset summary
+  document.getElementById("rowCount").textContent = preview.dataset_summary.row_count.toLocaleString();
+  document.getElementById("columnCount").textContent = preview.dataset_summary.column_count;
+
+  // Render patient insights if available
+  if (preview.patient_insights) {
+    document.getElementById("patientInsightsSection").style.display = "block";
+    document.getElementById("uniquePatients").textContent = preview.patient_insights.unique_patients.toLocaleString();
+    document.getElementById("returningPatients").textContent = preview.patient_insights.returning_patients.toLocaleString();
+    document.getElementById("returnRate").textContent = preview.patient_insights.return_rate_percentage.toFixed(1) + "%";
+    
+    // Render patient appearance distribution chart if available
+    if (preview.patient_insights.appearance_distribution) {
+      const distData = preview.patient_insights.appearance_distribution;
+      const chartContainer = document.getElementById("patientAppearanceContainer");
+      const chartCanvas = document.getElementById("patientAppearanceChart");
+      
+      // Show the container
+      chartContainer.style.display = "block";
+      
+      // Destroy existing chart if any
+      if (chartCanvas.chart) {
+        chartCanvas.chart.destroy();
+      }
+      
+      // Simple clean bar chart
+      chartCanvas.chart = new Chart(chartCanvas, {
+        type: 'bar',
+        data: {
+          labels: distData.labels,
+          datasets: [{
+            data: distData.counts,
+            backgroundColor: '#8b5cf6',
+            borderWidth: 0,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          indexAxis: 'x',
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(0,0,0,0.8)',
+              padding: 8,
+              titleFont: { size: 12 },
+              bodyFont: { size: 11 },
+              callbacks: {
+                label: () => null,
+                afterLabel: function(context) {
+                  return context.parsed.y + ' patient' + (context.parsed.y !== 1 ? 's' : '');
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1, font: { size: 10 } },
+              grid: { color: 'rgba(255, 255, 255, 0.06)', drawBorder: false },
+              title: {
+                display: true,
+                text: ['Number of', 'Patients'],
+                font: { size: 11, weight: 'bold' }
+              }
+            },
+            x: {
+              ticks: { font: { size: 10 } },
+              grid: { display: false, drawBorder: false },
+              title: {
+                display: true,
+                text: 'Number of Rows',
+                font: { size: 11, weight: 'bold' }
+              }
+            }
+          }
+        }
+      });
+      
+      window.previewCharts.push(chartCanvas.chart);
+    } else {
+      document.getElementById("patientAppearanceContainer").style.display = "none";
+    }
+  } else {
+    document.getElementById("patientInsightsSection").style.display = "none";
+  }
+
+  // Render column information
+  const columnsContainer = document.getElementById("columnsContainer");
+  columnsContainer.innerHTML = "";
+
+  preview.columns.forEach((col, idx) => {
+    // Skip rendering regular column cards for patient ID column
+    // (it's handled in the patient_insights section)
+    if (col.is_patient_id) {
+      return;
+    }
+
+    const colDiv = document.createElement("div");
+    colDiv.className = `column-info type-${col.dtype}`;
+
+    let statsHtml = `<strong>Type:</strong> <span class="type-badge type-badge-${col.dtype}">${col.dtype}</span>`;
+    statsHtml += `<br><strong>Unique:</strong> ${col.unique_values}`;
+    
+    if (col.missing_percentage > 0) {
+      statsHtml += `<br><strong>Missing:</strong> ${col.missing_percentage.toFixed(2)}%`;
+    }
+
+    // Add type-specific stats (never for patient ID columns)
+    if (col.dtype === "numeric") {
+      statsHtml += `
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-name">Mean</span>
+            <span class="stat-val">${(col.mean !== null ? col.mean.toFixed(2) : "N/A")}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-name">Min</span>
+            <span class="stat-val">${(col.min !== null ? col.min.toFixed(2) : "N/A")}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-name">Max</span>
+            <span class="stat-val">${(col.max !== null ? col.max.toFixed(2) : "N/A")}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-name">Std Dev</span>
+            <span class="stat-val">${(col.std !== null ? col.std.toFixed(2) : "N/A")}</span>
+          </div>
+        </div>
+      `;
+      // Add histogram placeholder
+      statsHtml += `<canvas id="chart-${idx}" class="distribution-chart" style="max-height: 150px; margin-top: 10px;"></canvas>`;
+    } else if (col.dtype === "categorical") {
+      if (col.top_values) {
+        statsHtml += `<div class="top-values">`;
+        Object.entries(col.top_values).forEach(([value, count]) => {
+          const percentage = col.unique_values > 0 ? ((count / preview.dataset_summary.row_count) * 100).toFixed(1) : 0;
+          statsHtml += `<div class="value-bar">
+            <div class="value-bar-fill" style="width: ${percentage}%"></div>
+            <span class="value-label">${value}</span>
+            <span class="value-count">${count} <span class="value-pct">${percentage}%</span></span>
+          </div>`;
+        });
+        statsHtml += `</div>`;
+      }
+      // Add distribution chart placeholder
+      statsHtml += `<canvas id="chart-${idx}" class="distribution-chart" style="max-height: 150px; margin-top: 10px;"></canvas>`;
+    } else if (col.dtype === "datetime") {
+      statsHtml += `<br><strong>Date Range:</strong> ${col.min_date || "N/A"} to ${col.max_date || "N/A"}`;
+    }
+
+    colDiv.innerHTML = `
+      <div class="column-header">
+        <div class="column-type-icon">${columnTypeIcon(col.dtype)}</div>
+        <span class="column-name">${col.name}</span>
+      </div>
+      <div class="column-stats">${statsHtml}</div>
+    `;
+    
+    columnsContainer.appendChild(colDiv);
+    
+    // Render chart after element is added to DOM
+    setTimeout(() => {
+      renderChart(col, idx, preview.dataset_summary.row_count);
+    }, 0);
+  });
+
+  // Render sample rows
+  const sampleTable = document.getElementById("sampleRowsTable");
+  sampleTable.innerHTML = "";
+
+  if (preview.sample_rows.length === 0) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td class="no-data" colspan="${preview.columns.length}">No sample data available</td>`;
+    sampleTable.appendChild(tr);
+    return;
+  }
+
+  // Header row
+  const headerRow = document.createElement("tr");
+  preview.columns.forEach(col => {
+    const th = document.createElement("th");
+    th.textContent = col.name;
+    headerRow.appendChild(th);
+  });
+  sampleTable.appendChild(headerRow);
+
+  // Data rows
+  preview.sample_rows.forEach(row => {
+    const tr = document.createElement("tr");
+    preview.columns.forEach(col => {
+      const td = document.createElement("td");
+      const value = row[col.name];
+      
+      // Check if this is a scan_id column
+      if (isScanIdColumn(col.name) && value !== null && value !== undefined) {
+        td.appendChild(createScanIdLink(String(value)));
+      } else {
+        td.textContent = value !== null && value !== undefined ? value : "-";
+      }
+      tr.appendChild(td);
+    });
+    sampleTable.appendChild(tr);
+  });
+  } catch (error) {
+    console.error("Error in renderPreview:", error, error.stack);
+    document.getElementById("previewError").style.display = "block";
+    document.getElementById("previewError").textContent = "Error rendering preview: " + error.message;
+  }
+}
+
+/**
+ * Decide which chart type to use for a categorical column.
+ * 
+ * Logic:
+ * - 2-4 categories: Pie chart
+ * - 5-6 categories: Doughnut chart
+ * - 7+ categories: Bar chart
+ * 
+ * Special case: If max/min ratio >= 10:1, use bar chart (data too skewed for pie)
+ */
+function decideChartType(column) {
+  if (column.dtype !== "categorical" || !column.distribution) {
+    return "bar";
+  }
+  
+  const uniqueValues = column.unique_values || 0;
+  
+  // Need at least 2 categories for pie/doughnut
+  if (uniqueValues < 2) {
+    return "bar";
+  }
+  
+  // Check if data is too skewed for pie/doughnut charts
+  const counts = column.distribution.counts || [];
+  if (counts.length > 0) {
+    const maxCount = Math.max(...counts);
+    const minCount = Math.min(...counts);
+    const ratio = minCount > 0 ? maxCount / minCount : Infinity;
+    
+    // If ratio is too large (>=10:1), use bar chart to avoid illegible slices
+    if (ratio >= 10) {
+      console.log(`Column "${column.name}" has skewed distribution (ratio: ${ratio.toFixed(1)}:1). Using bar chart.`);
+      return "bar";
+    }
+  }
+  
+  // Apply progressive categorization
+  if (uniqueValues <= 4) {
+    return "pie";
+  } else if (uniqueValues <= 6) {
+    return "doughnut";
+  } else {
+    return "bar";
+  }
+}
+
+/**
+ * Generate a palette of distinct colors for pie/doughnut charts.
+ * Cycles through predefined colors if more slices than colors.
+ */
+function generatePaletteColors(count) {
+  const colors = [
+    'rgba(20, 184, 166, 0.85)',   // Teal
+    'rgba(245, 158, 11, 0.85)',   // Amber
+    'rgba(139, 92, 246, 0.85)',   // Violet
+    'rgba(244, 63, 94, 0.85)',    // Rose
+    'rgba(14, 165, 233, 0.85)',   // Sky
+    'rgba(132, 204, 22, 0.85)',   // Lime
+    'rgba(217, 70, 239, 0.85)',   // Fuchsia
+    'rgba(100, 116, 139, 0.85)',  // Slate
+    'rgba(251, 146, 60, 0.85)',   // Orange
+    'rgba(6, 182, 212, 0.85)',    // Cyan
+  ];
+  
+  let result = [];
+  for (let i = 0; i < count; i++) {
+    result.push(colors[i % colors.length]);
+  }
+  return result;
+}
+
+/**
+ * Generate border colors (darker version of palette colors for borders).
+ */
+function generateBorderColors(count) {
+  const borderColors = [
+    'rgba(15, 118, 110, 1)',      // Teal
+    'rgba(180, 116, 6, 1)',       // Amber
+    'rgba(109, 62, 214, 1)',      // Violet
+    'rgba(190, 18, 60, 1)',       // Rose
+    'rgba(3, 105, 161, 1)',       // Sky
+    'rgba(77, 124, 15, 1)',       // Lime
+    'rgba(162, 28, 175, 1)',      // Fuchsia
+    'rgba(51, 65, 85, 1)',        // Slate
+    'rgba(194, 65, 12, 1)',       // Orange
+    'rgba(14, 116, 144, 1)',      // Cyan
+  ];
+  
+  let result = [];
+  for (let i = 0; i < count; i++) {
+    result.push(borderColors[i % borderColors.length]);
+  }
+  return result;
+}
+
+function renderChart(column, idx, totalRows) {
+  const ctx = document.getElementById(`chart-${idx}`);
+  if (!ctx) return;
+
+  let config;
+  
+  if (column.dtype === "numeric" && column.distribution) {
+    // Histogram for numeric columns
+    config = {
+      type: "bar",
+      data: {
+        labels: column.distribution.bins || [],
+        datasets: [{
+          label: "Frequency",
+          data: column.distribution.counts || [],
+          backgroundColor: "rgba(139, 92, 246, 0.55)",
+          borderColor: "rgba(167, 139, 250, 1)",
+          borderWidth: 1,
+          borderRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+      }
+    };
+  } else if (column.dtype === "categorical" && column.distribution) {
+    // Smart chart type selection for categorical columns
+    const chartType = decideChartType(column);
+    const categories = column.distribution.categories || [];
+    const counts = column.distribution.counts || [];
+    
+    if (chartType === "pie") {
+      // Pie chart for 2-4 categories
+      config = {
+        type: "pie",
+        data: {
+          labels: categories,
+          datasets: [{
+            data: counts,
+            backgroundColor: generatePaletteColors(categories.length),
+            borderColor: generateBorderColors(categories.length),
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'right',
+              labels: { padding: 12, font: { size: 11 } }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((context.parsed / total) * 100).toFixed(1);
+                  return `${context.label}: ${context.parsed} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      };
+    } else if (chartType === "doughnut") {
+      // Doughnut chart for 5-6 categories
+      config = {
+        type: "doughnut",
+        data: {
+          labels: categories,
+          datasets: [{
+            data: counts,
+            backgroundColor: generatePaletteColors(categories.length),
+            borderColor: generateBorderColors(categories.length),
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'right',
+              labels: { padding: 12, font: { size: 11 } }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = ((context.parsed / total) * 100).toFixed(1);
+                  return `${context.label}: ${context.parsed} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      };
+    } else {
+      // Bar chart for 7+ categories or skewed data
+      config = {
+        type: "bar",
+        data: {
+          labels: categories,
+          datasets: [{
+            label: "Count",
+            data: counts,
+            backgroundColor: "rgba(139, 92, 246, 0.6)",
+            borderColor: "rgba(109, 62, 214, 1)",
+            borderWidth: 1,
+            borderRadius: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { beginAtZero: true, ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 } },
+            y: { beginAtZero: true }
+          }
+        }
+      };
+    }
+  }
+
+  if (config) {
+    try {
+      const chart = new Chart(ctx, config);
+      if (!window.previewCharts) window.previewCharts = [];
+      window.previewCharts.push(chart);
+      console.log(`Chart created for column "${column.name}": ${config.type}`);
+    } catch (e) {
+      console.error("Chart rendering failed:", e);
+    }
+  }
+}
+
+function closePreviewModal() {
+  document.getElementById("previewModal").style.display = "none";
+}
+
+function renderTable(sparqlResults) {
+  // In preview-only mode, we don't render the full results table
+  // Full results are only shown after data-manager approval
+  const table = document.getElementById("resultsTable");
+  if (!table) {
+    console.log("Results table element not found (preview-only mode) - skipping renderTable");
+    return;
+  }
+  
+  table.innerHTML = "";
+
+  if (!sparqlResults || !sparqlResults.results.bindings.length) {
+    table.innerHTML = "<tr><td class='no-results' colspan='100'>No results found</td></tr>";
+    return;
+  }
+
+  const columns = sparqlResults.head.vars;
+  const rows = sparqlResults.results.bindings;
+
+  const headerRow = document.createElement("tr");
+  columns.forEach(col => {
+    const th = document.createElement("th");
+    th.textContent = col;
+    headerRow.appendChild(th);
+  });
+  table.appendChild(headerRow);
+
+  rows.forEach(row => {
+    const tr = document.createElement("tr");
+    columns.forEach(col => {
+      const td = document.createElement("td");
+      const value = row[col]?.value || "";
+      
+      // Check if this is a scan_id column
+      if (isScanIdColumn(col) && value) {
+        td.appendChild(createScanIdLink(String(value)));
+      } else {
+        td.textContent = value;
+      }
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+}
+
+function showRequestAccessDialog() {
+  if (!currentQueryData) {
+    alert("No query results to request");
+    return;
+  }
+  
+  // Populate modal with query and dataset info
+  document.getElementById('requestAccessQueryPreview').textContent = currentQueryData.nl_query;
+  document.getElementById('requestAccessRowCount').textContent = (currentQueryData.results?.results?.bindings?.length || 0).toLocaleString();
+  
+  // Count columns
+  const columnCount = currentQueryData.results?.head?.vars?.length || 0;
+  document.getElementById('requestAccessColCount').textContent = columnCount;
+  
+  document.getElementById('requestAccessModal').style.display = 'block';
+}
+
+function closeRequestAccessDialog() {
+  document.getElementById('requestAccessModal').style.display = 'none';
+  document.getElementById('requestAccessForm').reset();
+  document.getElementById('reasonCharCount').textContent = '0';
+  document.getElementById('projectNameCharCount').textContent = '0';
+}
+
+// Character counters for form fields
+document.addEventListener('DOMContentLoaded', function() {
+  const reasonText = document.getElementById('accessReason');
+  if (reasonText) {
+    reasonText.addEventListener('input', function() {
+      document.getElementById('reasonCharCount').textContent = this.value.length;
+    });
+  }
+  
+  const projectName = document.getElementById('projectName');
+  if (projectName) {
+    projectName.addEventListener('input', function() {
+      document.getElementById('projectNameCharCount').textContent = this.value.length;
+    });
+  }
+});
+
+// Handle request access form submission
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('requestAccessForm');
+  if (form) {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const projectName = document.getElementById('projectName').value.trim();
+      const reason = document.getElementById('accessReason').value;
+      const supportingDocument = document.getElementById('supportingDocument').files[0];
+      const token = localStorage.getItem('token');
+      
+      // Validate project name
+      if (!projectName || projectName.length < 2 || projectName.length > 255) {
+        alert('Please provide a project name between 2 and 255 characters');
+        return;
+      }
+      
+      // Validate reason
+      if (reason.length < 10 || reason.length > 500) {
+        alert('Please provide a reason between 10 and 500 characters');
+        return;
+      }
+      
+      // Validate PDF if provided
+      if (supportingDocument) {
+        if (!supportingDocument.name.toLowerCase().endsWith('.pdf')) {
+          alert('Supporting document must be a PDF file');
+          return;
+        }
+        
+        if (supportingDocument.size > 10 * 1024 * 1024) {  // 10MB
+          alert('PDF file size must not exceed 10MB');
+          return;
+        }
+      }
+      
+      if (!currentQueryData) {
+        alert('No query results to request');
+        return;
+      }
+      
+      try {
+        // Create FormData for multipart/form-data submission
+        const formData = new FormData();
+        formData.append('project_name', projectName);
+        formData.append('reason', reason);
+        formData.append('nl_query', currentQueryData.nl_query);
+        formData.append('sparql_query', currentQueryData.sparql);
+        
+        // Add preview data as JSON string
+        if (currentQueryData.preview_data) {
+          formData.append('data_preview', JSON.stringify(currentQueryData.preview_data));
+        }
+        
+        // Add supporting document if provided
+        if (supportingDocument) {
+          formData.append('supporting_document', supportingDocument);
+        }
+        
+        // First, create the access request with multipart form data
+        const createResponse = await fetch(
+          'http://' + window.location.hostname + ':8000/datasets/access-requests/create',
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + token
+              // Don't set Content-Type: multipart/form-data - let the browser set it with boundary
+            },
+            body: formData
+          }
+        );
+        
+        if (!createResponse.ok) {
+          const error = await createResponse.json();
+          alert('Failed to create request: ' + (error.detail || 'Unknown error'));
+          return;
+        }
+        
+        const createResult = await createResponse.json();
+        const requestId = createResult.request_id;
+        
+        // Then, store full results if needed
+        if (currentQueryData.results) {
+          try {
+            const storeResponse = await fetch(
+              'http://' + window.location.hostname + ':8000/datasets/access-requests/' + requestId + '/full-results',
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify(currentQueryData.results)
+              }
+            );
+            
+            if (!storeResponse.ok) {
+              console.warn('Could not store full results, but request was created');
+            }
+          } catch (err) {
+            console.warn('Error storing results:', err);
+          }
+        }
+        
+        closeRequestAccessDialog();
+        alert('Your data access request has been submitted! Request ID: ' + requestId + '\n\nYou will be notified when the Data Manager approves or rejects your request.');
+        
+        // Optionally clear the query
+        // document.getElementById('query').value = '';
+        
+      } catch (error) {
+        alert('Error submitting request: ' + error.message);
+      }
+    });
+  }
+});
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+  const requestModal = document.getElementById('requestAccessModal');
+  
+  if (event.target == requestModal) {
+    requestModal.style.display = 'none';
+  }
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "/login.html";
+}
+
+</script>
+
+</body>
+</html>

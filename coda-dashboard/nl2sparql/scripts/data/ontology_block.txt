@@ -1,0 +1,69 @@
+Ontology (auto-generated from live GraphDB schema -- see scripts/generate_ontology_snapshot.py)
+PREFIX ns1: <http://clinical-example.org/ontology/>
+
+Classes: ExamFinding, Diagnosis, VisionItem, Investigation, Visit, AdviceDetails, DrugPrescription, AnteriorSegmentExam, OctDetails, VisionDetails, Patient, ReportedHistory, VitalDetails, RefractionItem, RefractionDetails, SystemicHistory, ProcedureAdvice, GeneralAdvice, TreatmentAdvice, RefractionCorrection, SurgeryAdvice
+
+Key Relationships (predicate -> target class(es); '|' = a property that can point to more than one type):
+- hasAdvice -> AdviceDetails
+- hasAdviceItem -> DrugPrescription | ProcedureAdvice | GeneralAdvice | TreatmentAdvice | RefractionCorrection | SurgeryAdvice
+- hasAsExam -> AnteriorSegmentExam
+- hasDiagnosis -> Diagnosis
+- hasFinding -> ExamFinding
+- hasInvestigation -> Investigation
+- hasOctDetails -> OctDetails
+- hasRefraction -> RefractionDetails
+- hasRefractionItem -> RefractionItem
+- hasReportedHistory -> ReportedHistory
+- hasSystemicHistory -> SystemicHistory
+- hasVisionDetails -> VisionDetails
+- hasVisionItem -> VisionItem
+- hasVisit -> Visit
+- hasVitals -> VitalDetails
+
+Attribute Reference (class: datatype properties, with sample values):
+- ExamFinding: partName, findingValue, laterality
+- Diagnosis: diagnosisName, laterality
+- VisionItem: chartType, leftEyeValue, rightEyeValue, visionType
+- Investigation: laterality, investigationName, resultNumeric, resultUnit
+- Visit: batch_id, description, purpose_of_visit, visitDate
+- DrugPrescription: dosage, drug_name, form_type, drug_advice_date, drug_duration
+- OctDetails: anonymous_accession_no, anonymous_mrno, scan_id, visit_id, image_eye_laterality
+- Patient: last_extracted_date, anonymous_accession_no, patientId, patientMrnNo, age, gender, dataset_id
+- VitalDetails: diastolicBP, systolicBP
+- RefractionItem: leAxis, leCylinder, lePHVA, leSphere, reAxis, reCylinder, rePHVA, reSphere
+- SystemicHistory: duration, conditionCode, hasPrescription, medicine, diabetesControl, otherAllergies, nonOcularSx
+- ProcedureAdvice: number_of_sittings_advice, procedure_advice_date, procedure_completion_date, procedure_done_at, procedure_laterality, procedure_name, procedure_type, sitting_num_completed
+- GeneralAdvice: glass_precription_value, glass_prescription_advice_date
+- TreatmentAdvice: treatment_advice_date, treatment_completion_date, treatment_done_at, treatment_duration, treatment_laterality, treatment_type
+- RefractionCorrection: refractive_advice_date, refractive_correction_type, refractive_laterality
+- SurgeryAdvice: adjunct, anesthesia, axis_length, implant, k1degree, k1dioptre, k1mm, k2degree, k2dioptre, k2mm, primary_procedure, secondary_procedure, surgery_advice_date, surgery_advice_laterality, surgery_completed_date, surgery_done_at
+
+Closed vocabularies observed (use these exact values in FILTERs where relevant):
+- Diagnosis.laterality: "BE", "LE", "RE", "OTH"
+- DrugPrescription.dosage: "1 drop", "1 tablet", "", "1     ml", "2 tablet", "60 ml", "1/2 tablet", "2 drops", "40    mg", "1     units", "0.5   mg", "23    units", "100   ml", "3 tablets", "4  tablets"
+- DrugPrescription.form_type: "Drops", "TABLETS", "Ointment", "Injection", "SOLUTION", "Others"
+- ExamFinding.laterality: "LE", "RE"
+- ExamFinding.partName: "Anterior Chamber", "Lid", "Conjunctiva", "Cornea", "Iris", "Pupil", "Lens", "Ocular Movements", "Corneal Reflex"
+- GeneralAdvice.glass_precription_value: "True"
+- Investigation.investigationName: "IOP", "CCT", "K Reading", "Duct", "Central Fields", "Dilate RR", "Refraction", "Repeat RR", "Colour Vision", "Schirmer's 1 test", "PH Vision", "Vision with CL", "Muscle Balance"
+- Investigation.laterality: "RE", "LE"
+- Investigation.resultUnit: "mm of Hg", "", "D", "mm"
+- OctDetails.image_eye_laterality: "RE", "LE"
+- Patient.gender: "M", "F"
+- ProcedureAdvice.number_of_sittings_advice: "1", "2", "", "3", "4", "5"
+- ProcedureAdvice.procedure_done_at: "Hospital", "OutSide"
+- ProcedureAdvice.procedure_laterality: "RE", "LE"
+- ProcedureAdvice.procedure_type: "Retina Laser", "IntraVit Inj", "YAG PI", "YAG Cap", "Inj. PST"
+- ProcedureAdvice.sitting_num_completed: "", "1", "2", "3", "4"
+- RefractionCorrection.refractive_correction_type: "Same GP", "LASIK Counselling", "Contact Lens"
+- RefractionCorrection.refractive_laterality: "OTH", "BE", "RE"
+- SystemicHistory.conditionCode: "Diabetes", "Hypertension", "Hyperlipidemia", "Cardiac", "Non-Ocular Sx", "Thyroid Status", "Asthma", "Renal Disease", "Drug Allergies", "Stroke/Neuro", "Other Allergies", "TB"
+- SystemicHistory.hasPrescription: "true", "false"
+- TreatmentAdvice.treatment_done_at: "", "Hospital"
+- TreatmentAdvice.treatment_duration: "", "1 hr", "10 mins"
+- TreatmentAdvice.treatment_laterality: "BE", "LE", "RE"
+- TreatmentAdvice.treatment_type: "Fomentation", "LidHygiene", "Patching", "Exercise", "Crigglersmassage", "Lid Cleaning"
+- VisionItem.chartType: "Snellen 3 Metre"
+- VisionItem.visionType: "UCVA", "With Spectacles", "UCVA With PH", "Aphakic Correction"
+- Visit.description: "tanjore_oct_patients", "tanjore_inj_patients", "tanjore_as_oct_patients"
+- Visit.purpose_of_visit: "Regular Investigation -  Units", "Regular Investigation", "Review", "Intra Vit Injection", "Retina Laser", "Appointment"
