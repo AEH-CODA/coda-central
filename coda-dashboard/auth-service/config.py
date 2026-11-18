@@ -22,3 +22,16 @@ DB_HOST = os.getenv("DB_HOST")
 DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
+
+# OAuth2 provider configuration (for connected apps, e.g. Biomni).
+# Access tokens issued this way carry no `role` claim and are restricted to
+# a `scope`, unlike the interactive session token from /auth/callback.
+OAUTH_ACCESS_TOKEN_EXPIRE_DAYS = int(os.getenv("OAUTH_ACCESS_TOKEN_EXPIRE_DAYS", "30"))
+
+# Biomni is registered as an OAuth client via env config rather than a
+# self-service registration UI, since CODA only expects to integrate with a
+# small, known set of first-party tools for now. Seeded into oauth_clients
+# at startup — see services/oauth_service.seed_client_from_env().
+BIOMNI_CLIENT_ID = os.getenv("BIOMNI_CLIENT_ID", "biomni")
+BIOMNI_CLIENT_SECRET = os.getenv("BIOMNI_CLIENT_SECRET")
+BIOMNI_REDIRECT_URI = os.getenv("BIOMNI_REDIRECT_URI", "http://127.0.0.1:7860/oauth/callback")

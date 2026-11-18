@@ -76,8 +76,55 @@ services:
     volumes:
       - dataset_data:/app/data
 
+  inference-db:
+    image: postgres:16
+    container_name: inference-db
+    restart: always
+    environment:
+      POSTGRES_DB: inference-db
+      POSTGRES_USER: coda
+      POSTGRES_PASSWORD: coda-pass
+    volumes:
+      - inference_db_data:/var/lib/postgresql/data
+    # no host port: internal only
+
+  # One image (./inference-service), two containers. Model packages are bind-mounted read-only, so swapping a
+  # model never needs an image rebuild. GPU: add -f docker-compose.gpu.yml (otherwise the worker runs on CPU).
+  inference-api:
+    build: ./inference-service
+    image: coda-inference-service
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]
+    ports:
+      - "8002:8002"
+    depends_on:
+      - inference-db
+    env_file:
+      - ./inference-service/.env
+    volumes:
+      - inference_data:/data
+      - ./inference-service/models:/models:ro
+    restart: unless-stopped
+
+  inference-worker:
+    build: ./inference-service
+    image: coda-inference-service
+    command: ["python", "worker.py"]
+    depends_on:
+      - inference-db
+      - inference-api
+    env_file:
+      - ./inference-service/.env
+    volumes:
+      - inference_data:/data
+      - ./inference-service/models:/models:ro
+    mem_limit: 10g
+    stop_grace_period: 5m   # SIGTERM lets the current job finish
+    restart: unless-stopped
+
 volumes:
   graphdb-data:
   user_db_data:
   dataset_db_data:
   dataset_data:
+  inference_data:
+  inference_db_data:

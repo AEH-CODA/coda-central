@@ -1,0 +1,24 @@
+# ML runtime: pinned to the versions the model was trained/saved with.
+# tensorflow[and-cuda] pulls the CUDA/cuDNN wheels, so one image runs on GPU (if visible) or CPU.
+tensorflow[and-cuda]==2.21.0
+keras==3.13.2
+
+# imaging / numerics
+numpy
+scipy
+opencv-python-headless
+pydicom==3.0.2
+pillow
+
+# config
+pyyaml
+pydantic>=2
+
+# service (inference-api + inference-worker)
+fastapi==0.115.6
+uvicorn==0.32.1
+python-multipart==0.0.20
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+python-jose==3.3.0
+python-dotenv==1.0.0

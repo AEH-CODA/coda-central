@@ -2,13 +2,14 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { API_BASE_URL } from '@/lib/api'
+import { consumePostLoginRedirect } from '@/lib/auth'
 
 export function LoginPage() {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/', { replace: true })
+    if (isAuthenticated) navigate(consumePostLoginRedirect() || '/', { replace: true })
   }, [isAuthenticated, navigate])
 
   function handleGoogleLogin() {

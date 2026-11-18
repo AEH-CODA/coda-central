@@ -7,6 +7,7 @@ import { ErrorBanner } from '@/components/ui/ErrorBanner'
 import { LoadingState } from '@/components/ui/LoadingState'
 import { DatasetPreview } from '@/components/query/DatasetPreview'
 import { RequestAccessModal } from '@/components/query/RequestAccessModal'
+import { SaveDatasetModal } from '@/components/query/SaveDatasetModal'
 import { useAuth } from '@/hooks/useAuth'
 import { api, AuthError } from '@/lib/api'
 
@@ -24,6 +25,7 @@ export function QueryDataPage() {
   const [previewState, setPreviewState] = useState('idle')
   const [previewError, setPreviewError] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [saveModalOpen, setSaveModalOpen] = useState(false)
 
   // Restore the last session's results on mount, so a page refresh doesn't
   // lose an in-progress query — same behavior as the previous static app.
@@ -140,7 +142,12 @@ export function QueryDataPage() {
         <section>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">Results</h2>
-            {!hasFullDatasetAccess && <Button onClick={() => setModalOpen(true)}>Request Access</Button>}
+            <div className="flex gap-2">
+              <Button variant="secondary" onClick={() => setSaveModalOpen(true)}>
+                Save Dataset
+              </Button>
+              {!hasFullDatasetAccess && <Button onClick={() => setModalOpen(true)}>Request Access</Button>}
+            </div>
           </div>
 
           {!hasFullDatasetAccess && (
@@ -162,6 +169,13 @@ export function QueryDataPage() {
       {!hasFullDatasetAccess && (
         <RequestAccessModal open={modalOpen} onClose={() => setModalOpen(false)} queryData={queryData} />
       )}
+
+      <SaveDatasetModal
+        open={saveModalOpen}
+        onClose={() => setSaveModalOpen(false)}
+        queryData={queryData}
+        onAuthError={handleAuthError}
+      />
     </div>
   )
 }

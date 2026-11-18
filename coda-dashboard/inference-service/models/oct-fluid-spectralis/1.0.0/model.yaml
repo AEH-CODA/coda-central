@@ -1,0 +1,43 @@
+# Model package manifest — schema: inference-service/core/manifest.py
+id: oct-fluid-spectralis
+version: 1.0.0
+display_name: "OCT Fluid (IRF / SRF / PED) — Heidelberg Spectralis"
+task: segmentation-2d-per-bscan
+modality: OPT
+adapter: refattn_unet_v1
+framework: keras
+weights: best_model.keras
+sha256: 2c4b5e48e46b8f190b30697e38970da38efae075c49fdb0f664dfecaf6ad83d4
+
+input:
+  supported_manufacturers: ["Heidelberg Engineering"]
+  supported_models: ["Spectralis"]
+  target_spacing_mm: {lateral: 0.011174, axial: 0.003872}
+  canvas: {height: 512, width: 576, dynamic: true, multiple_of: 16}
+  clip_percentiles: [0.5, 99.5]
+  padding: edge_connected_zero_runs        # as trained (RETOUCH .mhd)
+  # Phase 0 (see model_card.md): DICOM exports are quantised to 0..100 with a black vitreous. Treating only fully-zero
+  # rows/cols as padding and histogram-matching to the RETOUCH training distribution recovers most of the domain gap
+  # (simulated val score 0.791 -> 0.829; as-trained upper bound 0.833).
+  padding_overrides:
+    dicom-opt: zero_border
+  harmonization:
+    default: {method: none}
+    dicom-opt: {method: histogram_match, reference: intensity_reference.npy, dither: true, seed: 0}
+
+classes:
+  1: {name: IRF, label: "Intraretinal fluid", color: "#E53935"}
+  2: {name: SRF, label: "Subretinal fluid", color: "#FBC02D"}
+  3: {name: PED, label: "Pigment epithelial detachment", color: "#1E88E5"}
+
+quantification:
+  units: nL
+  etdrs_diameters_mm: [1, 3, 6]
+
+report:
+  disclaimer: "Research use only. Not for clinical diagnosis."
+  warnings:
+    default:
+      - "Model trained and validated on RETOUCH Spectralis data only (24 volumes); accuracy on other data is not established."
+    dicom-opt:
+      - "DICOM input is intensity-harmonized to the training data (histogram matching); segmentation on DICOM exports has been reviewed visually only."

@@ -97,6 +97,13 @@ class PreviewService:
         return False
     
     @staticmethod
+    def results_to_dataframe(sparql_results: Dict[str, Any]) -> pd.DataFrame:
+        """Public entry point for turning stored SPARQL JSON results into a
+        flat DataFrame — used by the dataset CSV export endpoint as well as
+        the preview pipeline below."""
+        return PreviewService._convert_results_to_dataframe(sparql_results)
+
+    @staticmethod
     def _convert_results_to_dataframe(sparql_results: Dict[str, Any]) -> pd.DataFrame:
         """
         Convert GraphDB SPARQL JSON results to a pandas DataFrame.

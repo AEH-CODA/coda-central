@@ -1,0 +1,11 @@
+# Model packages are bind-mounted at /models, never baked into the image.
+models/
+tests/data/
+experiments/out/
+docs/reference/
+data/
+*.db
+.env
+.venv/
+.pytest_cache/
+**/__pycache__/

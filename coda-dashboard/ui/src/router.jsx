@@ -7,7 +7,9 @@ import {
   RequireNotFullDatasetAccess,
 } from '@/components/layout/RequireAuth'
 import { LoginPage } from '@/pages/LoginPage'
+import { OAuthAuthorizePage } from '@/pages/OAuthAuthorizePage'
 import { QueryDataPage } from '@/pages/QueryDataPage'
+import { SavedDatasetsPage } from '@/pages/SavedDatasetsPage'
 import { MyDataRequestsPage } from '@/pages/MyDataRequestsPage'
 import { DataAccessRequestsPage } from '@/pages/DataAccessRequestsPage'
 import { RoleManagementPage } from '@/pages/RoleManagementPage'
@@ -18,10 +20,15 @@ export const router = createBrowserRouter([
   {
     element: <RequireAuth />,
     children: [
+      // Standalone (no sidebar chrome), like /login — this is a one-off
+      // consent screen reached via an external redirect (e.g. from Biomni),
+      // not a page someone navigates the app to.
+      { path: '/oauth/authorize', element: <OAuthAuthorizePage /> },
       {
         element: <AppShell />,
         children: [
           { path: '/', element: <QueryDataPage /> },
+          { path: '/saved-datasets', element: <SavedDatasetsPage /> },
           {
             element: <RequireNotFullDatasetAccess />,
             children: [{ path: '/requests', element: <MyDataRequestsPage /> }],

@@ -51,6 +51,49 @@ def init_db():
                 );
             """)
 
+            # OAuth2 provider tables — let external tools (e.g. Biomni) be
+            # handed a narrow, revocable token instead of a user's full
+            # session JWT. See routes/oauth.py and services/oauth_service.py.
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS oauth_clients (
+                    client_id TEXT PRIMARY KEY,
+                    client_secret_hash TEXT NOT NULL,
+                    name TEXT,
+                    redirect_uris TEXT[] NOT NULL,
+                    allowed_scopes TEXT[] NOT NULL,
+                    created_at TIMESTAMPTZ DEFAULT NOW()
+                );
+            """)
+
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS oauth_codes (
+                    code TEXT PRIMARY KEY,
+                    client_id TEXT NOT NULL REFERENCES oauth_clients(client_id),
+                    user_id UUID NOT NULL REFERENCES users(id),
+                    redirect_uri TEXT NOT NULL,
+                    scope TEXT NOT NULL,
+                    expires_at TIMESTAMPTZ NOT NULL,
+                    used BOOLEAN NOT NULL DEFAULT FALSE,
+                    created_at TIMESTAMPTZ DEFAULT NOW()
+                );
+            """)
+
+            # jti/revoked_at let a stateless JWT be checked for revocation
+            # (via /oauth/introspect) even though signature+exp alone can't
+            # express "the user revoked this from Connected Apps".
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS oauth_grants (
+                    id UUID PRIMARY KEY,
+                    user_id UUID NOT NULL REFERENCES users(id),
+                    client_id TEXT NOT NULL REFERENCES oauth_clients(client_id),
+                    scope TEXT NOT NULL,
+                    jti TEXT NOT NULL UNIQUE,
+                    issued_at TIMESTAMPTZ DEFAULT NOW(),
+                    expires_at TIMESTAMPTZ NOT NULL,
+                    revoked_at TIMESTAMPTZ
+                );
+            """)
+
             conn.commit()
             cur.close()
             conn.close()

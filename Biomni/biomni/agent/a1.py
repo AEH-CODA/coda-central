@@ -2662,6 +2662,8 @@ Each library is listed with its description to help you understand its functiona
         import os
         from time import time
 
+        from biomni.integrations import coda_client
+
         # Define supported file extensions
         SUPPORTED_EXTENSIONS = (".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".pdf")
 
@@ -2978,6 +2980,21 @@ Each library is listed with its description to help you understand its functiona
 
             # Main interface
             with main_interface_container:
+                # CODA connection — lets a saved CODA dataset be pulled in as
+                # a CSV and attached to the chat input exactly like a
+                # manually uploaded file (see attach_coda_dataset below).
+                with gr.Accordion("CODA datasets", open=False) as coda_accordion:
+                    coda_status = gr.Markdown("Checking CODA connection…")
+                    with gr.Row():
+                        coda_connect_btn = gr.Button("Connect CODA account", visible=False)
+                        coda_disconnect_btn = gr.Button("Disconnect", visible=False)
+                    with gr.Row(visible=False) as coda_dataset_row:
+                        coda_dataset_dropdown = gr.Dropdown(label="Your saved CODA datasets", choices=[])
+                        coda_refresh_btn = gr.Button("Refresh")
+                        coda_attach_btn = gr.Button("Attach to chat")
+                    coda_authorize_url = gr.Textbox(visible=False)
+                    coda_dataset_map = gr.State({})
+
                 with gr.Row():
                     with gr.Column(scale=1):
                         main_chatbot = gr.Chatbot(
@@ -3012,6 +3029,138 @@ Each library is listed with its description to help you understand its functiona
                 ).then(lambda: gr.MultimodalTextbox(value=None), None, [prompt_input])
                 main_chatbot.like(like)
 
-        # Launch
-        print(f"Launching Gradio demo on {server_name}:7860")
-        demo.launch(share=share, server_name=server_name)
+                # --- CODA wiring ---
+
+                def refresh_coda_status():
+                    connected = coda_client.is_connected()
+                    if not connected:
+                        return (
+                            gr.update(value="Not connected to CODA."),
+                            gr.update(visible=True),
+                            gr.update(visible=False),
+                            gr.update(visible=False),
+                            gr.update(choices=[]),
+                            {},
+                            gr.update(),
+                        )
+
+                    try:
+                        datasets = coda_client.list_datasets()
+                        status = f"✅ Connected to CODA — {len(datasets)} saved dataset(s) available."
+                    except Exception as e:
+                        datasets = []
+                        status = f"⚠️ Connected to CODA, but couldn't load datasets: {e}"
+
+                    return (
+                        gr.update(value=status),
+                        gr.update(visible=False),
+                        gr.update(visible=True),
+                        gr.update(visible=True),
+                        gr.update(choices=[(d["name"], d["id"]) for d in datasets], value=None),
+                        {d["id"]: d["name"] for d in datasets},
+                        # Open the accordion whenever we land here already
+                        # connected (e.g. the page reload after the OAuth
+                        # redirect back from CODA) — otherwise the newly
+                        # available datasets are computed correctly but sit
+                        # invisible behind a collapsed accordion the user has
+                        # no reason to think to reopen.
+                        gr.update(open=True),
+                    )
+
+                coda_status_outputs = [
+                    coda_status,
+                    coda_connect_btn,
+                    coda_disconnect_btn,
+                    coda_dataset_row,
+                    coda_dataset_dropdown,
+                    coda_dataset_map,
+                    coda_accordion,
+                ]
+
+                demo.load(fn=refresh_coda_status, outputs=coda_status_outputs)
+
+                # Clicking "Connect" computes the (fresh, single-use) authorize
+                # URL server-side, then a JS callback navigates the browser to
+                # it — this leaves the app entirely (through CODA's own login
+                # and consent screen) and comes back via /oauth/callback below.
+                coda_connect_btn.click(
+                    fn=lambda: coda_client.build_authorize_url(),
+                    outputs=[coda_authorize_url],
+                ).then(
+                    fn=None,
+                    inputs=[coda_authorize_url],
+                    js="(url) => { window.location.href = url; }",
+                )
+
+                def disconnect_coda():
+                    coda_client.disconnect()
+                    return refresh_coda_status()
+
+                coda_disconnect_btn.click(fn=disconnect_coda, outputs=coda_status_outputs)
+                coda_refresh_btn.click(fn=refresh_coda_status, outputs=coda_status_outputs)
+
+                def attach_coda_dataset(dataset_id, dataset_map, current_prompt):
+                    if not dataset_id:
+                        return current_prompt
+                    dataset_name = dataset_map.get(dataset_id, dataset_id)
+                    local_path = coda_client.download_dataset_csv(
+                        dataset_id, dataset_name, os.path.join(self.path, "coda_imports")
+                    )
+                    current_prompt = current_prompt or {"text": "", "files": []}
+                    files = list(current_prompt.get("files", [])) + [local_path]
+                    return gr.MultimodalTextbox(value={"text": current_prompt.get("text", ""), "files": files})
+
+                coda_attach_btn.click(
+                    fn=attach_coda_dataset,
+                    inputs=[coda_dataset_dropdown, coda_dataset_map, prompt_input],
+                    outputs=[prompt_input],
+                )
+
+        if share:
+            # gradio.live tunnels don't have a fixed local origin, so a
+            # hardcoded 127.0.0.1 OAuth redirect_uri can't work here — the
+            # /oauth/callback route below is skipped and the CODA connection
+            # panel will show a connect error if used in this mode.
+            print(f"Launching Gradio demo on {server_name}:7860")
+            demo.launch(share=share, server_name=server_name)
+            return
+
+        # Mount Gradio on a plain FastAPI app instead of demo.launch() so we
+        # can add /oauth/callback: CODA redirects the browser back here after
+        # the user approves the consent screen, server-to-server-exchanges
+        # the one-time code for an access token, then sends the browser back
+        # into the Gradio app itself.
+        from fastapi import FastAPI, Request
+        from fastapi.responses import HTMLResponse, RedirectResponse
+
+        fastapi_app = FastAPI()
+
+        @fastapi_app.get("/oauth/callback")
+        def oauth_callback(request: Request):
+            error = request.query_params.get("error")
+            if error:
+                return HTMLResponse(f"<p>CODA authorization was not completed ({error}). "
+                                     f"You can close this tab and try again from Biomni.</p>")
+
+            code = request.query_params.get("code")
+            state = request.query_params.get("state")
+            if not code or not state or not coda_client.consume_state(state):
+                return HTMLResponse(
+                    "<p>This authorization link is invalid or has expired. "
+                    "Please try connecting again from Biomni.</p>",
+                    status_code=400,
+                )
+
+            try:
+                coda_client.exchange_code(code)
+            except Exception as e:
+                return HTMLResponse(f"<p>Failed to connect to CODA: {e}</p>", status_code=500)
+
+            return RedirectResponse(url="/")
+
+        fastapi_app = gr.mount_gradio_app(fastapi_app, demo, path="/")
+
+        print(f"Launching Biomni (with CODA integration) on {server_name}:7860")
+        import uvicorn
+
+        uvicorn.run(fastapi_app, host=server_name, port=7860)

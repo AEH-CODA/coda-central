@@ -1,0 +1,19 @@
+{
+ "TARGET_XY_MM": [
+  0.011174,
+  0.003872
+ ],
+ "CANVAS_H": 512,
+ "CANVAS_W": 576,
+ "CLIP_PCT": [
+  0.5,
+  99.5
+ ],
+ "CLASS_NAMES": {
+  "1": "IRF",
+  "2": "SRF",
+  "3": "PED"
+ },
+ "padding": "edge-connected zero runs",
+ "normalise": "per-B-scan z-score over non-padding pixels"
+}

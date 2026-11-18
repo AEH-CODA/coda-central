@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Header, Query, Body, Form, UploadFile, File
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from uuid import UUID
 from jose import jwt, JWTError
+import io
 
 from db import get_db
 from config import JWT_SECRET, JWT_ALGORITHM, SPARQL_QUERY_TIMEOUT
@@ -14,6 +16,7 @@ from models import (
 from services.dataset_service import DatasetService
 from services.preview_service import PreviewService
 from services.access_request_service import AccessRequestService
+from services.oauth_client import introspect_is_active
 
 router = APIRouter(prefix="/datasets", tags=["datasets"])
 
@@ -30,6 +33,12 @@ FULL_ACCESS_ROLES = ("doctor", "admin", "data-manager")
 def verify_token(authorization: str = Header(...)) -> UUID:
     """
     Verify JWT token and extract user_id.
+
+    Rejects oauth_access tokens (Connected Apps, e.g. Biomni): every endpoint
+    guarded by this dependency is a write or otherwise sensitive operation
+    that a connected app's datasets:read grant should never reach. The two
+    read endpoints connected apps are meant to use (list/detail) are guarded
+    by require_scope() instead.
     """
     if not authorization.startswith("Bearer "):
         raise HTTPException(
@@ -37,25 +46,30 @@ def verify_token(authorization: str = Header(...)) -> UUID:
             detail="Invalid token format",
             headers={"WWW-Authenticate": "Bearer"}
         )
-    
+
     token = authorization.split(" ")[1]
-    
+
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        user_id = payload.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid token: missing sub claim")
-        return UUID(user_id)
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.InvalidSignatureError:
-        raise HTTPException(status_code=401, detail="Invalid token signature")
-    except jwt.DecodeError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    # python-jose's jwt module has no InvalidSignatureError/DecodeError (those
+    # are PyJWT names) — a bad signature or malformed token both surface as
+    # JWTError, caught below.
     except (JWTError, ValueError) as e:
         raise HTTPException(status_code=401, detail=f"Token validation failed: {str(e)}")
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=401, detail="Token validation error")
+
+    # Raised outside the try/except above: an HTTPException here must not be
+    # re-caught and downgraded by the bare `except Exception` clause.
+    if payload.get("token_type") == "oauth_access":
+        raise HTTPException(status_code=403, detail="This connected app is not authorized for this action")
+
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid token: missing sub claim")
+    return UUID(user_id)
 
 
 def extract_user_role(authorization: str = Header(...)) -> tuple:
@@ -73,26 +87,29 @@ def extract_user_role(authorization: str = Header(...)) -> tuple:
         )
     
     token = authorization.split(" ")[1]
-    
+
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        user_id = payload.get("sub")
-        role = payload.get("role", "user")  # Default to "user" if role not in token
-        
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid token: missing sub claim")
-        
-        return UUID(user_id), role
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.InvalidSignatureError:
-        raise HTTPException(status_code=401, detail="Invalid token signature")
-    except jwt.DecodeError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    # python-jose's jwt module has no InvalidSignatureError/DecodeError (those
+    # are PyJWT names) — a bad signature or malformed token both surface as
+    # JWTError, caught below.
     except (JWTError, ValueError) as e:
         raise HTTPException(status_code=401, detail=f"Token validation failed: {str(e)}")
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=401, detail="Token validation error")
+
+    if payload.get("token_type") == "oauth_access":
+        raise HTTPException(status_code=403, detail="This connected app is not authorized for this action")
+
+    user_id = payload.get("sub")
+    role = payload.get("role", "user")  # Default to "user" if role not in token
+
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid token: missing sub claim")
+
+    return UUID(user_id), role
 
 
 def extract_user_info(authorization: str = Header(...)) -> tuple:
@@ -110,27 +127,77 @@ def extract_user_info(authorization: str = Header(...)) -> tuple:
         )
     
     token = authorization.split(" ")[1]
-    
+
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        user_id = payload.get("sub")
-        role = payload.get("role", "user")  # Default to "user" if role not in token
-        user_name = payload.get("name", "Unknown User")  # Get user_name from JWT
-        
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Invalid token: missing sub claim")
-        
-        return UUID(user_id), role, user_name
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.InvalidSignatureError:
-        raise HTTPException(status_code=401, detail="Invalid token signature")
-    except jwt.DecodeError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    # python-jose's jwt module has no InvalidSignatureError/DecodeError (those
+    # are PyJWT names) — a bad signature or malformed token both surface as
+    # JWTError, caught below.
     except (JWTError, ValueError) as e:
         raise HTTPException(status_code=401, detail=f"Token validation failed: {str(e)}")
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=401, detail="Token validation error")
+
+    if payload.get("token_type") == "oauth_access":
+        raise HTTPException(status_code=403, detail="This connected app is not authorized for this action")
+
+    user_id = payload.get("sub")
+    role = payload.get("role", "user")  # Default to "user" if role not in token
+    user_name = payload.get("name", "Unknown User")  # Get user_name from JWT
+
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid token: missing sub claim")
+
+    return UUID(user_id), role, user_name
+
+
+def require_scope(required_scope: str):
+    """
+    Dependency factory for the read endpoints a connected app (e.g. Biomni)
+    is allowed to call. Accepts a normal session token from any role
+    (unchanged behavior for the CODA UI) or an oauth_access token whose
+    granted scope includes `required_scope` — the latter is also checked
+    against auth-service's revocation list, since a JWT's signature alone
+    can't reflect a since-revoked Connected App grant.
+    """
+    def dependency(authorization: str = Header(...)) -> UUID:
+        if not authorization.startswith("Bearer "):
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid token format",
+                headers={"WWW-Authenticate": "Bearer"}
+            )
+
+        token = authorization.split(" ")[1]
+
+        try:
+            payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        except jwt.ExpiredSignatureError:
+            raise HTTPException(status_code=401, detail="Token has expired")
+        # python-jose's jwt module has no InvalidSignatureError/DecodeError
+        # (those are PyJWT names) — a bad signature or malformed token both
+        # surface as JWTError, caught below.
+        except (JWTError, ValueError) as e:
+            raise HTTPException(status_code=401, detail=f"Token validation failed: {str(e)}")
+        except Exception:
+            raise HTTPException(status_code=401, detail="Token validation error")
+
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token: missing sub claim")
+
+        if payload.get("token_type") == "oauth_access":
+            granted_scopes = set(payload.get("scope", "").split())
+            if required_scope not in granted_scopes:
+                raise HTTPException(status_code=403, detail=f"This connected app is not authorized for '{required_scope}'")
+            if not introspect_is_active(token):
+                raise HTTPException(status_code=401, detail="This connected app's access has been revoked or expired")
+
+        return UUID(user_id)
+
+    return dependency
 
 @router.post("")
 def save_dataset(
@@ -209,20 +276,23 @@ def preview_dataset(
 
 @router.get("")
 def list_datasets(
-    user_id: UUID = Depends(verify_token),
+    user_id: UUID = Depends(require_scope("datasets:read")),
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
     """
     List all datasets for the authenticated user with pagination.
-    
+
+    Reachable by a connected app's datasets:read token (e.g. Biomni browsing
+    what it can import) as well as the CODA UI's own session token.
+
     Args:
         user_id: Verified user ID from JWT
         skip: Number of records to skip (pagination)
         limit: Max records to return
         db: Database session
-    
+
     Returns:
         Paginated list of user's datasets (without results)
     """
@@ -244,17 +314,20 @@ def list_datasets(
 @router.get("/{dataset_id}")
 def get_dataset_detail(
     dataset_id: str,
-    user_id: UUID = Depends(verify_token),
+    user_id: UUID = Depends(require_scope("datasets:read")),
     db: Session = Depends(get_db)
 ):
     """
     Retrieve full dataset details including results.
-    
+
+    Reachable by a connected app's datasets:read token as well as the CODA
+    UI's own session token — see require_scope().
+
     Args:
         dataset_id: Dataset ID to retrieve
         user_id: Verified user ID from JWT
         db: Database session
-    
+
     Returns:
         Full dataset object with results
     """
@@ -262,18 +335,67 @@ def get_dataset_detail(
         dataset_uuid = UUID(dataset_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid dataset ID format")
-    
+
     try:
         dataset_detail = DatasetService.get_dataset_detail(db, dataset_uuid, user_id)
-        
+
         if not dataset_detail:
             raise HTTPException(status_code=404, detail="Dataset not found")
-        
+
         return dataset_detail
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve dataset: {str(e)}")
+
+
+@router.get("/{dataset_id}/export")
+def export_dataset_csv(
+    dataset_id: str,
+    format: str = Query("csv"),
+    user_id: UUID = Depends(require_scope("datasets:read")),
+    db: Session = Depends(get_db)
+):
+    """
+    Export a saved dataset's results as a downloadable file.
+
+    A CODA "dataset" is stored as SPARQL JSON results, not a CSV — this is
+    the endpoint that does that conversion, so any client (Biomni included)
+    gets a real CSV rather than having to reimplement the SPARQL-bindings
+    flattening logic itself. Only `format=csv` is supported today.
+    """
+    if format != "csv":
+        raise HTTPException(status_code=400, detail="Only format=csv is supported")
+
+    try:
+        dataset_uuid = UUID(dataset_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid dataset ID format")
+
+    try:
+        dataset_detail = DatasetService.get_dataset_detail(db, dataset_uuid, user_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve dataset: {str(e)}")
+
+    if not dataset_detail:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+
+    if not dataset_detail.results:
+        raise HTTPException(status_code=422, detail="This dataset has no results to export")
+
+    df = PreviewService.results_to_dataframe(dataset_detail.results)
+
+    buffer = io.StringIO()
+    df.to_csv(buffer, index=False)
+    buffer.seek(0)
+
+    safe_name = "".join(c if c.isalnum() or c in "-_" else "_" for c in (dataset_detail.name or str(dataset_uuid)))
+    return StreamingResponse(
+        iter([buffer.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{safe_name}.csv"'},
+    )
+
 
 @router.put("/{dataset_id}")
 def update_dataset(

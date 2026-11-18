@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends, Header, Request, UploadFile
 from pydantic import BaseModel
 import requests
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import RedirectResponse, JSONResponse, StreamingResponse
 import os
 from jose import jwt, JWTError
 
@@ -68,24 +68,11 @@ def verify_token(authorization: str = Header(...)):
                 "action": "Please sign out and sign in again to continue."
             }
         )
-    except jwt.InvalidSignatureError:
-        raise HTTPException(
-            status_code=401, 
-            detail={
-                "error": "Invalid Token",
-                "detail": "Your authentication token is invalid.",
-                "action": "Please sign out and sign in again."
-            }
-        )
-    except jwt.DecodeError:
-        raise HTTPException(
-            status_code=401, 
-            detail={
-                "error": "Invalid Token",
-                "detail": "Your authentication token could not be verified.",
-                "action": "Please sign out and sign in again."
-            }
-        )
+    # python-jose's jwt module has no InvalidSignatureError/DecodeError (those
+    # are PyJWT names, not jose's) — a bad signature or malformed token both
+    # surface as JWTError, caught below. Referencing those nonexistent
+    # attributes here used to raise an unhandled AttributeError (500) for any
+    # malformed bearer token, instead of the intended 401.
     except JWTError as e:
         raise HTTPException(
             status_code=401, 
@@ -157,6 +144,106 @@ def proxy_auth_callback(request: Request, code: str, state: str):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Auth service error: {str(e)}")
+
+# ============================================================================
+# OAUTH2 PROVIDER PROXY ENDPOINTS (Connected Apps, e.g. Biomni)
+# Validation/consent/scoping is enforced by auth-service — the gateway just
+# forwards, same as the role-management and dataset proxies below.
+# ============================================================================
+
+@app.post("/oauth/authorize")
+async def proxy_oauth_authorize(request: Request):
+    """Proxy POST /oauth/authorize to auth-service. Called by the authenticated
+    consent page in the CODA UI, so it carries the user's session Authorization header."""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+
+        body = await request.json()
+
+        response = requests.post(
+            f"{AUTH_SERVICE_URL}/oauth/authorize",
+            json=body,
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to authorize OAuth request: {str(e)}")
+
+@app.post("/oauth/token")
+async def proxy_oauth_token(request: Request):
+    """Proxy POST /oauth/token to auth-service. Called server-to-server by a
+    connected app's own backend (e.g. Biomni) with its client_secret in the
+    body — never carries a user Authorization header."""
+    try:
+        body = await request.json()
+
+        response = requests.post(
+            f"{AUTH_SERVICE_URL}/oauth/token",
+            json=body,
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to exchange OAuth token: {str(e)}")
+
+@app.get("/oauth/grants")
+async def proxy_oauth_grants(request: Request):
+    """Proxy GET /oauth/grants to auth-service (Connected Apps settings page)."""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+
+        response = requests.get(
+            f"{AUTH_SERVICE_URL}/oauth/grants",
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list OAuth grants: {str(e)}")
+
+@app.delete("/oauth/grants/{grant_id}")
+async def proxy_revoke_oauth_grant(grant_id: str, request: Request):
+    """Proxy DELETE /oauth/grants/{grant_id} to auth-service (revoke a Connected App)."""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+
+        response = requests.delete(
+            f"{AUTH_SERVICE_URL}/oauth/grants/{grant_id}",
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to revoke OAuth grant: {str(e)}")
 
 # ============================================================================
 # ROLE MANAGEMENT PROXY ENDPOINTS (admin only, enforced by auth-service)
@@ -341,8 +428,10 @@ async def proxy_save_dataset(request: Request):
             headers={"Authorization": auth_header},
             timeout=int(DOCKER_API_TIMEOUT)
         )
-        
-        return response.json()
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save dataset: {str(e)}")
 
@@ -363,8 +452,10 @@ async def proxy_list_datasets(request: Request, skip: int = 0, limit: int = 10):
             headers={"Authorization": auth_header},
             timeout=int(DOCKER_API_TIMEOUT)
         )
-        
-        return response.json()
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to list datasets: {str(e)}")
 
@@ -385,15 +476,45 @@ async def proxy_get_dataset(dataset_id: str, request: Request):
             headers={"Authorization": auth_header},
             timeout=int(DOCKER_API_TIMEOUT)
         )
-        
-        if response.status_code == 404:
-            raise HTTPException(status_code=404, detail="Dataset not found")
-        
-        return response.json()
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get dataset: {str(e)}")
+
+@app.get("/datasets/{dataset_id}/export")
+async def proxy_export_dataset(dataset_id: str, request: Request, format: str = "csv"):
+    """Proxy GET /datasets/{dataset_id}/export to dataset-service, streaming
+    back the CSV file (not JSON, unlike the other dataset proxies)."""
+    try:
+        auth_header = request.headers.get("authorization")
+        if not auth_header:
+            raise HTTPException(status_code=401, detail={
+                "error": "Unauthorized",
+                "detail": "Your session has expired.",
+                "action": "Please sign out and sign in again to continue."
+            })
+
+        response = requests.get(
+            f"{DATASET_SERVICE_URL}/datasets/{dataset_id}/export",
+            params={"format": format},
+            headers={"Authorization": auth_header},
+            timeout=int(DOCKER_API_TIMEOUT)
+        )
+
+        if response.status_code != 200:
+            return JSONResponse(status_code=response.status_code, content=response.json())
+
+        return StreamingResponse(
+            iter([response.content]),
+            media_type=response.headers.get("content-type", "text/csv"),
+            headers={"Content-Disposition": response.headers.get("content-disposition", "attachment")},
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to export dataset: {str(e)}")
 
 @app.put("/datasets/{dataset_id}")
 async def proxy_update_dataset(dataset_id: str, request: Request):
@@ -415,11 +536,8 @@ async def proxy_update_dataset(dataset_id: str, request: Request):
             headers={"Authorization": auth_header},
             timeout=int(DOCKER_API_TIMEOUT)
         )
-        
-        if response.status_code == 404:
-            raise HTTPException(status_code=404, detail="Dataset not found")
-        
-        return response.json()
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
     except HTTPException:
         raise
     except Exception as e:
@@ -442,11 +560,8 @@ async def proxy_delete_dataset(dataset_id: str, request: Request):
             headers={"Authorization": auth_header},
             timeout=int(DOCKER_API_TIMEOUT)
         )
-        
-        if response.status_code == 404:
-            raise HTTPException(status_code=404, detail="Dataset not found")
-        
-        return response.json()
+
+        return JSONResponse(status_code=response.status_code, content=response.json())
     except HTTPException:
         raise
     except Exception as e:

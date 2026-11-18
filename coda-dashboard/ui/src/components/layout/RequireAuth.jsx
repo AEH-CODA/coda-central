@@ -1,11 +1,15 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
+import { stashPostLoginRedirect } from '@/lib/auth'
 
 export function RequireAuth() {
   const { isAuthenticated } = useAuth()
   const location = useLocation()
 
   if (!isAuthenticated) {
+    // Stashed durably (not just in router state) so it survives the full
+    // page navigation through Google's login and back — see auth.js.
+    stashPostLoginRedirect(location.pathname + location.search)
     return <Navigate to="/login" replace state={{ from: location }} />
   }
 
