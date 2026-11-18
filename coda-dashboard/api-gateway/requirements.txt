@@ -3,3 +3,4 @@ uvicorn
 requests
 python-jose==3.5.0
 python-multipart==0.0.6
+httpx==0.28.1

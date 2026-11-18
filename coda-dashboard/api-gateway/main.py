@@ -815,3 +815,131 @@ async def proxy_get_user_history(request: Request, skip: int = 0, limit: int = 2
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get user history: {str(e)}")
+
+# ============================================================================
+# OCT INFERENCE PROXY ENDPOINTS (inference-service, see OCT_INFERENCE_PLAN.md §5.1)
+# ============================================================================
+# Uses httpx (async, streaming) instead of requests: uploads can be hundreds of
+# MB and must not be read into gateway memory, and PNGs/downloads are passed
+# through as they arrive. The inference service validates the JWT again and
+# enforces ownership; errors keep its {"detail", "code"} shape.
+
+import uuid as _uuid
+
+import httpx
+from fastapi import Path
+from starlette.background import BackgroundTask
+
+INFERENCE_SERVICE_URL = os.getenv("INFERENCE_SERVICE_URL", "http://inference-api:8002")
+INFERENCE_UPLOAD_TIMEOUT = float(os.getenv("INFERENCE_UPLOAD_TIMEOUT", "120"))
+_INFERENCE_TIMEOUT = float(DOCKER_API_TIMEOUT or 15)
+_INFERENCE_RESPONSE_HEADERS = ("content-type", "content-length", "content-disposition", "cache-control")
+
+_inference_client = httpx.AsyncClient(base_url=INFERENCE_SERVICE_URL)
+
+
+def require_session(authorization: str = Header(None)):
+    """verify_token, but a missing header is a 401 (not FastAPI's 422)."""
+    if not authorization:
+        raise HTTPException(status_code=401, detail={
+            "error": "Unauthorized",
+            "detail": "Your session has expired.",
+            "action": "Please sign out and sign in again to continue."
+        })
+    return verify_token(authorization)
+
+
+async def _proxy_inference(request: Request, path: str, timeout: float = _INFERENCE_TIMEOUT,
+                           stream_body: bool = False):
+    headers = {}
+    if "authorization" in request.headers:
+        headers["Authorization"] = request.headers["authorization"]
+    content = None
+    if request.method in ("POST", "PUT"):
+        for h in ("content-type", "content-length"):
+            if h in request.headers:
+                headers[h] = request.headers[h]
+        content = request.stream() if stream_body else await request.body()
+
+    upstream_request = _inference_client.build_request(
+        request.method, path, params=request.query_params, headers=headers, content=content, timeout=timeout)
+    try:
+        upstream = await _inference_client.send(upstream_request, stream=True)
+    except httpx.TimeoutException:
+        return JSONResponse(status_code=504, content={
+            "detail": "The OCT analysis service did not respond in time. Please try again.",
+            "code": "inference_timeout"})
+    except httpx.HTTPError:
+        return JSONResponse(status_code=502, content={
+            "detail": "The OCT analysis service is unavailable. Please try again later.",
+            "code": "inference_unavailable"})
+
+    return StreamingResponse(
+        upstream.aiter_raw(),
+        status_code=upstream.status_code,
+        headers={h: upstream.headers[h] for h in _INFERENCE_RESPONSE_HEADERS if h in upstream.headers},
+        background=BackgroundTask(upstream.aclose),
+    )
+
+
+@app.get("/inference/health")
+async def proxy_inference_health(request: Request):
+    return await _proxy_inference(request, "/inference/health")
+
+
+@app.get("/inference/models")
+async def proxy_inference_models(request: Request, user=Depends(require_session)):
+    return await _proxy_inference(request, "/inference/models")
+
+
+@app.post("/inference/jobs")
+async def proxy_inference_create_job(request: Request, user=Depends(require_session)):
+    """Multipart upload, streamed straight through to inference-api (never buffered here)."""
+    return await _proxy_inference(request, "/inference/jobs", timeout=INFERENCE_UPLOAD_TIMEOUT, stream_body=True)
+
+
+@app.get("/inference/jobs")
+async def proxy_inference_list_jobs(request: Request, user=Depends(require_session)):
+    return await _proxy_inference(request, "/inference/jobs")
+
+
+@app.get("/inference/jobs/{job_id}")
+async def proxy_inference_get_job(job_id: _uuid.UUID, request: Request, user=Depends(require_session)):
+    return await _proxy_inference(request, f"/inference/jobs/{job_id}")
+
+
+@app.delete("/inference/jobs/{job_id}")
+async def proxy_inference_delete_job(job_id: _uuid.UUID, request: Request, user=Depends(require_session)):
+    return await _proxy_inference(request, f"/inference/jobs/{job_id}")
+
+
+@app.post("/inference/jobs/{job_id}/etdrs")
+async def proxy_inference_etdrs(job_id: _uuid.UUID, request: Request, user=Depends(require_session)):
+    return await _proxy_inference(request, f"/inference/jobs/{job_id}/etdrs")
+
+
+@app.get("/inference/jobs/{job_id}/bscan/{z}.png")
+async def proxy_inference_bscan(job_id: _uuid.UUID, z: int, request: Request, user=Depends(require_session)):
+    return await _proxy_inference(request, f"/inference/jobs/{job_id}/bscan/{z}.png")
+
+
+@app.get("/inference/jobs/{job_id}/overlay/{z}.png")
+async def proxy_inference_overlay(job_id: _uuid.UUID, z: int, request: Request, user=Depends(require_session)):
+    return await _proxy_inference(request, f"/inference/jobs/{job_id}/overlay/{z}.png")
+
+
+@app.get("/inference/jobs/{job_id}/enface/{cls}.png")
+async def proxy_inference_enface(job_id: _uuid.UUID, request: Request,
+                                 cls: str = Path(..., pattern=r"^[A-Za-z0-9_-]{1,32}$"),
+                                 user=Depends(require_session)):
+    return await _proxy_inference(request, f"/inference/jobs/{job_id}/enface/{cls}.png")
+
+
+@app.get("/inference/jobs/{job_id}/labels.npz")
+async def proxy_inference_labels(job_id: _uuid.UUID, request: Request, user=Depends(require_session)):
+    return await _proxy_inference(request, f"/inference/jobs/{job_id}/labels.npz")
+
+
+@app.get("/inference/jobs/{job_id}/result.json")
+async def proxy_inference_result(job_id: _uuid.UUID, request: Request, user=Depends(require_session)):
+    return await _proxy_inference(request, f"/inference/jobs/{job_id}/result.json")

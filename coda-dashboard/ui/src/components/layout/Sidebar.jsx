@@ -1,11 +1,12 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Search, Database, History, LayoutGrid, ShieldCheck, UserCog, LogOut, User } from 'lucide-react'
+import { Search, Database, History, LayoutGrid, ScanEye, ShieldCheck, UserCog, LogOut, User } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
 const baseNavItems = [
   { to: '/', label: 'Query Data', icon: Search, end: true },
   { to: '/saved-datasets', label: 'Saved Datasets', icon: Database },
   { to: '/requests', label: 'My Data Requests', icon: History },
+  { to: '/oct-analysis', label: 'OCT Fluid Analysis', icon: ScanEye },
   { to: '/model-workspace', label: 'Model Workspace', icon: LayoutGrid },
 ]
 

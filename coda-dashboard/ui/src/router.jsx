@@ -14,6 +14,8 @@ import { MyDataRequestsPage } from '@/pages/MyDataRequestsPage'
 import { DataAccessRequestsPage } from '@/pages/DataAccessRequestsPage'
 import { RoleManagementPage } from '@/pages/RoleManagementPage'
 import { ModelWorkspacePage } from '@/pages/ModelWorkspacePage'
+import { OctAnalysisPage } from '@/pages/OctAnalysisPage'
+import { OctReportPage } from '@/pages/OctReportPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -34,6 +36,8 @@ export const router = createBrowserRouter([
             children: [{ path: '/requests', element: <MyDataRequestsPage /> }],
           },
           { path: '/model-workspace', element: <ModelWorkspacePage /> },
+          { path: '/oct-analysis', element: <OctAnalysisPage /> },
+          { path: '/oct-analysis/:jobId', element: <OctReportPage /> },
           {
             element: <RequireRequestManager />,
             children: [{ path: '/admin/requests', element: <DataAccessRequestsPage /> }],

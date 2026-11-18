@@ -20,7 +20,7 @@ export default defineConfig({
     // Mirrors the reverse proxy in ui/nginx.conf so relative API calls
     // (same-origin) also work against the Vite dev server.
     proxy: {
-      '^/(auth|datasets|users|query|role-changes)': 'http://localhost:8000',
+      '^/(auth|datasets|users|query|role-changes|inference)': 'http://localhost:8000',
     },
   },
 })

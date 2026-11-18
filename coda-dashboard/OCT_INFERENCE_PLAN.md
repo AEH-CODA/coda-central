@@ -656,13 +656,45 @@ Built with existing `StatCard` / `DataTable` styles and the design tokens:
 - **En-face PNG encoding.** Each map is drawn in its class colour, with opacity = height: 0 µm is transparent, and opacity runs from 0.25 just above 0 µm to 1 at ≥ 250 µm. Row 0 is the first B-scan in acquisition order. The UI draws the legend and the ETDRS grid on top.
 - **Still open from Phase 0:** clinician review of the contact sheets, especially HARI08S.
 
-### Phase 2: Gateway, nginx and UI (about 2–3 days)
-- [ ] Gateway proxy routes (streamed upload, streamed images) and nginx changes.
-- [ ] Remove the temporary host port 8002 from `inference-api` in `docker-compose.yml`.
-- [ ] Sidebar, routes, `OctAnalysisPage` (upload, jobs list, polling).
-- [ ] `OctReportPage`: volume table, en-face panels with SVG ETDRS grid and click-to-recenter, B-scan viewer with overlay toggle, downloads, disclaimer.
+### Phase 2: Gateway, nginx and UI ✅ done 2026-11-18
+- [x] Gateway proxy routes (streamed upload, streamed images) and nginx changes.
+  - `api-gateway/main.py`: explicit routes for every §5.1 path, proxied with `httpx` (async, streaming both ways), so uploads and PNGs are never buffered in gateway memory. `httpx==0.28.1` added to the gateway requirements.
+  - Path params are validated before forwarding (job id = UUID, `z` = int, class name `[A-Za-z0-9_-]`). A missing token is 401, not 422. `/inference/health` needs no auth.
+  - `INFERENCE_SERVICE_URL` defaults to `http://inference-api:8002`, and `INFERENCE_UPLOAD_TIMEOUT` to 120 s. If the service is down the gateway returns `502 inference_unavailable`; if it times out, `504 inference_timeout`.
+  - `ui/nginx.conf`: `location ^~ /inference/` with `client_max_body_size 300m`, `proxy_request_buffering off`, HTTP/1.1 and 300 s timeouts. `vite.config.js` also proxies `/inference` for `npm run dev`.
+- [x] Remove the temporary host port 8002 from `inference-api` in `docker-compose.yml` (the gateway now `depends_on` it).
+- [x] Sidebar ("OCT Fluid Analysis", `ScanEye`), routes `/oct-analysis` and `/oct-analysis/:jobId`, and `OctAnalysisPage`.
+  - Drag-and-drop upload with a progress bar: XHR, since `fetch` has no upload progress.
+  - The model picker appears only when there is more than one model. Errors show the service's `detail` inline.
+  - The jobs table shows eye, B-scans, status with stage and %, and total nL per class. It polls every 2 s while a job is active; clicking a finished row opens its report; a delete button cancels or deletes. Admins get a "Show all users" toggle.
+- [x] `OctReportPage`: header, volume table, three en-face panels, B-scan viewer, downloads, warnings and disclaimer.
+  - The header shows eye, file, device, scan pattern, study date, and model with its compute device.
+  - The volume table has ETDRS 1/3/6 mm and Total scan columns, marked "partial" when the scan doesn't cover a circle.
+  - The en-face panels are SVG in scan millimetres. The PNG is drawn under the ETDRS circles and diagonals, with a line marking the current B-scan and a 0–250 µm legend. Clicking a map moves the ETDRS centre; "Reset to scan centre" undoes it.
+  - B-scan viewer:
+    - The slider, arrow keys and prev/next buttons step through B-scans; a strip of bars shows fluid area per B-scan.
+    - Views are side by side or one large view with an overlay toggle, plus a per-class area (mm²) readout.
+    - It opens on the B-scan with the most fluid and prefetches neighbouring B-scans.
+  - Images are fetched with the bearer token and shown as blob URLs (`components/oct/useOctHelpers.js`).
+  - New files: `ui/src/lib/inference.js`, `ui/src/components/oct/*`, `ui/src/pages/Oct{Analysis,Report}Page.jsx`.
 
 **Exit criteria:** the full flow works in the browser locally on CPU.
+
+#### Phase 2 results ✅ done 2026-11-18
+- **Exit criteria met.** With the full stack running locally (`docker compose up -d --build`), a scripted headless Chrome session against `http://localhost:5000` ran the whole flow without console errors.
+  - It signed in with a test JWT and opened OCT Fluid Analysis.
+  - It uploaded `HARI08S_oct_1.dcm` through the file input and watched the job go from queued to running to succeeded on CPU.
+  - It then opened the report, moved the ETDRS centre by clicking an en-face map (the IRF 1 mm value changed from 0.00 to 10.6 nL), reset it, stepped B-scans with the arrow keys and switched to the single view.
+- Through nginx → gateway → inference-api:
+  - Volumes are identical to Phase 1.
+  - No token gives 401, and a bad job id gives 422.
+  - A non-DICOM file gives `422 invalid_dicom`; a 310 MB file gives 413 from nginx.
+  - Gateway memory stayed flat (~52 MB) during a 200 MB upload, so uploads are streamed.
+  - Port 8002 is no longer reachable from the host.
+- Lint (`oxlint`) is clean and `npm run build` passes. The existing >500 kB bundle warning is unchanged.
+- **Notes for Phase 3:**
+  - En-face orientation is shown literally: top = B-scan 1, left = first A-scan. It has not been mapped to superior/inferior or nasal/temporal; that needs the scan's acquisition orientation and is worth confirming with the clinician during the HARI08S review.
+  - The gateway has no test suite; its inference routes were checked against the running stack only.
 
 ### Phase 3: Deploy to the GCP VM with the T4 (about 0.5–1 day)
 - [ ] Driver and nvidia-container-toolkit setup (§6.1), copy the model package, bring up with the GPU override.

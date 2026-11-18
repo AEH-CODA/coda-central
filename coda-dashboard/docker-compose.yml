@@ -11,6 +11,7 @@ services:
       - auth-service
       - user-db
       - dataset-service
+      - inference-api
     env_file:
       - ./api-gateway/.env
 
@@ -94,8 +95,7 @@ services:
     build: ./inference-service
     image: coda-inference-service
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]
-    ports:
-      - "8002:8002"
+    # internal only: reached through api-gateway (/inference/*)
     depends_on:
       - inference-db
     env_file:
